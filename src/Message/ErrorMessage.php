@@ -62,6 +62,14 @@ class ErrorMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'ERROR';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

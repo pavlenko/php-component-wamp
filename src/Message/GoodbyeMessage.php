@@ -35,6 +35,14 @@ class GoodbyeMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'GOODBYE';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

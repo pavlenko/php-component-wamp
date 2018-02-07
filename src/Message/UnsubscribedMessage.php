@@ -30,6 +30,14 @@ class UnsubscribedMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'UNSUBSCRIBED';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

@@ -40,6 +40,14 @@ class ResultMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'RESULT';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

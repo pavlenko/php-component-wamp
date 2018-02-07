@@ -40,6 +40,14 @@ class SubscribeMessage extends Message implements ActionInterface
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'SUBSCRIBE';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

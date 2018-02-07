@@ -37,6 +37,14 @@ class RegisteredMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'REGISTERED';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

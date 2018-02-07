@@ -37,6 +37,14 @@ class HelloMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'HELLO';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

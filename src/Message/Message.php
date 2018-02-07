@@ -10,6 +10,11 @@ abstract class Message implements \JsonSerializable
     abstract public function getCode();
 
     /**
+     * @return string
+     */
+    abstract public function getName();
+
+    /**
      * @return array
      */
     abstract public function getParts();

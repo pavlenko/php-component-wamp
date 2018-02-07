@@ -30,6 +30,14 @@ class UnregisteredMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'UNREGISTERED';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

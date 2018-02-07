@@ -41,6 +41,14 @@ class ChallengeMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'CHALLENGE';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

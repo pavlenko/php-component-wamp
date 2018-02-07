@@ -52,6 +52,14 @@ class CallMessage extends Message implements ActionInterface
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'CALL';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

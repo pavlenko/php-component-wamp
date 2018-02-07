@@ -37,6 +37,14 @@ class SubscribedMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'SUBSCRIBED';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

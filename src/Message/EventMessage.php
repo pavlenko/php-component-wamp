@@ -56,6 +56,14 @@ class EventMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'EVENT';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

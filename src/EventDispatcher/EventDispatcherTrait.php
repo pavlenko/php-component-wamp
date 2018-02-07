@@ -33,6 +33,8 @@ trait EventDispatcherTrait
      * @param string   $eventName
      * @param callable $listener
      * @param int      $priority
+     *
+     * @deprecated
      */
     public function on($eventName, callable $listener, $priority = 0)
     {
@@ -42,6 +44,8 @@ trait EventDispatcherTrait
     /**
      * @param string   $eventName
      * @param callable $listener
+     *
+     * @deprecated
      */
     public function off($eventName, callable $listener)
     {
@@ -52,6 +56,8 @@ trait EventDispatcherTrait
      * @param string   $eventName
      * @param callable $listener
      * @param int      $priority
+     *
+     * @deprecated
      */
     public function once($eventName, callable $listener, $priority = 0)
     {
@@ -67,6 +73,8 @@ trait EventDispatcherTrait
     /**
      * @param string $eventName
      * @param mixed  $payload
+     *
+     * @deprecated
      */
     public function emit($eventName, $payload = null)
     {

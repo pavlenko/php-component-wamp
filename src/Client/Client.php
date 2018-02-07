@@ -2,8 +2,8 @@
 
 namespace PE\Component\WAMP\Client;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Client\Event\ConnectionEvent;
@@ -17,19 +17,16 @@ use PE\Component\WAMP\Client\Role\Subscriber;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\ErrorURI;
-use PE\Component\WAMP\EventDispatcher\EventDispatcherTrait;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Client implements LoggerAwareInterface
+class Client
 {
-    use LoggerAwareTrait;
-    use EventDispatcherTrait;
-
     /**
      * @var string
      */
@@ -46,6 +43,16 @@ class Client implements LoggerAwareInterface
     private $loop;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
      * @var Session
      */
     private $session;
@@ -55,13 +62,47 @@ class Client implements LoggerAwareInterface
      */
     private $roles = [];
 
-    public function __construct($realm, TransportInterface $transport, LoopInterface $loop = null)
-    {
-        $this->realm     = $realm;
-        $this->transport = $transport;
-        $this->loop      = $loop ?: Factory::create();
+    public function __construct(
+        $realm,
+        TransportInterface $transport,
+        LoopInterface $loop = null,
+        EventDispatcherInterface $dispatcher = null,
+        LoggerInterface $logger = null
+    ) {
+        $this->realm      = $realm;
+        $this->transport  = $transport;
+        $this->loop       = $loop ?: Factory::create();
+        $this->dispatcher = $dispatcher ?: new EventDispatcher();
+        $this->logger     = $logger ?: new NullLogger();
 
-        $this->dispatcher = new EventDispatcher();
+        //TODO move to debug subscriber (client module interface)
+        $this->dispatcher->addListener(Events::MESSAGE_SEND, function (MessageEvent $event) {
+            $this->logger->info('<' . $event->getMessage()->getName());
+        });
+    }
+
+    /**
+     * @return TransportInterface
+     */
+    public function getTransport()
+    {
+        return $this->transport;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 
     /**
@@ -71,9 +112,11 @@ class Client implements LoggerAwareInterface
      */
     public function onOpen(ConnectionInterface $connection)
     {
+        $this->logger->info('Connection opened');
+
         $this->session = new Session($connection, $this);
 
-        $this->emit(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
+        $this->dispatcher->dispatch(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
 
         $this->session->send(new HelloMessage($this->realm, []));
     }
@@ -85,8 +128,10 @@ class Client implements LoggerAwareInterface
      */
     public function onClose($reason)
     {
+        $this->logger->info('Connection closed');
+
         if ($this->session) {
-            $this->emit(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
+            $this->dispatcher->dispatch(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
 
             $this->session->shutdown();
             $this->session = null;
@@ -100,8 +145,9 @@ class Client implements LoggerAwareInterface
      *
      * @param Message $message
      */
-    public function onMessage(Message $message)
+    public function onMessageReceived(Message $message)
     {
+        $this->logger->info('> ' . $message->getName());
         //TODO handle authentication
         //TODO handle authorization
 
@@ -117,7 +163,7 @@ class Client implements LoggerAwareInterface
                 $this->session->shutdown();
                 break;
             default:
-                $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
+                $this->dispatcher->dispatch(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
         }
     }
 
@@ -128,7 +174,8 @@ class Client implements LoggerAwareInterface
      */
     public function onError($error)
     {
-        $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
+        $this->logger->error($error);
+        $this->dispatcher->dispatch(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
     }
 
     /**
@@ -136,6 +183,7 @@ class Client implements LoggerAwareInterface
      */
     public function start($startLoop = true)
     {
+        $this->logger->info('Starting transport');
         $this->transport->start($this, $this->loop);
 
         if ($startLoop) {

@@ -35,6 +35,14 @@ class WelcomeMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'WELCOME';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

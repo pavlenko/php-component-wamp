@@ -12,14 +12,28 @@ class WebSocketTransport implements TransportInterface
     /**
      * @var string
      */
-    private $URL;
+    private $host;
 
     /**
-     * @param string $URL
+     * @var int
      */
-    public function __construct($URL = 'ws://127.0.0.1:8080/')
+    private $port;
+
+    /**
+     * @var bool
+     */
+    private $secure;
+
+    /**
+     * @param string $host
+     * @param int    $port
+     * @param bool   $secure
+     */
+    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false)
     {
-        $this->URL = $URL;
+        $this->host   = $host;
+        $this->port   = $port;
+        $this->secure = $secure;
     }
 
     /**
@@ -27,7 +41,9 @@ class WebSocketTransport implements TransportInterface
      */
     public function start(Client $client, LoopInterface $loop)
     {
-        \Ratchet\Client\connect($this->URL, ['wamp.2.json'], [], $loop)->then(
+        $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
+
+        \Ratchet\Client\connect($url, ['wamp.2.json'], [], $loop)->then(
             function (WebSocket $socket) use ($client) {
                 $connection = new WebSocketConnection($socket);
                 $connection->setSerializer(new Serializer());
@@ -35,7 +51,7 @@ class WebSocketTransport implements TransportInterface
                 $client->onOpen($connection);
 
                 $socket->on('message', function ($message) use ($client, $connection) {
-                    $client->onMessage($connection->getSerializer()->deserialize($message));
+                    $client->onMessageReceived($connection->getSerializer()->deserialize($message));
                 });
 
                 $socket->on('close', function ($code, $reason) use ($client) {
@@ -48,6 +64,7 @@ class WebSocketTransport implements TransportInterface
             },
             function (\Exception $exception) use ($client) {
                 $client->onClose('unreachable');
+                $client->onError($exception->getMessage());
             }
         );
     }

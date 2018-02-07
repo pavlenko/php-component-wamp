@@ -47,6 +47,14 @@ class InvocationMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'INVOCATION';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

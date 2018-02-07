@@ -34,6 +34,14 @@ class InterruptMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'INTERRUPT';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

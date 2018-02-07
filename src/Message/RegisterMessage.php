@@ -40,6 +40,14 @@ class RegisterMessage extends Message implements ActionInterface
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'REGISTER';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

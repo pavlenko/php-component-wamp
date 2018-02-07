@@ -34,6 +34,14 @@ class CancelMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'CANCEL';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

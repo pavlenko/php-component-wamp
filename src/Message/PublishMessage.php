@@ -47,6 +47,14 @@ class PublishMessage extends Message implements ActionInterface
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'PUBLISH';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

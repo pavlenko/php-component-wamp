@@ -42,6 +42,14 @@ class HeartbeatMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'HEARTBEAT';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

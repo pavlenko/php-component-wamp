@@ -35,6 +35,14 @@ class AbortMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'ABORT';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

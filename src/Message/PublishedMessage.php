@@ -37,6 +37,14 @@ class PublishedMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'PUBLISHED';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

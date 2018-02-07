@@ -41,6 +41,14 @@ class AuthenticateMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'AUTHENTICATE';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()

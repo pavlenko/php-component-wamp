@@ -40,6 +40,14 @@ class YieldMessage extends Message
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'YIELD';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParts()
