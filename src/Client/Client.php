@@ -148,7 +148,6 @@ class Client
     public function onMessageReceived(Message $message)
     {
         $this->logger->info('> ' . $message->getName());
-        $this->logger->debug('{m}', ['m' => json_encode($message, JSON_PRETTY_PRINT)]);
         //TODO handle authentication
         //TODO handle authorization
 

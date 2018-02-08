@@ -50,14 +50,14 @@ class Session extends \PE\Component\WAMP\Session
     }
 
     /**
-     * @param string     $topicName
-     * @param array|null $arguments
-     * @param array|null $argumentsKw
-     * @param array|null $options
+     * @param string $topic
+     * @param array  $arguments
+     * @param array  $argumentsKw
+     * @param array  $options
      */
-    public function publish($topicName, $arguments = null, $argumentsKw = null, array $options = null)
+    public function publish($topic, array $arguments = [], array $argumentsKw = [], array $options = [])
     {
-        $this->client->getPublisher()->publish($this, $topicName, $arguments, $argumentsKw, $options);
+        $this->client->getPublisher()->publish($this, $topic, $arguments, $argumentsKw, $options);
     }
 
     /**
