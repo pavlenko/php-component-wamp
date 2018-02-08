@@ -77,7 +77,7 @@ class Client
 
         //TODO move to debug subscriber (client module interface)
         $this->dispatcher->addListener(Events::MESSAGE_SEND, function (MessageEvent $event) {
-            $this->logger->info('<' . $event->getMessage()->getName());
+            $this->logger->info('< ' . $event->getMessage()->getName());
         });
     }
 
