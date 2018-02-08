@@ -20,6 +20,11 @@ final class Events
     const CONNECTION_ERROR = 'wamp.client.connection_error';
 
     /**
+     * @Event("\PE\Component\WAMP\Client\Event\ConnectionEvent")
+     */
+    const SESSION_ESTABLISHED = 'wamp.client.session_established';
+
+    /**
      * @Event("\PE\Component\WAMP\Client\Event\MessageEvent")
      */
     const MESSAGE_RECEIVED = 'wamp.client.message_received';

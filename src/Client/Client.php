@@ -155,7 +155,7 @@ class Client
         switch (true) {
             case ($message instanceof WelcomeMessage):
                 $this->session->setSessionID($message->getSessionId());
-                //TODO trigger session established, at this point allowed pubsub & rpc methods
+                $this->dispatcher->dispatch(Events::SESSION_ESTABLISHED, new ConnectionEvent($this->session));
                 break;
             case ($message instanceof AbortMessage):
                 $this->session->shutdown();
