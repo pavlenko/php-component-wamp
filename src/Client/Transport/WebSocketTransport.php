@@ -64,7 +64,7 @@ class WebSocketTransport implements TransportInterface
             },
             function (\Exception $exception) use ($client) {
                 $client->onClose('unreachable');
-                $client->onError($exception->getMessage());
+                $client->onError($exception);
             }
         );
     }

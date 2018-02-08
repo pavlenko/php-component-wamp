@@ -148,6 +148,7 @@ class Client
     public function onMessageReceived(Message $message)
     {
         $this->logger->info('> ' . $message->getName());
+        $this->logger->debug('{m}', ['m' => json_encode($message, JSON_PRETTY_PRINT)]);
         //TODO handle authentication
         //TODO handle authorization
 
@@ -170,11 +171,11 @@ class Client
     /**
      * Handle connection error (called directly from transport)
      *
-     * @param $error
+     * @param \Exception $error
      */
-    public function onError($error)
+    public function onError(\Exception $error)
     {
-        $this->logger->error($error);
+        $this->logger->error($error->getMessage());
         $this->dispatcher->dispatch(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
     }
 

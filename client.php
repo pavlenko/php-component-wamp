@@ -15,7 +15,7 @@ $client = new Client(
     new WebSocketTransport('127.0.0.1', 1337, false),
     null,
     null,
-    new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_VERY_VERBOSE))
+    new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 );
 
 $client->start();
