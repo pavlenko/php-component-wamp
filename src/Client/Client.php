@@ -25,7 +25,7 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Client
+final class Client implements ClientInterface
 {
     /**
      * @var string
@@ -169,6 +169,14 @@ class Client
     }
 
     /**
+     * @inheritDoc
+     */
+    public function onMessageSend(Message $message)
+    {
+        // TODO: Implement onMessageSend() method.
+    }
+
+    /**
      * Handle connection error (called directly from transport)
      *
      * @param \Exception $error
@@ -177,6 +185,22 @@ class Client
     {
         $this->logger->error($error->getMessage());
         $this->dispatcher->dispatch(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTransport(TransportInterface $transport)
+    {
+        $this->transport = $transport;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -194,7 +218,10 @@ class Client
 
     private function reconnect()
     {
-        //TODO
+        // TODO: Implement reconnect() method.
+        $this->loop->addTimer($this->retryTimer, function () {
+            $this->transport->start($this, $this->loop);
+        });
     }
 
     /**
