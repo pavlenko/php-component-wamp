@@ -9,6 +9,9 @@ use Psr\Log\LoggerInterface;
 
 interface ClientInterface
 {
+    const RECONNECT_TIMEOUT  = 1.5;
+    const RECONNECT_ATTEMPTS = 15;
+
     /**
      * Handle connection opened, called from transport
      *
@@ -59,7 +62,21 @@ interface ClientInterface
     public function setLogger(LoggerInterface $logger);
 
     /**
+     * Set reconnect timeout in seconds
+     *
+     * @param int $timeout
+     */
+    public function setReconnectTimeout($timeout);
+
+    /**
+     * Set reconnect attempts
+     *
+     * @param int $attempts
+     */
+    public function setReconnectAttempts($attempts);
+
+    /**
      * Start client
      */
-    public function start();
+    public function connect();
 }

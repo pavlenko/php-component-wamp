@@ -38,14 +38,29 @@ final class Client implements ClientInterface
     private $transport;
 
     /**
-     * @var LoopInterface
-     */
-    private $loop;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var int
+     */
+    private $reconnectTimeout = self::RECONNECT_TIMEOUT;
+
+    /**
+     * @var int
+     */
+    private $reconnectAttempts = self::RECONNECT_ATTEMPTS;
+
+    /**
+     * @var int
+     */
+    private $_reconnectAttempt = 0;
+
+    /**
+     * @var LoopInterface
+     */
+    private $loop;
 
     /**
      * @var EventDispatcherInterface
@@ -204,9 +219,25 @@ final class Client implements ClientInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function setReconnectTimeout($timeout)
+    {
+        $this->reconnectTimeout = (int) $timeout;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setReconnectAttempts($attempts)
+    {
+        $this->reconnectAttempts = (int) $attempts;
+    }
+
+    /**
      * @param bool $startLoop
      */
-    public function start($startLoop = true)
+    public function connect($startLoop = true)
     {
         $this->logger->info('Starting transport');
         $this->transport->start($this, $this->loop);
@@ -216,10 +247,19 @@ final class Client implements ClientInterface
         }
     }
 
+    /**
+     * Reconnect logic
+     */
     private function reconnect()
     {
-        // TODO: Implement reconnect() method.
-        $this->loop->addTimer($this->retryTimer, function () {
+        if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
+            // Max retry attempts reached
+            return;
+        }
+
+        $this->_reconnectAttempt++;
+
+        $this->loop->addTimer($this->reconnectTimeout, function () {
             $this->transport->start($this, $this->loop);
         });
     }

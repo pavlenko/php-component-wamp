@@ -35,4 +35,4 @@ $client->getDispatcher()->addListener(Events::SESSION_ESTABLISHED, function (Con
     $session->publish('foo');
 });
 
-$client->start();
+$client->connect();
