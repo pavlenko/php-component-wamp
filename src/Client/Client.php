@@ -239,7 +239,8 @@ final class Client implements ClientInterface
      */
     public function connect($startLoop = true)
     {
-        $this->logger->info('Starting transport');
+        //$this->logger->info('Starting transport');
+        $this->_reconnectAttempt = 0;
         $this->transport->start($this, $this->loop);
 
         if ($startLoop) {
@@ -254,8 +255,11 @@ final class Client implements ClientInterface
     {
         if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
             // Max retry attempts reached
+            $this->logger->error('Unable to connect after {n} attempts', ['n' => $this->reconnectAttempts]);
             return;
         }
+
+        $this->logger->warning('Reconnect after {n} seconds', ['n' => $this->reconnectTimeout]);
 
         $this->_reconnectAttempt++;
 

@@ -2,13 +2,18 @@
 
 namespace PE\Component\WAMP\Client\Transport;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Serializer\Serializer;
 
-class WebSocketTransport implements TransportInterface
+class WebSocketTransport implements TransportInterface,  LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var string
      */
@@ -25,15 +30,22 @@ class WebSocketTransport implements TransportInterface
     private $secure;
 
     /**
+     * @var int
+     */
+    private $timeout;
+
+    /**
      * @param string $host
      * @param int    $port
      * @param bool   $secure
+     * @param int    $timeout
      */
-    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false)
+    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false, $timeout = 20)
     {
-        $this->host   = $host;
-        $this->port   = $port;
-        $this->secure = $secure;
+        $this->host    = $host;
+        $this->port    = $port;
+        $this->secure  = $secure;
+        $this->timeout = $timeout;
     }
 
     /**
@@ -43,7 +55,15 @@ class WebSocketTransport implements TransportInterface
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 
-        \Ratchet\Client\connect($url, ['wamp.2.json'], [], $loop)->then(
+        !$this->logger ?: $this->logger->info('Connecting to {url} ...', ['url' => $url]);
+
+        $connector = new Connector(
+            $loop,
+            new \React\Socket\Connector($loop, ['timeout' => $this->timeout])
+        );
+
+        $promise = $connector($url, ['wamp.2.json'], []);
+        $promise->then(
             function (WebSocket $socket) use ($client) {
                 $connection = new WebSocketConnection($socket);
                 $connection->setSerializer(new Serializer());

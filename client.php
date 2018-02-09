@@ -11,16 +11,23 @@ use PE\Component\WAMP\Client\Transport\WebSocketTransport;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Debug\Debug;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+$logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG));
+
+$transport = new WebSocketTransport('127.0.0.1', 1337, false, 5);
+$transport->setLogger($logger);
+
 $client = new Client(
     'realm1',
-    new WebSocketTransport('127.0.0.1', 1337, false),
+    $transport,
     null,
     null,
-    new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
+    $logger
 );
+$client->setReconnectAttempts(3);
 
 $client->addRole(new Subscriber());
 $client->addRole(new Publisher());
