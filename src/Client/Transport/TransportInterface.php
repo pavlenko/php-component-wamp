@@ -2,14 +2,14 @@
 
 namespace PE\Component\WAMP\Client\Transport;
 
+use PE\Component\WAMP\Client\ClientInterface;
 use React\EventLoop\LoopInterface;
-use PE\Component\WAMP\Client\Client;
 
 interface TransportInterface
 {
     /**
-     * @param Client        $client
-     * @param LoopInterface $loop
+     * @param ClientInterface $client
+     * @param LoopInterface   $loop
      */
-    public function start(Client $client, LoopInterface $loop);
+    public function start(ClientInterface $client, LoopInterface $loop);
 }
