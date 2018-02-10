@@ -20,13 +20,9 @@ $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 $transport = new WebSocketTransport('127.0.0.1', 1337, false, 5);
 $transport->setLogger($logger);
 
-$client = new Client(
-    'realm1',
-    $transport,
-    null,
-    null,
-    $logger
-);
+$client = new Client('realm1');
+$client->setTransport($transport);
+$client->setLogger($logger);
 $client->setReconnectAttempts(3);
 
 $client->addRole(new Subscriber());

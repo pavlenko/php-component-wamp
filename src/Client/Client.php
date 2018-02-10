@@ -3,7 +3,6 @@
 namespace PE\Component\WAMP\Client;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Client\Event\ConnectionEvent;
@@ -79,29 +78,16 @@ final class Client implements ClientInterface
 
     public function __construct(
         $realm,
-        TransportInterface $transport,
-        LoopInterface $loop = null,
-        EventDispatcherInterface $dispatcher = null,
-        LoggerInterface $logger = null
+        LoopInterface $loop = null
     ) {
         $this->realm      = $realm;
-        $this->transport  = $transport;
         $this->loop       = $loop ?: Factory::create();
-        $this->dispatcher = $dispatcher ?: new EventDispatcher();
-        $this->logger     = $logger ?: new NullLogger();
+        $this->dispatcher = new EventDispatcher();
 
         //TODO move to debug subscriber (client module interface)
         $this->dispatcher->addListener(Events::MESSAGE_SEND, function (MessageEvent $event) {
             $this->logger->info('< ' . $event->getMessage()->getName());
         });
-    }
-
-    /**
-     * @return TransportInterface
-     */
-    public function getTransport()
-    {
-        return $this->transport;
     }
 
     /**
@@ -127,7 +113,8 @@ final class Client implements ClientInterface
      */
     public function onOpen(ConnectionInterface $connection)
     {
-        $this->logger->info('Connection opened');
+        $this->_reconnectAttempt = 0;
+        !$this->logger ?: $this->logger->info('Connection opened');
 
         $this->session = new Session($connection, $this);
 
@@ -143,7 +130,7 @@ final class Client implements ClientInterface
      */
     public function onClose($reason)
     {
-        $this->logger->info('Connection closed');
+        !$this->logger ?: $this->logger->info('Connection closed: ' . $reason);
 
         if ($this->session) {
             $this->dispatcher->dispatch(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
@@ -239,8 +226,11 @@ final class Client implements ClientInterface
      */
     public function connect($startLoop = true)
     {
+        if (null === $this->transport) {
+            throw new \RuntimeException('Transport not set via setTransport()');
+        }
+
         //$this->logger->info('Starting transport');
-        $this->_reconnectAttempt = 0;
         $this->transport->start($this, $this->loop);
 
         if ($startLoop) {
@@ -255,11 +245,11 @@ final class Client implements ClientInterface
     {
         if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
             // Max retry attempts reached
-            $this->logger->error('Unable to connect after {n} attempts', ['n' => $this->reconnectAttempts]);
+            !$this->logger ?: $this->logger->error('Unable to connect after {n} attempts', ['n' => $this->reconnectAttempts]);
             return;
         }
 
-        $this->logger->warning('Reconnect after {n} seconds', ['n' => $this->reconnectTimeout]);
+        !$this->logger ?: $this->logger->warning('Reconnect after {n} seconds', ['n' => $this->reconnectTimeout]);
 
         $this->_reconnectAttempt++;
 
