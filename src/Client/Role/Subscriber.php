@@ -15,6 +15,9 @@ use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Util;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 
 class Subscriber implements RoleInterface
 {
@@ -76,6 +79,8 @@ class Subscriber implements RoleInterface
      * @param string     $topic
      * @param callable   $callback
      * @param array|null $options
+     *
+     * @return PromiseInterface
      */
     public function subscribe(Session $session, $topic, callable $callback, array $options = null)
     {
@@ -84,32 +89,46 @@ class Subscriber implements RoleInterface
 
         $subscription = new Subscription($topic, $callback);
         $subscription->setSubscribeRequestID($requestID);
+        $subscription->setSubscribeDeferred($deferred = new Deferred());
 
         $this->subscriptions[] = $subscription;
 
         $session->send(new SubscribeMessage($requestID, $options, $topic));
+
+        return $deferred->promise();
     }
 
     /**
      * @param Session  $session
      * @param string   $topic
      * @param callable $callback
+     *
+     * @return PromiseInterface
      */
     public function unsubscribe(Session $session, $topic, callable $callback)
     {
         $requestID = Util::generateID();
 
-        $subscriptionID = null;
-        foreach ($this->subscriptions as $subscription) {
-            if ($subscription->getTopic() === $topic && $subscription->getCallback() === $callback) {
-                $subscriptionID = $subscription->getSubscriptionID();
+        $subscription = null;
+        foreach ($this->subscriptions as $item) {
+            if ($item->getTopic() === $topic && $item->getCallback() === $callback) {
+                $subscription = $item;
                 break;
             }
         }
 
-        if ($subscriptionID) {
-            $session->send(new UnsubscribeMessage($requestID, $subscriptionID));
+        if ($subscription) {
+            $subscription->getSubscribeDeferred()->reject();
+
+            $subscription->setUnsubscribeRequestID($requestID);
+            $subscription->setUnsubscribeDeferred($deferred = new Deferred());
+
+            $session->send(new UnsubscribeMessage($requestID, $subscription->getSubscriptionID()));
+
+            return $deferred->promise();
         }
+
+        return new RejectedPromise();
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace PE\Component\WAMP\Client;
 
+use React\Promise\Deferred;
+
 class Subscription
 {
     /**
@@ -28,6 +30,16 @@ class Subscription
      * @var int
      */
     private $subscriptionID;
+
+    /**
+     * @var Deferred
+     */
+    private $subscribeDeferred;
+
+    /**
+     * @var Deferred
+     */
+    private $unsubscribeDeferred;
 
     /**
      * @param string   $topic
@@ -101,5 +113,37 @@ class Subscription
     public function setSubscriptionID($subscriptionID)
     {
         $this->subscriptionID = (int) $subscriptionID;
+    }
+
+    /**
+     * @return Deferred
+     */
+    public function getSubscribeDeferred()
+    {
+        return $this->subscribeDeferred;
+    }
+
+    /**
+     * @param Deferred $deferred
+     */
+    public function setSubscribeDeferred(Deferred $deferred)
+    {
+        $this->subscribeDeferred = $deferred;
+    }
+
+    /**
+     * @return Deferred
+     */
+    public function getUnsubscribeDeferred()
+    {
+        return $this->unsubscribeDeferred;
+    }
+
+    /**
+     * @param Deferred $deferred
+     */
+    public function setUnsubscribeDeferred(Deferred $deferred)
+    {
+        $this->unsubscribeDeferred = $deferred;
     }
 }
