@@ -31,6 +31,9 @@ $client->addRole(new Publisher());
 $client->getDispatcher()->addListener(Events::SESSION_ESTABLISHED, function (ConnectionEvent $event) {
     $session = $event->getSession();
 
+    //$subscriber = new Subscriber();
+    //$subscriber->subscribe('foo', function () {});
+
     $session->subscribe('foo', function () {
         echo json_encode(func_get_args()) . "\n";
     });

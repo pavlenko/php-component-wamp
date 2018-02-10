@@ -34,6 +34,8 @@ class Session extends \PE\Component\WAMP\Session
      * @param string     $topic
      * @param callable   $callback
      * @param array|null $options
+     *
+     * @deprecated Use role directly instead
      */
     public function subscribe($topic, callable $callback, array $options = null)
     {
@@ -43,6 +45,8 @@ class Session extends \PE\Component\WAMP\Session
     /**
      * @param string   $topic
      * @param callable $callback
+     *
+     * @deprecated Use role directly instead
      */
     public function unsubscribe($topic, callable $callback)
     {
@@ -54,6 +58,8 @@ class Session extends \PE\Component\WAMP\Session
      * @param array  $arguments
      * @param array  $argumentsKw
      * @param array  $options
+     *
+     * @deprecated Use role directly instead
      */
     public function publish($topic, array $arguments = [], array $argumentsKw = [], array $options = [])
     {
@@ -64,6 +70,8 @@ class Session extends \PE\Component\WAMP\Session
      * @param string     $procedureURI
      * @param callable   $callback
      * @param array|null $options
+     *
+     * @deprecated Use role directly instead
      */
     public function register($procedureURI, callable $callback, array $options = null)
     {
@@ -72,6 +80,8 @@ class Session extends \PE\Component\WAMP\Session
 
     /**
      * @param string $procedureURI
+     *
+     * @deprecated Use role directly instead
      */
     public function unregister($procedureURI)
     {
@@ -83,6 +93,8 @@ class Session extends \PE\Component\WAMP\Session
      * @param array|null $arguments
      * @param array|null $argumentsKw
      * @param array|null $options
+     *
+     * @deprecated Use role directly instead
      */
     public function call($procedureURI, $arguments = null, $argumentsKw = null, $options = null)
     {
@@ -92,6 +104,8 @@ class Session extends \PE\Component\WAMP\Session
     /**
      * @param string     $procedureIRI
      * @param array|null $options
+     *
+     * @deprecated Use role directly instead
      */
     public function cancel($procedureIRI, array $options = null)
     {
