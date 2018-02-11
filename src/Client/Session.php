@@ -31,19 +31,6 @@ class Session extends \PE\Component\WAMP\Session
     }
 
     /**
-     * @param string $topic
-     * @param array  $arguments
-     * @param array  $argumentsKw
-     * @param array  $options
-     *
-     * @deprecated Use role directly instead
-     */
-    public function publish($topic, array $arguments = [], array $argumentsKw = [], array $options = [])
-    {
-        $this->client->getPublisher()->publish($this, $topic, $arguments, $argumentsKw, $options);
-    }
-
-    /**
      * @param string     $procedureURI
      * @param callable   $callback
      * @param array|null $options

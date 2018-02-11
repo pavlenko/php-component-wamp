@@ -27,6 +27,11 @@ class Subscriber implements RoleInterface
      */
     private $session;
 
+    /**
+     * @param Session|null $session
+     *
+     * @TODO split to API & Handler|Module|smth
+     */
     public function __construct(Session $session = null)
     {
         $this->session = $session;

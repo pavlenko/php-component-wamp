@@ -4,19 +4,30 @@ namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
-use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\PublishedMessage;
 use PE\Component\WAMP\Message\PublishMessage;
+use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
+use React\Promise\Deferred;
+use React\Promise\FulfilledPromise;
+use React\Promise\PromiseInterface;
 
 class Publisher implements RoleInterface
 {
     /**
-     * @var array
+     * @var Session
      */
-    private $requests = [];
+    private $session;
+
+    /**
+     * @param Session|null $session
+     */
+    public function __construct(Session $session = null)
+    {
+        $this->session = $session;
+    }
 
     /**
      * @inheritDoc
@@ -34,14 +45,15 @@ class Publisher implements RoleInterface
      */
     public function onMessageReceived(MessageEvent $event)
     {
+        $session = $event->getSession();
         $message = $event->getMessage();
 
         switch (true) {
             case ($message instanceof PublishedMessage):
-                $this->processPublishedMessage($message);
+                $this->processPublishedMessage($session, $message);
                 break;
             case ($message instanceof ErrorMessage):
-                $this->processErrorMessage($message);
+                $this->processErrorMessage($session, $message);
                 break;
         }
     }
@@ -61,40 +73,60 @@ class Publisher implements RoleInterface
     }
 
     /**
-     * @param Session $session
-     * @param string  $topic
-     * @param array   $arguments
-     * @param array   $argumentsKw
-     * @param array   $options
+     * @param string $topic
+     * @param array  $arguments
+     * @param array  $argumentsKw
+     * @param array  $options
+     *
+     * @return PromiseInterface
+     *
+     * @throws \InvalidArgumentException
      */
-    public function publish(Session $session, $topic, array $arguments, array $argumentsKw, array $options)
+    public function publish($topic, array $arguments, array $argumentsKw, array $options)
     {
         $requestID = Util::generateID();
+        $deferred  = null;
 
         if (isset($options['acknowledge']) && true === $options['acknowledge']) {
-            $this->requests[$requestID] = true;
+            if (!is_array($this->session->publishRequests)) {
+                $this->session->publishRequests = [];
+            }
+
+            $this->session->publishRequests[$requestID] = $deferred = new Deferred();
         }
 
-        $session->send(new PublishMessage($requestID, $options, $topic, $arguments, $argumentsKw));
+        $this->session->send(new PublishMessage($requestID, $options, $topic, $arguments, $argumentsKw));
+
+        return $deferred ? $deferred->promise() : new FulfilledPromise();
     }
 
     /**
+     * @param Session          $session
      * @param PublishedMessage $message
      */
-    private function processPublishedMessage(PublishedMessage $message)
+    private function processPublishedMessage(Session $session, PublishedMessage $message)
     {
-        if (isset($this->requests[$message->getRequestID()])) {
-            unset($this->requests[$message->getRequestID()]);
+        if (isset($session->publishRequests[$id = $message->getRequestID()])) {
+            /* @var $deferred Deferred */
+            $deferred = $session->publishRequests[$id];
+            $deferred->resolve();
+
+            unset($session->publishRequests[$id]);
         }
     }
 
     /**
+     * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessage(ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message)
     {
-        if (isset($this->requests[$message->getErrorRequestID()])) {
-            unset($this->requests[$message->getErrorRequestID()]);
+        if (isset($session->publishRequests[$id = $message->getErrorRequestID()])) {
+            /* @var $deferred Deferred */
+            $deferred = $session->publishRequests[$id];
+            $deferred->resolve();
+
+            unset($session->publishRequests[$id]);
         }
     }
 }
