@@ -4,7 +4,6 @@ namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
-use PE\Component\WAMP\Client\InvocationResult;
 use PE\Component\WAMP\Client\Registration;
 use PE\Component\WAMP\Client\RegistrationCollection;
 use PE\Component\WAMP\ErrorURI;
@@ -35,15 +34,9 @@ class Callee implements RoleInterface
     private $session;
 
     /**
-     * @deprecated
-     * @var callable[]
+     * @param Session|null $session
      */
-    private $cancellers = [];
-
-    /**
-     * @param Session $session
-     */
-    public function __construct(Session $session)
+    public function __construct(Session $session = null)
     {
         $this->session = $session;
     }
