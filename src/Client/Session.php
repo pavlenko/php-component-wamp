@@ -31,29 +31,6 @@ class Session extends \PE\Component\WAMP\Session
     }
 
     /**
-     * @param string     $topic
-     * @param callable   $callback
-     * @param array|null $options
-     *
-     * @deprecated Use role directly instead
-     */
-    public function subscribe($topic, callable $callback, array $options = null)
-    {
-        $this->client->getSubscriber()->subscribe($this, $topic, $callback, $options);
-    }
-
-    /**
-     * @param string   $topic
-     * @param callable $callback
-     *
-     * @deprecated Use role directly instead
-     */
-    public function unsubscribe($topic, callable $callback)
-    {
-        $this->client->getSubscriber()->unsubscribe($this, $topic, $callback);
-    }
-
-    /**
      * @param string $topic
      * @param array  $arguments
      * @param array  $argumentsKw
