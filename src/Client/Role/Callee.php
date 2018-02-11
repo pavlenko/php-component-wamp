@@ -6,7 +6,7 @@ use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Client\InvocationResult;
 use PE\Component\WAMP\Client\Registration;
-use PE\Component\WAMP\Client\Session;
+use PE\Component\WAMP\Client\RegistrationCollection;
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -19,19 +19,38 @@ use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 
 class Callee implements RoleInterface
 {
     /**
+     * @var Session
+     */
+    private $session;
+
+    /**
+     * @deprecated
      * @var Registration[]
      */
     private $registrations = [];
 
     /**
+     * @deprecated
      * @var callable[]
      */
     private $cancellers = [];
+
+    /**
+     * @param Session $session
+     */
+    public function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
 
     /**
      * @inheritDoc
@@ -54,10 +73,10 @@ class Callee implements RoleInterface
 
         switch (true) {
             case ($message instanceof RegisteredMessage):
-                $this->processRegisteredMessage($message);
+                $this->processRegisteredMessage($session, $message);
                 break;
             case ($message instanceof UnregisteredMessage):
-                $this->processUnregisteredMessage($message);
+                $this->processUnregisteredMessage($session, $message);
                 break;
             case ($message instanceof InvocationMessage):
                 $this->processInvocationMessage($session, $message);
@@ -66,7 +85,7 @@ class Callee implements RoleInterface
                 $this->processInterruptMessage($session, $message);
                 break;
             case ($message instanceof ErrorMessage):
-                $this->processErrorMessage($message);
+                $this->processErrorMessage($session, $message);
                 break;
         }
     }
@@ -86,65 +105,93 @@ class Callee implements RoleInterface
     }
 
     /**
-     * @param Session    $session
-     * @param string     $procedureURI
-     * @param callable   $callback
-     * @param array|null $options
+     * @param string   $procedureURI
+     * @param callable $callback
+     * @param array    $options
+     *
+     * @return PromiseInterface
+     *
+     * @throws \InvalidArgumentException
      */
-    public function register(Session $session, $procedureURI, callable $callback, array $options = null)
+    public function register($procedureURI, callable $callback, array $options = [])
     {
-        if (!isset($this->registrations[$procedureURI])) {
-            $requestId = Util::generateID();
-
-            $registration = new Registration($procedureURI, $callback);
-            $registration->setRegisterRequestID($requestId);
-
-            $this->registrations[$procedureURI] = $registration;
-
-            $session->send(new RegisterMessage($requestId, $options ?: [], $procedureURI));
+        if (!($this->session->registrations instanceof RegistrationCollection)) {
+            $this->session->registrations = new RegistrationCollection();
         }
+
+        if ($this->session->registrations->findByProcedureURI($procedureURI)) {
+            throw new \InvalidArgumentException(sprintf('Procedure with uri "%s" already registered', $procedureURI));
+        }
+
+        $requestId = Util::generateID();
+
+        $registration = new Registration($procedureURI, $callback);
+        $registration->setRegisterRequestID($requestId);
+        $registration->setRegisterDeferred($deferred = new Deferred());
+
+        $this->session->registrations[$procedureURI] = $registration;
+
+        $this->session->send(new RegisterMessage($requestId, $options, $procedureURI));
+
+        return $deferred->promise();
     }
 
     /**
-     * @param Session $session
-     * @param string  $procedureURI
+     * @param string $procedureURI
+     *
+     * @return PromiseInterface
+     *
+     * @throws \InvalidArgumentException
      */
-    public function unregister(Session $session, $procedureURI)
+    public function unregister($procedureURI)
     {
-        if (isset($this->registrations[$procedureURI])) {
-            $requestID = Util::generateID();
+        $requestID     = Util::generateID();
+        $registrations = $this->session->registrations ?: new RegistrationCollection();
 
-            $registration = $this->registrations[$procedureURI];
-            $registration->setUnregisterRequestID($requestID);
+        if ($registration = $registrations->findByProcedureURI($procedureURI)) {
+            $registration->getRegisterDeferred()->reject();
+
             $registration->setCallback(null);
+            $registration->setUnregisterRequestID($requestID);
+            $registration->setUnregisterDeferred($deferred = new Deferred());
 
-            $session->send(new UnregisterMessage($requestID, $this->registrations[$procedureURI]->getRegistrationID()));
+            $this->session->send(new UnregisterMessage($requestID, $registration->getRegistrationID()));
+
+            return $deferred->promise();
         }
+
+        return new RejectedPromise();
     }
 
     /**
+     * @param Session           $session
      * @param RegisteredMessage $message
      */
-    private function processRegisteredMessage(RegisteredMessage $message)
+    private function processRegisteredMessage(Session $session, RegisteredMessage $message)
     {
-        foreach ($this->registrations as $key => $registration) {
-            if ($registration->getRegisterRequestID() === $message->getRequestID()) {
-                $registration->setRegistrationID($message->getRegistrationID());
-                break;
-            }
+        $registrations = $session->registrations ?: new RegistrationCollection();
+
+        if ($registration = $registrations->findByRegisterRequestID($message->getRequestID())) {
+            $registration->setRegistrationID($message->getRegistrationID());
+
+            $deferred = $registration->getRegisterDeferred();
+            $deferred->resolve();
         }
     }
 
     /**
+     * @param Session             $session
      * @param UnregisteredMessage $message
      */
-    private function processUnregisteredMessage(UnregisteredMessage $message)
+    private function processUnregisteredMessage(Session $session, UnregisteredMessage $message)
     {
-        foreach ($this->registrations as $key => $registration) {
-            if ($registration->getUnregisterRequestID() === $message->getRequestID()) {
-                unset($this->registrations[$key]);
-                return;
-            }
+        $registrations = $session->registrations ?: new RegistrationCollection();
+
+        if ($registration = $registrations->findByUnregisterRequestID($message->getRequestID())) {
+            $deferred = $registration->getUnregisterDeferred();
+            $deferred->resolve();
+
+            $registrations->remove($registration);
         }
     }
 
@@ -154,6 +201,9 @@ class Callee implements RoleInterface
      */
     private function processInvocationMessage(Session $session, InvocationMessage $message)
     {
+        //TODO update logic
+        $registrations = $session->registrations ?: new RegistrationCollection();
+
         foreach ($this->registrations as $key => $registration) {
             if ($registration->getRegistrationID() === $message->getRegistrationID()) {
                 if ($registration->getCallback() === null) {
@@ -212,43 +262,50 @@ class Callee implements RoleInterface
     }
 
     /**
+     * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessage(ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message)
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_REGISTER:
-                $this->processErrorMessageFromRegister($message);
+                $this->processErrorMessageFromRegister($session, $message);
                 break;
             case MessageCode::_UNREGISTER:
-                $this->processErrorMessageFromUnregister($message);
+                $this->processErrorMessageFromUnregister($session, $message);
                 break;
         }
     }
 
     /**
+     * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessageFromRegister(ErrorMessage $message)
+    private function processErrorMessageFromRegister(Session $session, ErrorMessage $message)
     {
-        foreach ($this->registrations as $key => $registration) {
-            if ($registration->getRegisterRequestID() === $message->getErrorRequestID()) {
-                unset($this->registrations[$key]);
-                return;
-            }
+        $registrations = $session->registrations ?: new RegistrationCollection();
+
+        if ($registration = $registrations->findByRegisterRequestID($message->getErrorRequestID())) {
+            $deferred = $registration->getRegisterDeferred();
+            $deferred->reject();
+
+            $registrations->remove($registration);
         }
     }
 
     /**
+     * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessageFromUnregister(ErrorMessage $message)
+    private function processErrorMessageFromUnregister(Session $session, ErrorMessage $message)
     {
-        foreach ($this->registrations as $key => $registration) {
-            if ($registration->getUnregisterRequestID() === $message->getErrorRequestID()) {
-                unset($this->registrations[$key]);
-                return;
-            }
+        $registrations = $session->registrations ?: new RegistrationCollection();
+
+        if ($registration = $registrations->findByUnregisterRequestID($message->getErrorRequestID())) {
+            $deferred = $registration->getUnregisterDeferred();
+            $deferred->reject();
+
+            $registrations->remove($registration);
         }
     }
 }

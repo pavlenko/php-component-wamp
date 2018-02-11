@@ -2,6 +2,8 @@
 
 namespace PE\Component\WAMP\Client;
 
+use React\Promise\Deferred;
+
 class Registration
 {
     /**
@@ -28,6 +30,16 @@ class Registration
      * @var int
      */
     private $unregisterRequestID;
+
+    /**
+     * @var Deferred
+     */
+    private $registerDeferred;
+
+    /**
+     * @var Deferred
+     */
+    private $unregisterDeferred;
 
     public function __construct($procedureURI, callable $callback)
     {
@@ -113,5 +125,37 @@ class Registration
     public function setUnregisterRequestID($unregisterRequestID)
     {
         $this->unregisterRequestID = (int) $unregisterRequestID;
+    }
+
+    /**
+     * @return Deferred
+     */
+    public function getRegisterDeferred()
+    {
+        return $this->registerDeferred;
+    }
+
+    /**
+     * @param Deferred $deferred
+     */
+    public function setRegisterDeferred(Deferred $deferred)
+    {
+        $this->registerDeferred = $deferred;
+    }
+
+    /**
+     * @return Deferred
+     */
+    public function getUnregisterDeferred()
+    {
+        return $this->unregisterDeferred;
+    }
+
+    /**
+     * @param Deferred $deferred
+     */
+    public function setUnregisterDeferred(Deferred $deferred)
+    {
+        $this->unregisterDeferred = $deferred;
     }
 }
