@@ -34,12 +34,6 @@ class Callee implements RoleInterface
 
     /**
      * @deprecated
-     * @var Registration[]
-     */
-    private $registrations = [];
-
-    /**
-     * @deprecated
      * @var callable[]
      */
     private $cancellers = [];
@@ -204,43 +198,39 @@ class Callee implements RoleInterface
         //TODO update logic
         $registrations = $session->registrations ?: new RegistrationCollection();
 
-        foreach ($this->registrations as $key => $registration) {
-            if ($registration->getRegistrationID() === $message->getRegistrationID()) {
-                if ($registration->getCallback() === null) {
-                    // Callback can be empty if unregister request occurred, but not completed
-                    $session->send(MessageFactory::createErrorMessageFromMessage($message));
-                    return;
-                }
+        if ($registration = $registrations->findByRegistrationID($message->getRegistrationID())) {
+            if ($registration->getCallback() === null) {
+                // Callback can be empty if unregister request occurred, but not completed
+                $session->send(MessageFactory::createErrorMessageFromMessage($message));
+                return;
+            }
 
-                try {
-                    $yield = new YieldMessage($message->getRequestID(), []);
+            try {
+                $yield = new YieldMessage($message->getRequestID(), []);
 
-                    $result = call_user_func(
-                        $registration->getCallback(),
-                        $message->getArguments(),
-                        $message->getArgumentsKw(),
-                        $message->getDetails()
-                    );
+                $result = call_user_func(
+                    $registration->getCallback(),
+                    $message->getArguments(),
+                    $message->getArgumentsKw(),
+                    $message->getDetails()
+                );
 
-                    if ($result instanceof InvocationResult) {
-                        if ($canceller = $result->getCanceller()) {
-                            $this->cancellers[$message->getRequestID()] = $canceller;
-                        }
-
-                        $yield->setArguments($result->getArguments());
-                        $yield->setArgumentsKw($result->getArgumentsKw());
+                if ($result instanceof InvocationResult) {
+                    if ($canceller = $result->getCanceller()) {
+                        $this->cancellers[$message->getRequestID()] = $canceller;
                     }
 
-                    $session->send($yield);
-                } catch (\Exception $exception) {
-                    $error = MessageFactory::createErrorMessageFromMessage($message);
-                    $error->setArguments([$exception->getMessage()]);
-                    $error->setArgumentsKw($exception);
-
-                    $session->send($error);
+                    $yield->setArguments($result->getArguments());
+                    $yield->setArgumentsKw($result->getArgumentsKw());
                 }
 
-                return;
+                $session->send($yield);
+            } catch (\Exception $exception) {
+                $error = MessageFactory::createErrorMessageFromMessage($message);
+                $error->setArguments([$exception->getMessage()]);
+                $error->setArgumentsKw([$exception]);
+
+                $session->send($error);
             }
         }
     }
