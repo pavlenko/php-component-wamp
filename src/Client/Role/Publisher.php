@@ -7,28 +7,11 @@ use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\PublishedMessage;
-use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\Session;
-use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
-use React\Promise\PromiseInterface;
 
 class Publisher implements RoleInterface
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @param Session|null $session
-     */
-    public function __construct(Session $session = null)
-    {
-        $this->session = $session;
-    }
-
     /**
      * @inheritDoc
      */
@@ -70,34 +53,6 @@ class Publisher implements RoleInterface
                 //TODO
             ]);
         }
-    }
-
-    /**
-     * @param string $topic
-     * @param array  $arguments
-     * @param array  $argumentsKw
-     * @param array  $options
-     *
-     * @return PromiseInterface
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function publish($topic, array $arguments, array $argumentsKw, array $options)
-    {
-        $requestID = Util::generateID();
-        $deferred  = null;
-
-        if (isset($options['acknowledge']) && true === $options['acknowledge']) {
-            if (!is_array($this->session->publishRequests)) {
-                $this->session->publishRequests = [];
-            }
-
-            $this->session->publishRequests[$requestID] = $deferred = new Deferred();
-        }
-
-        $this->session->send(new PublishMessage($requestID, $options, $topic, $arguments, $argumentsKw));
-
-        return $deferred ? $deferred->promise() : new FulfilledPromise();
     }
 
     /**
