@@ -21,7 +21,9 @@ use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
+use React\Promise\CancellablePromiseInterface;
 use React\Promise\Deferred;
+use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 
@@ -195,7 +197,6 @@ class Callee implements RoleInterface
      */
     private function processInvocationMessage(Session $session, InvocationMessage $message)
     {
-        //TODO update logic
         $registrations = $session->registrations ?: new RegistrationCollection();
 
         if ($registration = $registrations->findByRegistrationID($message->getRegistrationID())) {
@@ -206,8 +207,6 @@ class Callee implements RoleInterface
             }
 
             try {
-                $yield = new YieldMessage($message->getRequestID(), []);
-
                 $result = call_user_func(
                     $registration->getCallback(),
                     $message->getArguments(),
@@ -215,16 +214,47 @@ class Callee implements RoleInterface
                     $message->getDetails()
                 );
 
-                if ($result instanceof InvocationResult) {
-                    if ($canceller = $result->getCanceller()) {
-                        $this->cancellers[$message->getRequestID()] = $canceller;
-                    }
-
-                    $yield->setArguments($result->getArguments());
-                    $yield->setArgumentsKw($result->getArgumentsKw());
+                if (!($result instanceof PromiseInterface)) {
+                    // If result is not a promise - wrap it into fulfilled promise
+                    $result = new FulfilledPromise($result);
                 }
 
-                $session->send($yield);
+                // Check if promise is cancellable and add canceller to session if true
+                if ($result instanceof CancellablePromiseInterface) {
+                    if (!is_array($session->invocationCancellers)) {
+                        $session->invocationCancellers = [];
+                    }
+
+                    $session->invocationCancellers[$message->getRequestID()] = [$result, 'cancel'];
+
+                    $result = $result->then(function ($result) use ($session, $message) {
+                        unset($session->invocationCancellers[$message->getRequestID()]);
+                        return $result;
+                    });
+                }
+
+                // Send messages depends on invocation state
+                $result->then(
+                    function ($result) use ($session, $message) {
+                        // Send invocation success
+                        $session->send(new YieldMessage($message->getRequestID(), [], [$result]));
+                    },
+                    function ($error) use ($session, $message) {
+                        // Send invocation error
+                        $errorMessage = MessageFactory::createErrorMessageFromMessage($message);
+
+                        if ($error instanceof \Exception) {
+                            $errorMessage->setArguments([$error->getMessage()]);
+                            $errorMessage->setArgumentsKw([$error]);
+                        }
+
+                        $session->send($errorMessage);
+                    },
+                    function ($result) use ($session, $message) {
+                        // Send invocation progress
+                        $session->send(new YieldMessage($message->getRequestID(), ['progress' => true], [$result]));
+                    }
+                );
             } catch (\Exception $exception) {
                 $error = MessageFactory::createErrorMessageFromMessage($message);
                 $error->setArguments([$exception->getMessage()]);
@@ -241,11 +271,11 @@ class Callee implements RoleInterface
      */
     private function processInterruptMessage(Session $session, InterruptMessage $message)
     {
-        if (isset($this->cancellers[$message->getRequestID()])) {
-            $callable = $this->cancellers[$message->getRequestID()];
+        if (isset($session->invocationCancellers[$message->getRequestID()])) {
+            $callable = $session->invocationCancellers[$message->getRequestID()];
             $callable();
 
-            unset($this->cancellers[$message->getRequestID()]);
+            unset($session->invocationCancellers[$message->getRequestID()]);
 
             $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_CANCELLED));
         }
