@@ -2,23 +2,35 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
+use PE\Component\WAMP\Client\Call;
+use PE\Component\WAMP\Client\CallCollection;
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
-use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\ResultMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
 
 class Caller implements RoleInterface
 {
     /**
-     * @var array
+     * @var Session
      */
-    private $requests = [];
+    private $session;
+
+    /**
+     * @param Session $session
+     */
+    public function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
 
     /**
      * @inheritDoc
@@ -36,14 +48,15 @@ class Caller implements RoleInterface
      */
     public function onMessageReceived(MessageEvent $event)
     {
+        $session = $event->getSession();
         $message = $event->getMessage();
 
         switch (true) {
             case ($message instanceof ResultMessage):
-                $this->processResultMessage($message);
+                $this->processResultMessage($session, $message);
                 break;
             case ($message instanceof ErrorMessage):
-                $this->processErrorMessage($message);
+                $this->processErrorMessage($session, $message);
                 break;
         }
     }
@@ -56,90 +69,87 @@ class Caller implements RoleInterface
         $message = $event->getMessage();
 
         if ($message instanceof HelloMessage) {
-            $message->addFeatures('publisher', [
+            $message->addFeatures('caller', [
                 //TODO
             ]);
         }
     }
 
     /**
-     * @param Session    $session
-     * @param string     $procedureURI
-     * @param array|null $arguments
-     * @param array|null $argumentsKw
-     * @param array|null $options
+     * @param string $procedureURI
+     * @param array  $arguments
+     * @param array  $argumentsKw
+     * @param array  $options
+     *
+     * @return PromiseInterface
      */
-    public function call(Session $session, $procedureURI, array $arguments = null, array $argumentsKw = null, array $options = null)
+    public function call($procedureURI, array $arguments = [], array $argumentsKw = [], array $options = [])
     {
-        if (!in_array($procedureURI, $this->requests, false)) {
-            $requestID = Util::generateID();
+        $requestID = Util::generateID();
 
-            $this->requests[$requestID] = $procedureURI;
+        $deferred = new Deferred(function () use ($requestID) {
+            // This is only one possible point to cancel a call
+            $this->session->send(new CancelMessage($requestID, []));
+        });
 
-            $session->send(new CallMessage($requestID, $options ?: [], $procedureURI, $arguments, $argumentsKw));
+        if (!($this->session->callRequests instanceof CallCollection)) {
+            $this->session->callRequests = new CallCollection();
         }
+
+        $this->session->callRequests->add(new Call($requestID, $deferred));
+
+        $this->session->send(new CallMessage($requestID, $options ?: [], $procedureURI, $arguments, $argumentsKw));
+
+        return $deferred->promise();
     }
 
     /**
-     * @param Session    $session
-     * @param string     $procedureIRI
-     * @param array|null $options
-     */
-    public function cancel(Session $session, $procedureIRI, array $options = null)
-    {
-        $requestID = array_search($procedureIRI, $this->requests, false);
-
-        if (false === $requestID) {
-            $session->send(new CancelMessage($requestID, $options ?: []));
-        }
-    }
-
-    /**
+     * @param Session       $session
      * @param ResultMessage $message
      */
-    private function processResultMessage(ResultMessage $message)
+    private function processResultMessage(Session $session, ResultMessage $message)
     {
-        if (isset($this->requests[$message->getRequestID()])) {
-            $details = $message->getDetails();
+        $calls = $session->callRequests ?: new CallCollection();
+
+        if ($call = $calls->findByRequestID($message->getRequestID())) {
+            $deferred = $call->getDeferred();
+            $details  = $message->getDetails();
 
             if (empty($details['progress'])) {
-                unset($this->requests[$message->getRequestID()]);
+                $deferred->resolve();
+                $calls->remove($call);
+            } else {
+                $deferred->notify();
             }
         }
     }
 
     /**
+     * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessage(ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message)
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_CALL:
-                $this->processErrorMessageFromCall($message);
-                break;
-            case MessageCode::_CANCEL:
-                $this->processErrorMessageFromCancel($message);
+                $this->processErrorMessageFromCall($session, $message);
                 break;
         }
     }
 
     /**
+     * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessageFromCall(ErrorMessage $message)
+    private function processErrorMessageFromCall(Session $session, ErrorMessage $message)
     {
-        if (isset($this->requests[$message->getErrorRequestID()])) {
-            unset($this->requests[$message->getErrorRequestID()]);
-        }
-    }
+        $calls = $session->callRequests ?: new CallCollection();
 
-    /**
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessageFromCancel(ErrorMessage $message)
-    {
-        if (isset($this->requests[$message->getErrorRequestID()])) {
-            unset($this->requests[$message->getErrorRequestID()]);
+        if ($call = $calls->findByRequestID($message->getErrorRequestID())) {
+            $deferred = $call->getDeferred();
+            $deferred->reject();
+
+            $calls->remove($call);
         }
     }
 }
