@@ -19,6 +19,7 @@
     "guzzlehttp/psr7": "^1.4",
     "ratchet/pawl": "^0.3",
     "react/event-loop": "^0.4",
+    "react/http": "^0.8.1",
     "react/http-client": "^0.5.8",
     "react/promise": "^2.5",
     "symfony/event-dispatcher": "^2.7|^3.0|^4.0"

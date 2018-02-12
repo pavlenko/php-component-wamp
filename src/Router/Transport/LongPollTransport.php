@@ -4,11 +4,14 @@ namespace PE\Component\WAMP\Router\Transport;
 
 use PE\Component\WAMP\Router\Router;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\Http\HttpServerInterface;
 use Ratchet\Server\IoServer;
 use React\EventLoop\LoopInterface;
+use React\Http\Response;
+use React\Promise\Promise;
 use React\Socket\Server;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -54,6 +57,22 @@ class LongPollTransport implements TransportInterface, HttpServerInterface
             $socket,
             $loop
         );
+
+        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($loop) {
+            //TODO create async http server & add routing handler
+            return new Promise(function ($resolve, $reject) use ($loop) {
+                $loop->addTimer(1.5, function() use ($resolve) {
+                    $response = new Response(
+                        200,
+                        array(
+                            'Content-Type' => 'text/plain'
+                        ),
+                        'Hello world'
+                    );
+                    $resolve($response);
+                });
+            });
+        });
     }
 
     /**
