@@ -5,9 +5,9 @@ namespace PE\Component\WAMP;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\Event\ConnectionEvent;
 use PE\Component\WAMP\Client\Event\Events;
-use PE\Component\WAMP\Client\Role\Publisher;
+use PE\Component\WAMP\Client\Role\PublisherModule;
 use PE\Component\WAMP\Client\Role\PublisherAPI;
-use PE\Component\WAMP\Client\Role\Subscriber;
+use PE\Component\WAMP\Client\Role\SubscriberModule;
 use PE\Component\WAMP\Client\Role\SubscriberAPI;
 use PE\Component\WAMP\Client\Transport\WebSocketTransport;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -26,10 +26,10 @@ $client->setTransport($transport);
 $client->setLogger($logger);
 $client->setReconnectAttempts(3);
 
-$client->addRole(new Subscriber());
-$client->addRole(new Publisher());
+$client->addModule(new SubscriberModule());
+$client->addModule(new PublisherModule());
 
-$client->addListener(Events::SESSION_ESTABLISHED, function (ConnectionEvent $event) {
+$client->on(Events::SESSION_ESTABLISHED, function (ConnectionEvent $event) {
     $session = $event->getSession();
 
     $subscriber = new SubscriberAPI($session);

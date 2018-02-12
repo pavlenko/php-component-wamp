@@ -11,9 +11,10 @@ use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 
-class Subscriber implements RoleInterface
+class SubscriberModule implements ModuleInterface
 {
     /**
      * @inheritDoc

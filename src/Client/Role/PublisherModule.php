@@ -7,10 +7,11 @@ use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\PublishedMessage;
+use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 use React\Promise\Deferred;
 
-class Publisher implements RoleInterface
+class PublisherModule implements ModuleInterface
 {
     /**
      * @inheritDoc

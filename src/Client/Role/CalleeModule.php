@@ -15,12 +15,13 @@ use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 use React\Promise\CancellablePromiseInterface;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
-class Callee implements RoleInterface
+class CalleeModule implements ModuleInterface
 {
     /**
      * @inheritDoc

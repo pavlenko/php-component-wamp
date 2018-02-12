@@ -9,9 +9,10 @@ use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\ResultMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 
-class Caller implements RoleInterface
+class CallerModule implements ModuleInterface
 {
     /**
      * @inheritDoc
