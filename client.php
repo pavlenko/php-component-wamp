@@ -29,7 +29,7 @@ $client->setReconnectAttempts(3);
 $client->addRole(new Subscriber());
 $client->addRole(new Publisher());
 
-$client->getDispatcher()->addListener(Events::SESSION_ESTABLISHED, function (ConnectionEvent $event) {
+$client->addListener(Events::SESSION_ESTABLISHED, function (ConnectionEvent $event) {
     $session = $event->getSession();
 
     $subscriber = new SubscriberAPI($session);

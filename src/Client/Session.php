@@ -25,7 +25,7 @@ class Session extends \PE\Component\WAMP\Session
      */
     public function send(Message $message)
     {
-        $this->client->getDispatcher()->dispatch(Events::MESSAGE_SEND, new MessageEvent($this, $message));
+        $this->client->dispatch(Events::MESSAGE_SEND, new MessageEvent($this, $message));
 
         $this->getConnection()->send($message);
     }

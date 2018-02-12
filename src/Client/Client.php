@@ -8,11 +8,7 @@ use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Client\Event\ConnectionEvent;
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
-use PE\Component\WAMP\Client\Role\Callee;
-use PE\Component\WAMP\Client\Role\Caller;
-use PE\Component\WAMP\Client\Role\Publisher;
 use PE\Component\WAMP\Client\Role\RoleInterface;
-use PE\Component\WAMP\Client\Role\Subscriber;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\ErrorURI;
@@ -22,9 +18,8 @@ use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class Client implements ClientInterface
+final class Client extends EventDispatcher implements ClientInterface
 {
     /**
      * @var string
@@ -62,11 +57,6 @@ final class Client implements ClientInterface
     private $loop;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var Session
      */
     private $session;
@@ -80,12 +70,11 @@ final class Client implements ClientInterface
         $realm,
         LoopInterface $loop = null
     ) {
-        $this->realm      = $realm;
-        $this->loop       = $loop ?: Factory::create();
-        $this->dispatcher = new EventDispatcher();
+        $this->realm = $realm;
+        $this->loop  = $loop ?: Factory::create();
 
         //TODO move to debug subscriber (client module interface)
-        $this->dispatcher->addListener(Events::MESSAGE_SEND, function (MessageEvent $event) {
+        $this->addListener(Events::MESSAGE_SEND, function (MessageEvent $event) {
             $this->logger->info('< ' . $event->getMessage()->getName());
         });
     }
@@ -96,14 +85,6 @@ final class Client implements ClientInterface
     public function getLogger()
     {
         return $this->logger;
-    }
-
-    /**
-     * @return EventDispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
     }
 
     /**
@@ -118,7 +99,7 @@ final class Client implements ClientInterface
 
         $this->session = new Session($connection, $this);
 
-        $this->dispatcher->dispatch(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
+        $this->dispatch(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
 
         $this->session->send(new HelloMessage($this->realm, []));
     }
@@ -133,7 +114,7 @@ final class Client implements ClientInterface
         !$this->logger ?: $this->logger->info('Connection closed: ' . $reason);
 
         if ($this->session) {
-            $this->dispatcher->dispatch(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
+            $this->dispatch(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
 
             $this->session->shutdown();
             $this->session = null;
@@ -156,7 +137,7 @@ final class Client implements ClientInterface
         switch (true) {
             case ($message instanceof WelcomeMessage):
                 $this->session->setSessionID($message->getSessionId());
-                $this->dispatcher->dispatch(Events::SESSION_ESTABLISHED, new ConnectionEvent($this->session));
+                $this->dispatch(Events::SESSION_ESTABLISHED, new ConnectionEvent($this->session));
                 break;
             case ($message instanceof AbortMessage):
                 $this->session->shutdown();
@@ -166,7 +147,7 @@ final class Client implements ClientInterface
                 $this->session->shutdown();
                 break;
             default:
-                $this->dispatcher->dispatch(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
+                $this->dispatch(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
         }
     }
 
@@ -186,7 +167,7 @@ final class Client implements ClientInterface
     public function onError(\Exception $error)
     {
         $this->logger->error($error->getMessage());
-        $this->dispatcher->dispatch(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
+        $this->dispatch(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
     }
 
     /**
@@ -273,54 +254,6 @@ final class Client implements ClientInterface
 
         $this->roles[$class] = $role;
 
-        $this->dispatcher->addSubscriber($role);
-    }
-
-    /**
-     * @param string $class
-     *
-     * @return RoleInterface
-     *
-     * @throws \RuntimeException If role not used
-     */
-    public function getRole($class)
-    {
-        if (!array_key_exists($class, $this->roles)) {
-            throw new \RuntimeException(sprintf('Unknown role "%s"', $class));
-        }
-
-        return $this->roles[$class];
-    }
-
-    /**
-     * @return Callee|RoleInterface
-     */
-    public function getCallee()
-    {
-        return $this->getRole(Callee::class);
-    }
-
-    /**
-     * @return Caller|RoleInterface
-     */
-    public function getCaller()
-    {
-        return $this->getRole(Caller::class);
-    }
-
-    /**
-     * @return Publisher|RoleInterface
-     */
-    public function getPublisher()
-    {
-        return $this->getRole(Publisher::class);
-    }
-
-    /**
-     * @return Subscriber|RoleInterface
-     */
-    public function getSubscriber()
-    {
-        return $this->getRole(Subscriber::class);
+        $this->addSubscriber($role);
     }
 }
