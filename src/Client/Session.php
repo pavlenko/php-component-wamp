@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Client;
 
-use PE\Component\WAMP\Client\Event\Events;
-use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
 
@@ -25,8 +23,7 @@ class Session extends \PE\Component\WAMP\Session
      */
     public function send(Message $message)
     {
-        $this->client->dispatch(Events::MESSAGE_SEND, new MessageEvent($this, $message));
-
+        $this->client->processMessageSend($message);
         $this->getConnection()->send($message);
     }
 }

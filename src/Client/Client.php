@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Client;
 
+use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Module\ModuleInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
@@ -11,18 +12,17 @@ use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\ErrorURI;
-use PE\Component\WAMP\Message\AbortMessage;
-use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
-use PE\Component\WAMP\Message\WelcomeMessage;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
-final class Client implements ClientInterface
+final class Client
 {
+    const RECONNECT_TIMEOUT  = 1.5;
+    const RECONNECT_ATTEMPTS = 15;
+
     /**
      * @var string
      */
@@ -73,27 +73,18 @@ final class Client implements ClientInterface
      */
     private $dispatcher;
 
-    public function __construct(
-        $realm,
-        LoopInterface $loop = null
-    ) {
+    /**
+     * @param string             $realm
+     * @param LoopInterface|null $loop
+     */
+    public function __construct($realm, LoopInterface $loop = null)
+    {
         $this->realm = $realm;
         $this->loop  = $loop ?: Factory::create();
 
         $this->dispatcher = new EventDispatcher();
 
-        //TODO move to debug subscriber (client module interface)
-        $this->on(Events::MESSAGE_SEND, function (MessageEvent $event) {
-            $this->logger->info('< ' . $event->getMessage()->getName());
-        });
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger()
-    {
-        return $this->logger;
+        $this->addModule(new SessionModule());
     }
 
     /**
@@ -101,7 +92,7 @@ final class Client implements ClientInterface
      *
      * @param ConnectionInterface $connection
      */
-    public function onOpen(ConnectionInterface $connection)
+    public function processOpen(ConnectionInterface $connection)
     {
         $this->_reconnectAttempt = 0;
         !$this->logger ?: $this->logger->info('Connection opened');
@@ -118,7 +109,7 @@ final class Client implements ClientInterface
      *
      * @param string $reason
      */
-    public function onClose($reason)
+    public function processClose($reason)
     {
         !$this->logger ?: $this->logger->info('Connection closed: ' . $reason);
 
@@ -137,35 +128,21 @@ final class Client implements ClientInterface
      *
      * @param Message $message
      */
-    public function onMessageReceived(Message $message)
+    public function processMessageReceived(Message $message)
     {
         $this->logger->info('> ' . $message->getName());
-        //TODO handle authentication
-        //TODO handle authorization
-
-        switch (true) {
-            case ($message instanceof WelcomeMessage):
-                $this->session->setSessionID($message->getSessionId());
-                $this->emit(Events::SESSION_ESTABLISHED, new ConnectionEvent($this->session));
-                break;
-            case ($message instanceof AbortMessage):
-                $this->session->shutdown();
-                break;
-            case ($message instanceof GoodbyeMessage):
-                $this->session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
-                $this->session->shutdown();
-                break;
-            default:
-                $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
-        }
+        $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
     }
 
     /**
-     * @inheritDoc
+     * Handle received message (called directly from transport)
+     *
+     * @param Message $message
      */
-    public function onMessageSend(Message $message)
+    public function processMessageSend(Message $message)
     {
-        // TODO: Implement onMessageSend() method.
+        $this->logger->info('< ' . $message->getName());
+        $this->emit(Events::MESSAGE_SEND, new MessageEvent($this->session, $message));
     }
 
     /**
@@ -173,7 +150,7 @@ final class Client implements ClientInterface
      *
      * @param \Exception $error
      */
-    public function onError(\Exception $error)
+    public function processError(\Exception $error)
     {
         $this->logger->error($error->getMessage());
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));

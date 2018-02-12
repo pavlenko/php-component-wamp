@@ -2,9 +2,9 @@
 
 namespace PE\Component\WAMP\Client\Transport;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Exception\RequestException;
-use PE\Component\WAMP\Client\ClientInterface;
+use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Serializer\Serializer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -52,13 +52,13 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
     /**
      * @inheritDoc
      */
-    public function start(ClientInterface $client, LoopInterface $loop)
+    public function start(Client $client, LoopInterface $loop)
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 
         !$this->logger ?: $this->logger->info('Connecting to {url} ...', ['url' => $url]);
 
-        $http = new Client([
+        $http = new GuzzleHttpClient([
             'base_uri' => $url,
             'timeout' => $this->timeout
         ]);
@@ -72,7 +72,7 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
                     $serializer = new Serializer();
 
                     // Create HTTP client with configured base url
-                    $http = new Client([
+                    $http = new GuzzleHttpClient([
                         'base_uri' => $url . '/' . $json->transport . '/',
                         'timeout'  => $this->timeout,
                     ]);
@@ -82,10 +82,10 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
                         $promise = $http->requestAsync('POST', 'receive');
                         $promise->then(
                             function (ResponseInterface $response) use ($client, $serializer) {
-                                $client->onMessageReceived($serializer->deserialize((string) $response->getBody()));
+                                $client->processMessageReceived($serializer->deserialize((string) $response->getBody()));
                             },
                             function (RequestException $exception) use ($client) {
-                                $client->onError($exception);
+                                $client->processError($exception);
                             }
                         );
                     });
@@ -95,14 +95,14 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
                     $connection->setSerializer($serializer);
 
                     // Notify client
-                    $client->onOpen($connection);
+                    $client->processOpen($connection);
                 } else {
-                    $client->onError(new \Exception());//TODO invalid response
+                    $client->processError(new \Exception());//TODO invalid response
                 }
             },
             function (RequestException $exception) use ($client) {
-                $client->onError($exception);
-                $client->onClose('unreachable');
+                $client->processError($exception);
+                $client->processClose('unreachable');
             }
         );
     }

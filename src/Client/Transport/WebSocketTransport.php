@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Transport;
 
-use PE\Component\WAMP\Client\ClientInterface;
+use PE\Component\WAMP\Client\Client;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Ratchet\Client\Connector;
@@ -51,7 +51,7 @@ class WebSocketTransport implements TransportInterface,  LoggerAwareInterface
     /**
      * @inheritDoc
      */
-    public function start(ClientInterface $client, LoopInterface $loop)
+    public function start(Client $client, LoopInterface $loop)
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 
@@ -68,23 +68,23 @@ class WebSocketTransport implements TransportInterface,  LoggerAwareInterface
                 $connection = new WebSocketConnection($socket);
                 $connection->setSerializer(new Serializer());
 
-                $client->onOpen($connection);
+                $client->processOpen($connection);
 
                 $socket->on('message', function ($message) use ($client, $connection) {
-                    $client->onMessageReceived($connection->getSerializer()->deserialize($message));
+                    $client->processMessageReceived($connection->getSerializer()->deserialize($message));
                 });
 
                 $socket->on('close', function ($code, $reason) use ($client) {
-                    $client->onClose($reason);
+                    $client->processClose($reason);
                 });
 
                 $socket->on('error', function ($error) use ($client) {
-                    $client->onError($error);
+                    $client->processError($error);
                 });
             },
             function (\Exception $exception) use ($client) {
-                $client->onClose('unreachable');
-                $client->onError($exception);
+                $client->processClose('unreachable');
+                $client->processError($exception);
             }
         );
     }
