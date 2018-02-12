@@ -2,13 +2,13 @@
 
 namespace PE\Component\WAMP\Client;
 
+use PE\Component\WAMP\Module\ModuleInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Client\Event\ConnectionEvent;
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
-use PE\Component\WAMP\Client\Role\RoleInterface;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\ErrorURI;
@@ -17,9 +17,11 @@ use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
-final class Client extends EventDispatcher implements ClientInterface
+final class Client implements ClientInterface
 {
     /**
      * @var string
@@ -62,9 +64,14 @@ final class Client extends EventDispatcher implements ClientInterface
     private $session;
 
     /**
-     * @var RoleInterface[]
+     * @var ModuleInterface[]
      */
-    private $roles = [];
+    private $modules = [];
+
+    /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
 
     public function __construct(
         $realm,
@@ -73,8 +80,10 @@ final class Client extends EventDispatcher implements ClientInterface
         $this->realm = $realm;
         $this->loop  = $loop ?: Factory::create();
 
+        $this->dispatcher = new EventDispatcher();
+
         //TODO move to debug subscriber (client module interface)
-        $this->addListener(Events::MESSAGE_SEND, function (MessageEvent $event) {
+        $this->on(Events::MESSAGE_SEND, function (MessageEvent $event) {
             $this->logger->info('< ' . $event->getMessage()->getName());
         });
     }
@@ -99,7 +108,7 @@ final class Client extends EventDispatcher implements ClientInterface
 
         $this->session = new Session($connection, $this);
 
-        $this->dispatch(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
+        $this->emit(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
 
         $this->session->send(new HelloMessage($this->realm, []));
     }
@@ -114,7 +123,7 @@ final class Client extends EventDispatcher implements ClientInterface
         !$this->logger ?: $this->logger->info('Connection closed: ' . $reason);
 
         if ($this->session) {
-            $this->dispatch(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
+            $this->emit(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
 
             $this->session->shutdown();
             $this->session = null;
@@ -137,7 +146,7 @@ final class Client extends EventDispatcher implements ClientInterface
         switch (true) {
             case ($message instanceof WelcomeMessage):
                 $this->session->setSessionID($message->getSessionId());
-                $this->dispatch(Events::SESSION_ESTABLISHED, new ConnectionEvent($this->session));
+                $this->emit(Events::SESSION_ESTABLISHED, new ConnectionEvent($this->session));
                 break;
             case ($message instanceof AbortMessage):
                 $this->session->shutdown();
@@ -147,7 +156,7 @@ final class Client extends EventDispatcher implements ClientInterface
                 $this->session->shutdown();
                 break;
             default:
-                $this->dispatch(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
+                $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
         }
     }
 
@@ -167,7 +176,7 @@ final class Client extends EventDispatcher implements ClientInterface
     public function onError(\Exception $error)
     {
         $this->logger->error($error->getMessage());
-        $this->dispatch(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
+        $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
     }
 
     /**
@@ -204,6 +213,8 @@ final class Client extends EventDispatcher implements ClientInterface
 
     /**
      * @param bool $startLoop
+     *
+     * @throws \RuntimeException
      */
     public function connect($startLoop = true)
     {
@@ -240,20 +251,66 @@ final class Client extends EventDispatcher implements ClientInterface
     }
 
     /**
-     * @param RoleInterface $role
+     * @param ModuleInterface $module
      *
-     * @throws \InvalidArgumentException If role added twice
+     * @throws \InvalidArgumentException
      */
-    public function addRole(RoleInterface $role)
+    public function addModule(ModuleInterface $module)
     {
-        $class = get_class($role);
-
-        if (array_key_exists($class, $this->roles)) {
-            throw new \InvalidArgumentException(sprintf('Cannot add role "%s" twice', $class));
+        if (!array_key_exists($hash = spl_object_hash($module), $this->modules)) {
+            throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
-        $this->roles[$class] = $role;
+        $this->modules[$hash] = $module;
 
-        $this->addSubscriber($role);
+        $this->dispatcher->addSubscriber($module);
+    }
+
+    /**
+     * @param string   $eventName
+     * @param callable $listener
+     * @param int      $priority
+     */
+    public function on($eventName, callable $listener, $priority = 0)
+    {
+        $this->dispatcher->addListener($eventName, $listener, $priority);
+    }
+
+    /**
+     * @param string   $eventName
+     * @param callable $listener
+     */
+    public function off($eventName, callable $listener)
+    {
+        $this->dispatcher->removeListener($eventName, $listener);
+    }
+
+    /**
+     * @param string   $eventName
+     * @param callable $listener
+     * @param int      $priority
+     */
+    public function once($eventName, callable $listener, $priority = 0)
+    {
+        $onceListener = function () use (&$onceListener, $eventName, $listener) {
+            $this->off($eventName, $onceListener);
+
+            \call_user_func_array($listener, \func_get_args());
+        };
+
+        $this->on($eventName, $onceListener, $priority);
+    }
+
+    /**
+     * @param string $eventName
+     * @param mixed  $payload
+     */
+    public function emit($eventName, $payload = null)
+    {
+        if (null !== $payload && !($payload instanceof Event)) {
+            $payload = new GenericEvent($payload);
+        }
+
+        $this->dispatcher->dispatch($eventName, $payload);
     }
 }
