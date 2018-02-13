@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class LongPollTransport implements TransportInterface, HttpServerInterface
+class LongPollTransport implements TransportInterface
 {
     /**
      * @var string
@@ -122,37 +122,5 @@ class LongPollTransport implements TransportInterface, HttpServerInterface
         if ($this->server) {
             $this->server->socket->close();
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onClose(RatchetConnectionInterface $ratchetConnection)
-    {
-        // TODO: Implement onClose() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onError(RatchetConnectionInterface $ratchetConnection, \Exception $e)
-    {
-        // TODO: Implement onError() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onOpen(RatchetConnectionInterface $ratchetConnection, RequestInterface $request = null)
-    {
-        // TODO: Implement onOpen() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onMessage(RatchetConnectionInterface $ratchetConnection, $message)
-    {
-        // TODO: Implement onMessage() method.
     }
 }
