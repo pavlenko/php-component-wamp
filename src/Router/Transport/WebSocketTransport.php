@@ -43,7 +43,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
 
     /**
      * @param string $host
-     * @param int $port
+     * @param int    $port
      */
     public function __construct($host = '127.0.0.1', $port = 8080)
     {

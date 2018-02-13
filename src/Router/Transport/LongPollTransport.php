@@ -3,11 +3,9 @@
 namespace PE\Component\WAMP\Router\Transport;
 
 use PE\Component\WAMP\Router\Router;
-use Psr\Http\Message\RequestInterface;
+use PE\Component\WAMP\Util;
 use Psr\Http\Message\ServerRequestInterface;
-use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Ratchet\Http\HttpServer;
-use Ratchet\Http\HttpServerInterface;
 use Ratchet\Server\IoServer;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
@@ -32,9 +30,26 @@ class LongPollTransport implements TransportInterface
     private $port;
 
     /**
+     * @var \SplObjectStorage|LongPollConnection[]
+     */
+    private $connections;
+
+    /**
      * @var IoServer
      */
     private $server;
+
+    /**
+     * @param string $host
+     * @param int    $port
+     */
+    public function __construct($host = '127.0.0.1', $port = 8080)
+    {
+        $this->host = $host;
+        $this->port = $port;
+
+        $this->connections = new \SplObjectStorage();
+    }
 
     /**
      * @inheritDoc
@@ -44,9 +59,9 @@ class LongPollTransport implements TransportInterface
         //TODO maybe use this as router instead of builtin ratchet
         $routes = new RouteCollectionBuilder();
         $routes->add('/open', $this);
-        $routes->add('/{transport}/receive', $this);
-        $routes->add('/{transport}/send', $this);
-        $routes->add('/{transport}/close', $this);
+        $routes->add('/{transportID}/receive', $this);
+        $routes->add('/{transportID}/send', $this);
+        $routes->add('/{transportID}/close', $this);
 
         $socket = new Server('tcp://' . $this->host . ':' . $this->port, $loop);
 
@@ -63,7 +78,7 @@ class LongPollTransport implements TransportInterface
         $matcher = new UrlMatcher($routes->build(), new RequestContext());
 
         $socket = new Server('tcp://' . $this->host . ':' . $this->port, $loop);
-        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($matcher, $loop) {
+        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($matcher) {
             $uri = $request->getUri();
 
             $context = $matcher->getContext();
@@ -78,38 +93,23 @@ class LongPollTransport implements TransportInterface
                 return new Response(404);
             }
 
-            //TODO maybe call separate methods for each route
             switch ($route['_route']) {
                 case 'open':
-                    return new Response(404);
+                    return $this->processOpen();
                     break;
                 case 'receive':
-                    return new Promise(function(){});
+                    return $this->processReceive($route['transportID']);
                     break;
                 case 'send':
-                    return new Response(404);
+                    return $this->processSend($route['transportID']);
                     break;
                 case 'close':
-                    return new Response(404);
+                    return $this->processClose($route['transportID']);
                     break;
             }
 
-            //TODO create async http server & add routing handler
-            return new Promise(function ($resolve, $reject) use ($loop) {
-                $loop->addTimer(1.5, function() use ($resolve) {
-                    $response = new Response(
-                        200,
-                        array(
-                            'Content-Type' => 'text/plain'
-                        ),
-                        'Hello world'
-                    );
-                    $resolve($response);
-                });
-            });
+            return new Response(500);
         });
-
-        $connection = new LongPollConnection();//TODO pass callable which called on send message and trigger promise resolve
 
         $server->listen($socket);
     }
@@ -122,5 +122,62 @@ class LongPollTransport implements TransportInterface
         if ($this->server) {
             $this->server->socket->close();
         }
+    }
+
+    /**
+     * @return Response
+     */
+    private function processOpen()
+    {
+        $transportID = (string) Util::generateID();
+
+        $this->connections[$transportID] = new LongPollConnection();
+
+        return new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            json_encode(['transport' => $transportID, 'protocol'  => 'wamp.2.json'])
+        );
+    }
+
+    /**
+     * @param string $transportID
+     *
+     * @return Promise
+     */
+    private function processReceive($transportID)
+    {
+        $connection = $this->connections[$transportID];
+
+        //TODO get request data
+        //TODO trigger router onMessageReceive
+        //TODO create promise and associate with request
+        //TODO return promise
+        return new Promise(function ($resolve, $reject) {});
+    }
+
+    /**
+     * @param string $transportID
+     */
+    private function processSend($transportID)
+    {
+        $connection = $this->connections[$transportID];
+
+        //TODO get associated promise and trigger resolve it
+    }
+
+    /**
+     * @param string $transportID
+     *
+     * @return Response
+     */
+    private function processClose($transportID)
+    {
+        $connection = $this->connections[$transportID];
+        $connection->close();
+
+        unset($this->connections[$transportID]);
+
+        return new Response(202);
     }
 }
