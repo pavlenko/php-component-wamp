@@ -36,6 +36,11 @@ class LongPollTransport implements TransportInterface
     private $connections;
 
     /**
+     * @var Router
+     */
+    private $router;
+
+    /**
      * @var IoServer
      */
     private $server;
@@ -76,6 +81,8 @@ class LongPollTransport implements TransportInterface
             $loop
         );
 
+        $this->router = $router;
+
         $matcher = new UrlMatcher($routes->build(), new RequestContext());
 
         $socket = new Server('tcp://' . $this->host . ':' . $this->port, $loop);
@@ -96,7 +103,6 @@ class LongPollTransport implements TransportInterface
 
             switch ($route['_route']) {
                 case 'open':
-                    //TODO Generate transport id and create connection instance
                     return $this->processOpen();
                     break;
                 case 'receive':
@@ -104,8 +110,7 @@ class LongPollTransport implements TransportInterface
                     return $this->processReceive($route['transportID']);
                     break;
                 case 'send':
-                    //TODO Handle incoming message
-                    return $this->processSend($route['transportID']);
+                    return $this->processIncomingMessage($route['transportID'], (string) $request->getBody());
                     break;
                 case 'close':
                     //TODO Destroy connection instance
@@ -165,13 +170,13 @@ class LongPollTransport implements TransportInterface
 
     /**
      * @param string $transportID
+     * @param string $requestBody
      */
-    private function processSend($transportID)
+    private function processIncomingMessage($transportID, $requestBody)
     {
         $connection = $this->connections[$transportID];
 
-        $deferred = $connection->getDeferred();
-        $deferred->resolve(new Response());
+        $this->router->onMessage($connection, $connection->getSerializer()->deserialize($requestBody));
     }
 
     /**
