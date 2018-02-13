@@ -9,6 +9,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
+use React\Promise\Deferred;
 use React\Promise\Promise;
 use React\Socket\Server;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -95,15 +96,19 @@ class LongPollTransport implements TransportInterface
 
             switch ($route['_route']) {
                 case 'open':
+                    //TODO Generate transport id and create connection instance
                     return $this->processOpen();
                     break;
                 case 'receive':
+                    //TODO Create promise which resolved when called connection->send()
                     return $this->processReceive($route['transportID']);
                     break;
                 case 'send':
+                    //TODO Handle incoming message
                     return $this->processSend($route['transportID']);
                     break;
                 case 'close':
+                    //TODO Destroy connection instance
                     return $this->processClose($route['transportID']);
                     break;
             }
@@ -147,13 +152,15 @@ class LongPollTransport implements TransportInterface
      */
     private function processReceive($transportID)
     {
-        $connection = $this->connections[$transportID];
+        $deferred = new Deferred();
+        $deferred->promise()->then(function ($message) {
+            return new Response(200, [], $message);
+        });
 
-        //TODO get request data
-        //TODO trigger router onMessageReceive
-        //TODO create promise and associate with request
-        //TODO return promise
-        return new Promise(function ($resolve, $reject) {});
+        $connection = $this->connections[$transportID];
+        $connection->setDeferred($deferred);
+
+        return $deferred->promise();
     }
 
     /**
@@ -163,7 +170,8 @@ class LongPollTransport implements TransportInterface
     {
         $connection = $this->connections[$transportID];
 
-        //TODO get associated promise and trigger resolve it
+        $deferred = $connection->getDeferred();
+        $deferred->resolve(new Response());
     }
 
     /**
