@@ -5,6 +5,8 @@ namespace PE\Component\WAMP\Router\Transport;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Util;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
 use React\Promise\Deferred;
@@ -17,7 +19,7 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class LongPollTransport implements TransportInterface
+class LongPollTransport implements TransportInterface, LoggerAwareInterface
 {
     /**
      * @var string
@@ -30,9 +32,9 @@ class LongPollTransport implements TransportInterface
     private $port;
 
     /**
-     * @var \SplObjectStorage|LongPollConnection[]
+     * @var LongPollConnection[]
      */
-    private $connections;
+    private $connections = [];
 
     /**
      * @var Router
@@ -45,6 +47,11 @@ class LongPollTransport implements TransportInterface
     private $socket;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param string $host
      * @param int    $port
      */
@@ -52,8 +59,6 @@ class LongPollTransport implements TransportInterface
     {
         $this->host = $host;
         $this->port = $port;
-
-        $this->connections = new \SplObjectStorage();
     }
 
     /**
@@ -61,6 +66,10 @@ class LongPollTransport implements TransportInterface
      */
     public function start(Router $router, LoopInterface $loop)
     {
+        $uri = 'tcp://' . $this->host . ':' . $this->port;
+
+        $this->logger && $this->logger->info('Listen to {uri}', ['uri' => $uri]);
+
         $this->router = $router;
 
         $routes = new RouteCollection();
@@ -71,7 +80,8 @@ class LongPollTransport implements TransportInterface
 
         $matcher = new UrlMatcher($routes, new RequestContext());
 
-        $socket = new Server('tcp://' . $this->host . ':' . $this->port, $loop);
+        $socket = new Server($uri, $loop);
+
         $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($matcher) {
             $uri = $request->getUri();
 
@@ -80,10 +90,12 @@ class LongPollTransport implements TransportInterface
             $context->setHost($uri->getHost());
 
             try {
-                $route = $matcher->match($uri->getHost());
+                $route = $matcher->match($uri->getPath());
             } catch (MethodNotAllowedException $exception) {
+                $this->logger && $this->logger->error('Method not allowed for {uri}', ['uri' => $uri]);
                 return new Response(405, ['Allow' => $exception->getAllowedMethods()]);
             } catch (ResourceNotFoundException $exception) {
+                $this->logger && $this->logger->error('Route not found for {uri}', ['uri' => $uri]);
                 return new Response(404);
             }
 
@@ -122,6 +134,8 @@ class LongPollTransport implements TransportInterface
     private function processOpen()
     {
         $transportID = (string) Util::generateID();
+
+        $this->logger && $this->logger->info('Long poll [{transportID}]: open', ['transportID' => $transportID]);
 
         $this->connections[$transportID] = new LongPollConnection();
 
@@ -168,6 +182,8 @@ class LongPollTransport implements TransportInterface
      */
     private function processClose($transportID)
     {
+        $this->logger && $this->logger->info('Long poll [{transportID}]: close', ['transportID' => $transportID]);
+
         $connection = $this->connections[$transportID];
         $connection->close();
 
@@ -178,5 +194,13 @@ class LongPollTransport implements TransportInterface
         unset($this->connections[$transportID]);
 
         return new Response(202);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }

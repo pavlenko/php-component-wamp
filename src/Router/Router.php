@@ -2,6 +2,8 @@
 
 namespace PE\Component\WAMP\Router;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
@@ -16,7 +18,7 @@ use PE\Component\WAMP\Router\Role\RoleInterface;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class Router
+class Router implements LoggerAwareInterface
 {
     use EventDispatcherTrait;
 
@@ -24,6 +26,11 @@ class Router
      * @var TransportInterface
      */
     private $transport;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var LoopInterface
@@ -40,9 +47,8 @@ class Router
      */
     private $sessions;
 
-    public function __construct(TransportInterface $transport, LoopInterface $loop)
+    public function __construct(LoopInterface $loop = null)
     {
-        $this->transport = $transport;
         $this->loop      = $loop ?: Factory::create();
 
         $this->dispatcher = new EventDispatcher();
@@ -113,8 +119,30 @@ class Router
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->sessions[$connection]));
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function setTransport(TransportInterface $transport)
+    {
+        $this->transport = $transport;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function start($startLoop = true)
     {
+        if (null === $this->transport) {
+            throw new \RuntimeException('Transport not set via setTransport()');
+        }
+
+        $this->logger && $this->logger->info('Start router');
+
         $this->transport->start($this, $this->loop);
 
         if ($startLoop) {

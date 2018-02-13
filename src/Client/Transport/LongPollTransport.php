@@ -10,6 +10,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use React\EventLoop\LoopInterface;
+use React\HttpClient\Response;
+use React\Promise\Promise;
 
 class LongPollTransport implements TransportInterface, LoggerAwareInterface
 {
@@ -54,9 +56,34 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
      */
     public function start(Client $client, LoopInterface $loop)
     {
-        $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
+        $url = ($this->secure ? 'https' : 'http') . '://' . $this->host . ':' . $this->port;
 
-        !$this->logger ?: $this->logger->info('Connecting to {url} ...', ['url' => $url]);
+        $this->logger && $this->logger->info('Connecting to {url} ...', ['url' => $url]);
+
+        $http = new \React\HttpClient\Client($loop);
+
+        $request = $http->request('POST', $url . '/open');
+        $request->on('response', function (Response $response) use ($client) {
+            $buffer = '';
+
+            $response->on('data', function ($chunk) use (&$buffer) {
+                $buffer .= $chunk;
+            });
+            $response->on('end', function() use ($client) {
+                echo 'DONE';
+
+                $connection = new LongPollConnection();
+                $connection->setSerializer(new Serializer());
+
+                $client->processOpen($connection);
+            });
+        });
+        $request->on('error', function (\Exception $e) use ($client) {
+            $client->processError($e);
+        });
+        $request->end();
+
+        return;
 
         $http = new GuzzleHttpClient([
             'base_uri' => $url,
@@ -105,5 +132,15 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
                 $client->processClose('unreachable');
             }
         );
+    }
+
+    private function processOpen(Client $client)
+    {
+        $connection = new LongPollConnection();//TODO set send callback
+        $connection->setSerializer(new Serializer());
+
+        $client->processOpen($connection);
+
+        $this->processReceive();//TODO start recieve loop
     }
 }

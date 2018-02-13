@@ -4,6 +4,7 @@ namespace PE\Component\WAMP\Client;
 
 use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Module\ModuleInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
@@ -199,7 +200,8 @@ final class Client
             throw new \RuntimeException('Transport not set via setTransport()');
         }
 
-        //$this->logger->info('Starting transport');
+        $this->logger && $this->logger->info('Connecting...');
+
         $this->transport->start($this, $this->loop);
 
         if ($startLoop) {
@@ -234,7 +236,7 @@ final class Client
      */
     public function addModule(ModuleInterface $module)
     {
-        if (!array_key_exists($hash = spl_object_hash($module), $this->modules)) {
+        if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 

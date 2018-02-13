@@ -15,19 +15,12 @@ class LongPollConnection extends Connection
     private $client;
 
     /**
-     * @var TimerInterface
-     */
-    private $timer;
-
-    /**
      * @param ClientInterface $client
-     * @param TimerInterface  $timer
      */
-    public function __construct(ClientInterface $client, TimerInterface $timer)
+    /*public function __construct(ClientInterface $client)
     {
         $this->client = $client;
-        $this->timer  = $timer;
-    }
+    }*/
 
     /**
      * @inheritDoc
