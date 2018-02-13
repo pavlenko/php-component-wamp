@@ -13,6 +13,8 @@ use React\EventLoop\LoopInterface;
 use React\Http\Response;
 use React\Promise\Promise;
 use React\Socket\Server;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -58,7 +60,40 @@ class LongPollTransport implements TransportInterface, HttpServerInterface
             $loop
         );
 
-        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($loop) {
+        $matcher = new UrlMatcher($routes->build(), new RequestContext());
+
+        $socket = new Server('tcp://' . $this->host . ':' . $this->port, $loop);
+        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($matcher, $loop) {
+            $uri = $request->getUri();
+
+            $context = $matcher->getContext();
+            $context->setMethod($request->getMethod());
+            $context->setHost($uri->getHost());
+
+            try {
+                $route = $matcher->match($uri->getHost());
+            } catch (MethodNotAllowedException $exception) {
+                return new Response(405, ['Allow' => $exception->getAllowedMethods()]);
+            } catch (ResourceNotFoundException $exception) {
+                return new Response(404);
+            }
+
+            //TODO maybe call separate methods for each route
+            switch ($route['_route']) {
+                case 'open':
+                    return new Response(404);
+                    break;
+                case 'receive':
+                    return new Promise(function(){});
+                    break;
+                case 'send':
+                    return new Response(404);
+                    break;
+                case 'close':
+                    return new Response(404);
+                    break;
+            }
+
             //TODO create async http server & add routing handler
             return new Promise(function ($resolve, $reject) use ($loop) {
                 $loop->addTimer(1.5, function() use ($resolve) {
@@ -73,6 +108,10 @@ class LongPollTransport implements TransportInterface, HttpServerInterface
                 });
             });
         });
+
+        $connection = new LongPollConnection();//TODO pass callable which called on send message and trigger promise resolve
+
+        $server->listen($socket);
     }
 
     /**
