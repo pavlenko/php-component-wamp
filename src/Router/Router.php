@@ -108,7 +108,7 @@ final class Router implements LoggerAwareInterface
      */
     public function processMessageReceived(ConnectionInterface $connection, Message $message)
     {
-        $this->logger && $this->logger->info('> ' . $message->getName());
+        $this->logger && $this->logger->info("Router: {$message->getName()} received");
         $this->logger && $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
@@ -122,7 +122,7 @@ final class Router implements LoggerAwareInterface
      */
     public function processMessageSend(ConnectionInterface $connection, Message $message)
     {
-        $this->logger && $this->logger->info('< ' . $message->getName());
+        $this->logger && $this->logger->info("Router: {$message->getName()} send");
         $this->logger && $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
@@ -134,10 +134,13 @@ final class Router implements LoggerAwareInterface
      * Handle connection error (called directly from transport)
      *
      * @param ConnectionInterface $connection
-     * @param \Exception          $exception
+     * @param \Exception          $ex
      */
-    public function processError(ConnectionInterface $connection, \Exception $exception)
+    public function processError(ConnectionInterface $connection, \Exception $ex)
     {
+        $this->logger && $this->logger->error("Router: [{$ex->getCode()}] {$ex->getMessage()}");
+        $this->logger && $this->logger->debug($ex->getTraceAsString());
+
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->sessions[$connection]));
     }
 
@@ -174,6 +177,7 @@ final class Router implements LoggerAwareInterface
 
     public function stop()
     {
+        $this->logger && $this->logger->info('Router: stop');
         $this->transport->stop();
     }
 
