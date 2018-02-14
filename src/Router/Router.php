@@ -123,11 +123,12 @@ final class Router implements LoggerAwareInterface
     public function processMessageSend(ConnectionInterface $connection, Message $message)
     {
         $this->logger && $this->logger->info("Router: {$message->getName()} send");
-        $this->logger && $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
 
         $this->emit(Events::MESSAGE_SEND, new MessageEvent($session, $message));
+
+        $this->logger && $this->logger->debug(json_encode($message));
     }
 
     /**

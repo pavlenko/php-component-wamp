@@ -145,9 +145,10 @@ final class Client
     public function processMessageSend(Message $message)
     {
         $this->logger && $this->logger->info('< ' . $message->getName());
-        $this->logger && $this->logger->debug(json_encode($message));
 
         $this->emit(Events::MESSAGE_SEND, new MessageEvent($this->session, $message));
+
+        $this->logger && $this->logger->debug(json_encode($message));
     }
 
     /**
