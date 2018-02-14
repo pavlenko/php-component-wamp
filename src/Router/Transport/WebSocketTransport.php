@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Router\Transport;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\RFC6455\Messaging\MessageInterface;
@@ -17,10 +15,8 @@ use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Serializer\Serializer;
 
-class WebSocketTransport implements TransportInterface, MessageComponentInterface, WsServerInterface, LoggerAwareInterface
+class WebSocketTransport implements TransportInterface, MessageComponentInterface, WsServerInterface
 {
-    use LoggerAwareTrait;
-
     /**
      * @var string
      */
@@ -73,7 +69,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     {
         $uri = 'tcp://' . $this->host . ':' . $this->port;
 
-        $this->logger && $this->logger->info('Web-socket transport: listen to ' . $uri);
+        $router->getLogger() && $router->getLogger()->info('Web-socket: listen to ' . $uri);
 
         $this->router = $router;
         $this->server = new IoServer(

@@ -12,7 +12,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG));
 
 $transport = new WebSocketTransport('127.0.0.1', 1337);
-$transport->setLogger($logger);
 
 $router = new Router();
 $router->setTransport($transport);

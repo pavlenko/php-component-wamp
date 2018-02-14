@@ -5,6 +5,7 @@ namespace PE\Component\WAMP\Client;
 use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Module\ModuleInterface;
 use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
@@ -19,8 +20,10 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
-final class Client
+final class Client implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const RECONNECT_TIMEOUT  = 1.5;
     const RECONNECT_ATTEMPTS = 15;
 
@@ -33,11 +36,6 @@ final class Client
      * @var TransportInterface
      */
     private $transport;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * @var int
@@ -131,7 +129,7 @@ final class Client
      */
     public function processMessageReceived(Message $message)
     {
-        $this->logger && $this->logger->info('> ' . $message->getName());
+        $this->logger && $this->logger->info("Client: {$message->getName()} received");
         $this->logger && $this->logger->debug(json_encode($message));
 
         $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
@@ -144,7 +142,7 @@ final class Client
      */
     public function processMessageSend(Message $message)
     {
-        $this->logger && $this->logger->info('< ' . $message->getName());
+        $this->logger && $this->logger->info("Client: {$message->getName()} send");
 
         $this->emit(Events::MESSAGE_SEND, new MessageEvent($this->session, $message));
 
@@ -159,7 +157,7 @@ final class Client
     public function processError(\Exception $ex)
     {
         $this->logger && $this->logger->error("Client: [{$ex->getCode()}] {$ex->getMessage()}");
-        $this->logger && $this->logger->debug($ex->getTraceAsString());
+        $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
 
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
     }
@@ -173,11 +171,11 @@ final class Client
     }
 
     /**
-     * @inheritDoc
+     * @return LoggerInterface
      */
-    public function setLogger(LoggerInterface $logger)
+    public function getLogger()
     {
-        $this->logger = $logger;
+        return $this->logger;
     }
 
     /**

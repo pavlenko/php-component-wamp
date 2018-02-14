@@ -5,6 +5,7 @@ namespace PE\Component\WAMP\Router;
 use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
@@ -21,15 +22,12 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class Router implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var TransportInterface
      */
     private $transport;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * @var LoopInterface
@@ -140,7 +138,7 @@ final class Router implements LoggerAwareInterface
     public function processError(ConnectionInterface $connection, \Exception $ex)
     {
         $this->logger && $this->logger->error("Router: [{$ex->getCode()}] {$ex->getMessage()}");
-        $this->logger && $this->logger->debug($ex->getTraceAsString());
+        $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
 
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->sessions[$connection]));
     }
@@ -154,11 +152,11 @@ final class Router implements LoggerAwareInterface
     }
 
     /**
-     * @inheritDoc
+     * @return LoggerInterface
      */
-    public function setLogger(LoggerInterface $logger)
+    public function getLogger()
     {
-        $this->logger = $logger;
+        return $this->logger;
     }
 
     public function start($startLoop = true)

@@ -3,17 +3,13 @@
 namespace PE\Component\WAMP\Client\Transport;
 
 use PE\Component\WAMP\Client\Client;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Serializer\Serializer;
 
-class WebSocketTransport implements TransportInterface,  LoggerAwareInterface
+class WebSocketTransport implements TransportInterface
 {
-    use LoggerAwareTrait;
-
     /**
      * @var string
      */
@@ -55,7 +51,7 @@ class WebSocketTransport implements TransportInterface,  LoggerAwareInterface
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 
-        !$this->logger ?: $this->logger->info('Connecting to {url} ...', ['url' => $url]);
+        $client->getLogger() && $client->getLogger()->info('Web-socket: connecting to {url} ...', ['url' => $url]);
 
         $connector = new Connector(
             $loop,
