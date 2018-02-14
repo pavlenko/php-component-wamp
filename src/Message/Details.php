@@ -30,6 +30,29 @@ trait Details
 
     /**
      * @param string $name
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getDetail($name, $default = null)
+    {
+        return array_key_exists($name, $this->details) ? $this->details[$name] : $default;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setDetail($name, $value)
+    {
+        $this->details[$name] = $value;
+        return $this;
+    }
+
+    /**
+     * @param string $name
      * @param array  $features
      *
      * @return $this

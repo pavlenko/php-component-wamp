@@ -1,0 +1,96 @@
+<?php
+
+namespace PE\Component\WAMP\Router\Authentication;
+
+use PE\Component\WAMP\ErrorURI;
+use PE\Component\WAMP\Message\AuthenticateMessage;
+use PE\Component\WAMP\Message\ChallengeMessage;
+use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\MessageFactory;
+use PE\Component\WAMP\Message\WelcomeMessage;
+use PE\Component\WAMP\Router\Authentication\Method\MethodInterface;
+use PE\Component\WAMP\Router\Event\Events;
+use PE\Component\WAMP\Router\Event\MessageEvent;
+use PE\Component\WAMP\Router\RouterModuleInterface;
+use PE\Component\WAMP\Session;
+use PE\Component\WAMP\Util;
+
+class AuthenticationModule implements RouterModuleInterface
+{
+    /**
+     * @var MethodInterface[]
+     */
+    private $methods = [];
+
+    /**
+     * @param MethodInterface $method
+     */
+    public function addMethod(MethodInterface $method)
+    {
+        $this->methods[] = $method;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            Events::MESSAGE_RECEIVED => ['onMessageReceived', 10],
+        ];
+    }
+
+    /**
+     * @param MessageEvent $event
+     */
+    public function onMessageReceived(MessageEvent $event)
+    {
+        if (count($this->methods)) {
+            $event->stopPropagation();
+        }
+
+        $session = $event->getSession();
+        $message = $event->getMessage();
+
+        switch (true) {
+            case ($message instanceof HelloMessage):
+                $this->processHelloMessage($session, $message);
+                break;
+            case ($message instanceof AuthenticateMessage):
+                $this->processAuthenticateMessage($session, $message);
+                break;
+        }
+    }
+
+    /**
+     * @param Session      $session
+     * @param HelloMessage $message
+     */
+    private function processHelloMessage(Session $session, HelloMessage $message)
+    {
+        $methods = (array) $message->getDetail('authmethods', []);
+
+        foreach ($this->methods as $method) {
+            if (in_array($method->getName(), $methods, true)) {
+                $method->processHelloMessage($session, $message);
+                return;
+            }
+        }
+
+        if (count($this->methods)) {
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NOT_AUTHORIZED));
+        }
+    }
+
+    /**
+     * @param Session             $session
+     * @param AuthenticateMessage $message
+     */
+    private function processAuthenticateMessage(Session $session, AuthenticateMessage $message)
+    {
+        $sessionID = Util::generateID();
+
+        $session->setSessionID($sessionID);
+        $session->send(new WelcomeMessage($sessionID, []));
+    }
+}

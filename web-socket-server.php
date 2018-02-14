@@ -1,6 +1,8 @@
 <?php
 namespace PE\Component\WAMP;
 
+use PE\Component\WAMP\Router\Authentication\AuthenticationModule;
+use PE\Component\WAMP\Router\Authentication\Method\TicketMethod;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\Transport\WebSocketTransport;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -16,5 +18,10 @@ $transport = new WebSocketTransport('127.0.0.1', 1337);
 $router = new Router();
 $router->setTransport($transport);
 $router->setLogger($logger);
+
+$authentication = new AuthenticationModule();
+$authentication->addMethod(new TicketMethod());//TODO define tickets
+
+$router->addModule($authentication);
 
 $router->start();

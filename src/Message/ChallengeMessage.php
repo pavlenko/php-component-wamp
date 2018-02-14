@@ -23,12 +23,12 @@ class ChallengeMessage extends Message
     private $extra = [];
 
     /**
-     * @param string $authMethod
+     * @param string $authenticationMethod
      * @param array  $extra
      */
-    public function __construct($authMethod, array $extra)
+    public function __construct($authenticationMethod, array $extra)
     {
-        $this->setAuthenticationMethod($authMethod);
+        $this->setAuthenticationMethod($authenticationMethod);
         $this->setExtra($extra);
     }
 

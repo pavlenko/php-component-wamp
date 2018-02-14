@@ -1,6 +1,8 @@
 <?php
 namespace PE\Component\WAMP;
 
+use PE\Component\WAMP\Client\Authentication\AuthenticationModule;
+use PE\Component\WAMP\Client\Authentication\Method\TicketMethod;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\Event\ConnectionEvent;
 use PE\Component\WAMP\Client\Event\Events;
@@ -24,6 +26,10 @@ $client->setTransport($transport);
 $client->setLogger($logger);
 $client->setReconnectAttempts(3);
 
+$authentication = new AuthenticationModule();
+$authentication->addMethod(new TicketMethod());//TODO define ticket
+
+$client->addModule($authentication);
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 

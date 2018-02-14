@@ -20,7 +20,7 @@ class SessionModule implements RouterModuleInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::MESSAGE_RECEIVED => 'onMessageReceived'
+            Events::MESSAGE_RECEIVED => ['onMessageReceived', 0]
         ];
     }
 
@@ -50,6 +50,7 @@ class SessionModule implements RouterModuleInterface
     {
         $sessionID = Util::generateID();
 
+        $session->setSessionID($sessionID);
         $session->send(new WelcomeMessage($sessionID, []));
     }
 
