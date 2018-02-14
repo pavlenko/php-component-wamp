@@ -62,6 +62,8 @@ class Router implements LoggerAwareInterface
      */
     public function onOpen(ConnectionInterface $connection)
     {
+        $this->logger && $this->logger->info('Router: open');
+
         $session = new Session($connection, $this);
 
         $this->sessions->attach($connection, $session);
@@ -76,6 +78,8 @@ class Router implements LoggerAwareInterface
      */
     public function onClose(ConnectionInterface $connection)
     {
+        $this->logger && $this->logger->info('Router: close');
+
         $session = $this->sessions[$connection];
 
         $this->sessions->detach($connection);
@@ -93,6 +97,8 @@ class Router implements LoggerAwareInterface
      */
     public function onMessage(ConnectionInterface $connection, Message $message)
     {
+        $this->logger && $this->logger->info('< {name}', ['name' => $message->getName()]);
+        $this->logger && $this->logger->debug($message);
         //TODO handle authentication
         //TODO handle authorization
 

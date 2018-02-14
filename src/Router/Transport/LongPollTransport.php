@@ -99,6 +99,8 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
                 return new Response(404);
             }
 
+            $this->logger && $this->logger->info('Matched route {route}', ['route' => $route['_route']]);
+
             switch ($route['_route']) {
                 case 'open':
                     return $this->processOpen();
@@ -137,7 +139,9 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
 
         $this->logger && $this->logger->info('Long poll [{transportID}]: open', ['transportID' => $transportID]);
 
-        $this->connections[$transportID] = new LongPollConnection();
+        $this->connections[$transportID] = $connection = new LongPollConnection();
+
+        $this->router->onOpen($connection);
 
         return new Response(
             200,
@@ -149,16 +153,26 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
     /**
      * @param string $transportID
      *
-     * @return Promise
+     * @return Promise|Response
      */
     private function processReceive($transportID)
     {
+        $connection = $this->connections[$transportID];
+
+        if ($message = $connection->shift()) {
+            return new Response(200, ['Content-Type' => 'application/json'], $message);
+        }
+
+        //TODO store pending messages in connection
+        //TODO get message from connection
+        //TODO if has messages - return response
+        //TODO else return promise
+
         $deferred = new Deferred();
         $deferred->promise()->then(function ($message) {
             return new Response(200, ['Content-Type' => 'application/json'], $message);
         });
 
-        $connection = $this->connections[$transportID];
         $connection->setDeferred($deferred);
 
         return $deferred->promise();
@@ -170,6 +184,8 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
      */
     private function processIncomingMessage($transportID, $requestBody)
     {
+        $this->logger && $this->logger->info('Process incoming message');
+
         $connection = $this->connections[$transportID];
 
         $this->router->onMessage($connection, $connection->getSerializer()->deserialize($requestBody));

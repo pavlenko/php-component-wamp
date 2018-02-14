@@ -9,6 +9,11 @@ use React\Promise\Deferred;
 class LongPollConnection extends Connection
 {
     /**
+     * @var Message[]
+     */
+    private $messages = [];
+
+    /**
      * @var Deferred
      */
     private $deferred;
@@ -34,8 +39,13 @@ class LongPollConnection extends Connection
      */
     public function send(Message $message)
     {
+        //TODO if deferred set - resolve it
+        //TODO else add message to stack
+
         if ($this->deferred) {
             $this->deferred->resolve($this->getSerializer()->serialize($message));
+        } else {
+            $this->messages[] = $message;
         }
     }
 
@@ -61,5 +71,13 @@ class LongPollConnection extends Connection
     public function getTransportDetails()
     {
         // TODO: Implement getTransportDetails() method.
+    }
+
+    /**
+     * @return Message|null
+     */
+    public function shift()
+    {
+        return array_shift($this->messages);
     }
 }

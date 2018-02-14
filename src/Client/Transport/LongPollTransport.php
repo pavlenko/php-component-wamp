@@ -9,9 +9,12 @@ use PE\Component\WAMP\Serializer\Serializer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\HttpClient\Client as HttpClient;
 use React\HttpClient\Response;
 use React\Promise\Promise;
+use React\Socket\Connector;
 
 class LongPollTransport implements TransportInterface, LoggerAwareInterface
 {
@@ -33,22 +36,22 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
     private $secure;
 
     /**
-     * @var int
+     * @var string
      */
-    private $timeout;
+    private $uri;
 
     /**
      * @param string $host
      * @param int    $port
      * @param bool   $secure
-     * @param int    $timeout
      */
-    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false, $timeout = 20)
+    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false)
     {
         $this->host    = $host;
         $this->port    = $port;
         $this->secure  = $secure;
-        $this->timeout = $timeout;
+
+        $this->uri = ($this->secure ? 'https' : 'http') . '://' . $this->host . ':' . $this->port;
     }
 
     /**
@@ -56,41 +59,83 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
      */
     public function start(Client $client, LoopInterface $loop)
     {
-        $url = ($this->secure ? 'https' : 'http') . '://' . $this->host . ':' . $this->port;
+        $this->logger && $this->logger->info('Connecting to {url} ...', ['url' => $this->uri]);
 
-        $this->logger && $this->logger->info('Connecting to {url} ...', ['url' => $url]);
+        $http = new LongPollClient($loop, [
+            'base_uri' => $this->uri,
+            'timeout'  => 5,
+            'headers'  => ['Content-Type' => 'application/json']
+        ]);
 
-        $http = new \React\HttpClient\Client($loop);
+        $http->request('POST', '/open', '{"protocols": ["wamp.2.json"]}')->then(
+            function ($response) use ($client, $loop) {
+                $response = json_decode($response);
 
-        $request = $http->request('POST', $url . '/open');
-        $request->on('response', function (Response $response) use ($client) {
-            $buffer = '';
+                if (!isset($response->protocol, $response->transport)) {
+                    throw new \RuntimeException('Invalid response');
+                }
 
-            $response->on('data', function ($chunk) use (&$buffer) {
-                $buffer .= $chunk;
-            });
-            $response->on('end', function() use ($client) {
-                echo 'DONE';
+                $http = new LongPollClient($loop, [
+                    'base_uri' => rtrim($this->uri, '/') . '/' . $response->transport,
+                    'timeout'  => false,
+                    'headers'  => ['Content-Type' => 'application/json']
+                ]);
 
-                $connection = new LongPollConnection();
-                $connection->setSerializer(new Serializer());
+                $connection = new LongPollConnection($http);
+                $connection->setSerializer($serializer = new Serializer());
 
                 $client->processOpen($connection);
-            });
-        });
-        $request->on('error', function (\Exception $e) use ($client) {
-            $client->processError($e);
-        });
-        $request->end();
+
+                $http->request('POST', '/receive')->then(
+                    function ($message) use ($client, $connection) {
+                        $client->processMessageReceived($connection->getSerializer()->deserialize($message));
+                    }
+                );
+            },
+            function ($error) {
+                $this->logger && $this->logger->error($error);
+            }
+        );
+
+        return;
+        $http = new HttpClient($loop, new Connector($loop, ['timeout' => 30]));
+
+        $promise = $this->request($http, '/open', '{"protocols": ["wamp.2.json"]}');
+        $promise->then(
+            function ($response) use ($client, $http) {
+                $this->logger && $this->logger->debug($response);
+                if ($transport = json_decode($response)->transport) {
+                    // Create connection
+                    $connection = new LongPollConnection(
+                        function ($message) use ($http, $transport) {
+                            $this->request($http, $transport . '/send', $message);
+                        },
+                        function () use ($http, $transport) {
+                            $this->request($http, $transport . '/close');
+                        }
+                    );
+
+                    $connection->setSerializer($serializer = new Serializer());
+
+                    $client->processOpen($connection);
+
+                    $this->processReceive($http, $client, $serializer, $transport);
+                }
+            },
+            function ($error) {
+                echo $error . "\n";
+            }
+        );
 
         return;
 
+        // Create HTTP client for open connection
         $http = new GuzzleHttpClient([
             'base_uri' => $url,
-            'timeout' => $this->timeout
+            'timeout'  => $this->timeout
         ]);
 
-        $promise = $http->requestAsync('POST', 'open', ['body' => '{"protocols": ["wamp.2.json"]}']);
+        $promise = $http->requestAsync('POST', '/open', ['body' => '{"protocols": ["wamp.2.json"]}']);
         $promise->then(
             function (ResponseInterface $response) use ($client, $loop, $url) {
                 $json = json_decode((string) $response->getBody());
@@ -100,31 +145,20 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
 
                     // Create HTTP client with configured base url
                     $http = new GuzzleHttpClient([
-                        'base_uri' => $url . '/' . $json->transport . '/',
+                        'base_uri' => $url . '/' . $json->transport,
                         'timeout'  => $this->timeout,
                     ]);
 
-                    // Create periodic timer for check new messages
-                    $timer = $loop->addPeriodicTimer(5, function () use ($client, $serializer, $http) {
-                        $promise = $http->requestAsync('POST', 'receive');
-                        $promise->then(
-                            function (ResponseInterface $response) use ($client, $serializer) {
-                                $client->processMessageReceived($serializer->deserialize((string) $response->getBody()));
-                            },
-                            function (RequestException $exception) use ($client) {
-                                $client->processError($exception);
-                            }
-                        );
-                    });
-
                     // Create connection
-                    $connection = new LongPollConnection($http, $timer);
+                    $connection = new LongPollConnection($http);
                     $connection->setSerializer($serializer);
 
                     // Notify client
                     $client->processOpen($connection);
+
+                    $this->processReceive($http, $client, $serializer);
                 } else {
-                    $client->processError(new \Exception());//TODO invalid response
+                    $client->processError(new \Exception());
                 }
             },
             function (RequestException $exception) use ($client) {
@@ -134,13 +168,50 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
         );
     }
 
-    private function processOpen(Client $client)
+    private function processOpen(HttpClient $http, Client $client, Serializer $serializer)
     {
-        $connection = new LongPollConnection();//TODO set send callback
-        $connection->setSerializer(new Serializer());
 
-        $client->processOpen($connection);
+    }
 
-        $this->processReceive();//TODO start recieve loop
+    private function processReceive(HttpClient $http, Client $client, Serializer $serializer, $transport)
+    {
+        $promise = $this->request($http, $transport . '/receive');
+
+        $promise->then(function (ResponseInterface $response) use ($http, $client, $serializer, $transport) {
+            $client->processMessageReceived($serializer->deserialize((string) $response->getBody()));
+
+            $this->processReceive($http, $client, $serializer, $transport);
+        });
+    }
+
+    private function request(HttpClient $http, $uri, $data = null)
+    {
+        $this->logger && $this->logger->debug('Request to {uri}', ['uri' => $uri]);
+
+        return new Promise(function ($resolve, $reject) use ($http, $uri, $data) {
+            $request = $http->request('POST', $this->uri . $uri);
+
+            $request->on('response', function (Response $response) use ($resolve, $reject) {
+                $buffer = '';
+
+                $response->on('data', function ($chunk) use (&$buffer) {
+                    $buffer .= $chunk;
+                });
+
+                $response->on('end', function() use ($resolve, &$buffer) {
+                    $resolve($buffer);
+                });
+
+                $response->on('error', function (\Exception $exception) use ($reject) {
+                    $reject($exception);
+                });
+            });
+
+            $request->on('error', function (\Exception $exception) use ($reject) {
+                $reject($exception);
+            });
+
+            $request->end($data);
+        });
     }
 }

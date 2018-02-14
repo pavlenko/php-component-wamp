@@ -2,32 +2,27 @@
 
 namespace PE\Component\WAMP\Client\Transport;
 
-use GuzzleHttp\ClientInterface;
 use PE\Component\WAMP\Connection\Connection;
 use PE\Component\WAMP\Message\Message;
-use React\EventLoop\Timer\TimerInterface;
 
 class LongPollConnection extends Connection
 {
     /**
-     * @var ClientInterface
+     * @var LongPollClient
      */
     private $client;
 
-    /**
-     * @param ClientInterface $client
-     */
-    /*public function __construct(ClientInterface $client)
+    public function __construct(LongPollClient $client)
     {
-        $this->client = $client;
-    }*/
+        $this->client  = $client;
+    }
 
     /**
      * @inheritDoc
      */
     public function send(Message $message)
     {
-        $this->client->request('POST', 'send', ['body' => $this->getSerializer()->serialize($message)]);
+        $this->client->request('POST', '/send', $this->getSerializer()->serialize($message));
     }
 
     /**
@@ -35,8 +30,7 @@ class LongPollConnection extends Connection
      */
     public function close()
     {
-        $this->timer->cancel();
-        $this->client->request('POST', 'close');
+        $this->client->request('POST', '/close');
     }
 
     /**
