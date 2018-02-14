@@ -29,7 +29,7 @@ class Session extends \PE\Component\WAMP\Session
      */
     public function send(Message $message)
     {
-        $this->router->emit(Events::MESSAGE_SEND, new MessageEvent($this, $message));
+        $this->router->processMessageSend($this->getConnection(), $message);
         $this->getConnection()->send($message);
     }
 }

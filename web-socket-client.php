@@ -1,5 +1,4 @@
 <?php
-
 namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Client\Client;

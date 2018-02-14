@@ -16,12 +16,12 @@ use PE\Component\WAMP\Router\Event\Events;
 use PE\Component\WAMP\Router\Event\MessageEvent;
 use PE\Component\WAMP\Router\Role\RoleInterface;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
-class Router implements LoggerAwareInterface
+final class Router implements LoggerAwareInterface
 {
-    use EventDispatcherTrait;
-
     /**
      * @var TransportInterface
      */
@@ -43,6 +43,11 @@ class Router implements LoggerAwareInterface
     private $roles = [];
 
     /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
+
+    /**
      * @var \SplObjectStorage|Session[]
      */
     private $sessions;
@@ -60,7 +65,7 @@ class Router implements LoggerAwareInterface
      *
      * @param ConnectionInterface $connection
      */
-    public function onOpen(ConnectionInterface $connection)
+    public function processOpen(ConnectionInterface $connection)
     {
         $this->logger && $this->logger->info('Router: open');
 
@@ -76,7 +81,7 @@ class Router implements LoggerAwareInterface
      *
      * @param ConnectionInterface $connection
      */
-    public function onClose(ConnectionInterface $connection)
+    public function processClose(ConnectionInterface $connection)
     {
         $this->logger && $this->logger->info('Router: close');
 
@@ -95,9 +100,9 @@ class Router implements LoggerAwareInterface
      * @param ConnectionInterface $connection
      * @param Message             $message
      */
-    public function onMessage(ConnectionInterface $connection, Message $message)
+    public function processMessageReceived(ConnectionInterface $connection, Message $message)
     {
-        $this->logger && $this->logger->info('< {name}', ['name' => $message->getName()]);
+        $this->logger && $this->logger->info('> ' . $message->getName());
         $this->logger && $this->logger->debug($message);
         //TODO handle authentication
         //TODO handle authorization
@@ -115,12 +120,26 @@ class Router implements LoggerAwareInterface
     }
 
     /**
+     * @param ConnectionInterface $connection
+     * @param Message             $message
+     */
+    public function processMessageSend(ConnectionInterface $connection, Message $message)
+    {
+        $this->logger && $this->logger->info('< ' . $message->getName());
+        $this->logger && $this->logger->debug($message);
+
+        $session = $this->sessions[$connection];
+
+        $this->emit(Events::MESSAGE_SEND, new MessageEvent($session, $message));
+    }
+
+    /**
      * Handle connection error (called directly from transport)
      *
      * @param ConnectionInterface $connection
      * @param \Exception          $exception
      */
-    public function onError(ConnectionInterface $connection, \Exception $exception)
+    public function processError(ConnectionInterface $connection, \Exception $exception)
     {
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->sessions[$connection]));
     }
@@ -180,10 +199,50 @@ class Router implements LoggerAwareInterface
     }
 
     /**
-     * @return EventDispatcher
+     * @param string   $eventName
+     * @param callable $listener
+     * @param int      $priority
      */
-    public function getDispatcher()
+    public function on($eventName, callable $listener, $priority = 0)
     {
-        return $this->dispatcher;
+        $this->dispatcher->addListener($eventName, $listener, $priority);
+    }
+
+    /**
+     * @param string   $eventName
+     * @param callable $listener
+     */
+    public function off($eventName, callable $listener)
+    {
+        $this->dispatcher->removeListener($eventName, $listener);
+    }
+
+    /**
+     * @param string   $eventName
+     * @param callable $listener
+     * @param int      $priority
+     */
+    public function once($eventName, callable $listener, $priority = 0)
+    {
+        $onceListener = function () use (&$onceListener, $eventName, $listener) {
+            $this->off($eventName, $onceListener);
+
+            \call_user_func_array($listener, \func_get_args());
+        };
+
+        $this->on($eventName, $onceListener, $priority);
+    }
+
+    /**
+     * @param string $eventName
+     * @param mixed  $payload
+     */
+    public function emit($eventName, $payload = null)
+    {
+        if (null !== $payload && !($payload instanceof Event)) {
+            $payload = new GenericEvent($payload);
+        }
+
+        $this->dispatcher->dispatch($eventName, $payload);
     }
 }

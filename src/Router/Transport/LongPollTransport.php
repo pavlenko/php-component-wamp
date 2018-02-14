@@ -141,7 +141,7 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
 
         $this->connections[$transportID] = $connection = new LongPollConnection();
 
-        $this->router->onOpen($connection);
+        $this->router->processOpen($connection);
 
         return new Response(
             200,
@@ -188,7 +188,7 @@ class LongPollTransport implements TransportInterface, LoggerAwareInterface
 
         $connection = $this->connections[$transportID];
 
-        $this->router->onMessage($connection, $connection->getSerializer()->deserialize($requestBody));
+        $this->router->processMessageReceived($connection, $connection->getSerializer()->deserialize($requestBody));
     }
 
     /**

@@ -95,7 +95,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
 
         $this->connections->attach($ratchetConnection, $connection);
 
-        $this->router->onOpen($connection);
+        $this->router->processOpen($connection);
     }
 
     /**
@@ -109,7 +109,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
 
         unset($this->connections[$ratchetConnection]);
 
-        $this->router->onClose($connection);
+        $this->router->processClose($connection);
     }
 
     /**
@@ -119,7 +119,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     {
         $connection = $this->connections[$ratchetConnection];
 
-        $this->router->onError($connection, $exception);
+        $this->router->processError($connection, $exception);
     }
 
     /**
@@ -132,7 +132,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
         try {
             $deserialized = $connection->getSerializer()->deserialize($message);
 
-            $this->router->onMessage($connection, $deserialized);
+            $this->router->processMessageReceived($connection, $deserialized);
         } catch (\Exception $exception) {}
     }
 }
