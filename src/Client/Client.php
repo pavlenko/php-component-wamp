@@ -112,9 +112,9 @@ final class Client
      */
     public function processClose($reason)
     {
-        !$this->logger ?: $this->logger->info('Connection closed: ' . $reason);
-
         if ($this->session) {
+            $this->logger && $this->logger->info('Client: close: ' . $reason);
+
             $this->emit(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
 
             $this->session->shutdown();
@@ -153,11 +153,13 @@ final class Client
     /**
      * Handle connection error (called directly from transport)
      *
-     * @param \Exception $error
+     * @param \Exception $ex
      */
-    public function processError(\Exception $error)
+    public function processError(\Exception $ex)
     {
-        $this->logger->error($error->getMessage());
+        $this->logger && $this->logger->error("Client: [{$ex->getCode()}] {$ex->getMessage()}");
+        $this->logger && $this->logger->debug($ex->getTraceAsString());
+
         $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
     }
 
@@ -204,7 +206,7 @@ final class Client
             throw new \RuntimeException('Transport not set via setTransport()');
         }
 
-        $this->logger && $this->logger->info('Connecting...');
+        $this->logger && $this->logger->info('Client: connecting...');
 
         $this->transport->start($this, $this->loop);
 
@@ -220,11 +222,11 @@ final class Client
     {
         if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
             // Max retry attempts reached
-            !$this->logger ?: $this->logger->error('Unable to connect after {n} attempts', ['n' => $this->reconnectAttempts]);
+            $this->logger && $this->logger->error("Client: unable to connect after {$this->reconnectAttempts} attempts");
             return;
         }
 
-        !$this->logger ?: $this->logger->warning('Reconnect after {n} seconds', ['n' => $this->reconnectTimeout]);
+        $this->logger && $this->logger->warning("Client: reconnect after {$this->reconnectTimeout} seconds");
 
         $this->_reconnectAttempt++;
 
