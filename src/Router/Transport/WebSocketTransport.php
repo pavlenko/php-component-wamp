@@ -2,20 +2,25 @@
 
 namespace PE\Component\WAMP\Router\Transport;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\MessageComponentInterface;
 use Ratchet\WebSocket\WsServer;
+use Ratchet\WebSocket\WsServerInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\Server;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Serializer\Serializer;
 
-class WebSocketTransport implements TransportInterface, MessageComponentInterface
+class WebSocketTransport implements TransportInterface, MessageComponentInterface, WsServerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var string
      */
@@ -56,17 +61,26 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
+    public function getSubProtocols()
+    {
+        return ['wamp.2.json'];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function start(Router $router, LoopInterface $loop)
     {
+        $uri = 'tcp://' . $this->host . ':' . $this->port;
+
+        $this->logger && $this->logger->info('Web-socket transport: listen to ' . $uri);
+
         $this->router = $router;
-
-        $socket = new Server('tcp://' . $this->host . ':' . $this->port, $loop);
-
         $this->server = new IoServer(
             new HttpServer(
                 new WsServer($this)
             ),
-            $socket,
+            new Server($uri, $loop),
             $loop
         );
     }

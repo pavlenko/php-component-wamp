@@ -3,8 +3,9 @@
 namespace PE\Component\WAMP\Router\Event;
 
 use PE\Component\WAMP\Router\Session;
+use Symfony\Component\EventDispatcher\Event;
 
-class ConnectionEvent
+class ConnectionEvent extends Event
 {
     /**
      * @var Session

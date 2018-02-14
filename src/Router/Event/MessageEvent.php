@@ -4,8 +4,9 @@ namespace PE\Component\WAMP\Router\Event;
 
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Session;
+use Symfony\Component\EventDispatcher\Event;
 
-class MessageEvent
+class MessageEvent extends Event
 {
     /**
      * @var Session

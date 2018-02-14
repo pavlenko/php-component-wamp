@@ -2,14 +2,13 @@
 
 namespace PE\Component\WAMP\Router;
 
+use PE\Component\WAMP\Module\ModuleInterface;
+use PE\Component\WAMP\Router\Session\SessionModule;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\ErrorURI;
-use PE\Component\WAMP\EventDispatcher\EventDispatcherTrait;
-use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Event\ConnectionEvent;
 use PE\Component\WAMP\Router\Event\Events;
@@ -43,6 +42,11 @@ final class Router implements LoggerAwareInterface
     private $roles = [];
 
     /**
+     * @var ModuleInterface[]
+     */
+    private $modules = [];
+
+    /**
      * @var EventDispatcher
      */
     private $dispatcher;
@@ -58,6 +62,8 @@ final class Router implements LoggerAwareInterface
 
         $this->dispatcher = new EventDispatcher();
         $this->sessions   = new \SplObjectStorage();
+
+        $this->addModule(new SessionModule());
     }
 
     /**
@@ -103,20 +109,11 @@ final class Router implements LoggerAwareInterface
     public function processMessageReceived(ConnectionInterface $connection, Message $message)
     {
         $this->logger && $this->logger->info('> ' . $message->getName());
-        $this->logger && $this->logger->debug($message);
-        //TODO handle authentication
-        //TODO handle authorization
+        $this->logger && $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
 
-        switch (true) {
-            case ($message instanceof GoodbyeMessage):
-                $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
-                $session->shutdown();
-                break;
-            default:
-                $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($session, $message));
-        }
+        $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($session, $message));
     }
 
     /**
@@ -126,7 +123,7 @@ final class Router implements LoggerAwareInterface
     public function processMessageSend(ConnectionInterface $connection, Message $message)
     {
         $this->logger && $this->logger->info('< ' . $message->getName());
-        $this->logger && $this->logger->debug($message);
+        $this->logger && $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
 
@@ -166,7 +163,7 @@ final class Router implements LoggerAwareInterface
             throw new \RuntimeException('Transport not set via setTransport()');
         }
 
-        $this->logger && $this->logger->info('Start router');
+        $this->logger && $this->logger->info('Router: start');
 
         $this->transport->start($this, $this->loop);
 
@@ -196,6 +193,22 @@ final class Router implements LoggerAwareInterface
         $this->roles[$class] = $role;
 
         $this->dispatcher->addSubscriber($role);
+    }
+
+    /**
+     * @param ModuleInterface $module
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function addModule(ModuleInterface $module)
+    {
+        if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
+            throw new \InvalidArgumentException('Cannot add same module twice');
+        }
+
+        $this->modules[$hash] = $module;
+
+        $this->dispatcher->addSubscriber($module);
     }
 
     /**
