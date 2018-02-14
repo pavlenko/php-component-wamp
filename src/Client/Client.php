@@ -63,7 +63,7 @@ final class Client implements LoggerAwareInterface
     private $session;
 
     /**
-     * @var ModuleInterface[]
+     * @var ClientModuleInterface[]
      */
     private $modules = [];
 
@@ -235,11 +235,11 @@ final class Client implements LoggerAwareInterface
     }
 
     /**
-     * @param ModuleInterface $module
+     * @param ClientModuleInterface $module
      *
      * @throws \InvalidArgumentException
      */
-    public function addModule(ModuleInterface $module)
+    public function addModule(ClientModuleInterface $module)
     {
         if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
             throw new \InvalidArgumentException('Cannot add same module twice');

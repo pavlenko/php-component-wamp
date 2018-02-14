@@ -40,7 +40,7 @@ final class Router implements LoggerAwareInterface
     private $roles = [];
 
     /**
-     * @var ModuleInterface[]
+     * @var RouterModuleInterface[]
      */
     private $modules = [];
 
@@ -199,11 +199,11 @@ final class Router implements LoggerAwareInterface
     }
 
     /**
-     * @param ModuleInterface $module
+     * @param RouterModuleInterface $module
      *
      * @throws \InvalidArgumentException
      */
-    public function addModule(ModuleInterface $module)
+    public function addModule(RouterModuleInterface $module)
     {
         if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
             throw new \InvalidArgumentException('Cannot add same module twice');

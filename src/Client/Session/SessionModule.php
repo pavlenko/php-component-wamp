@@ -2,16 +2,16 @@
 
 namespace PE\Component\WAMP\Client\Session;
 
+use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 
-class SessionModule implements ModuleInterface
+class SessionModule implements ClientModuleInterface
 {
     /**
      * @inheritDoc

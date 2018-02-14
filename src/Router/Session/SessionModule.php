@@ -6,13 +6,13 @@ use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Router\Event\Events;
 use PE\Component\WAMP\Router\Event\MessageEvent;
+use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
 
-class SessionModule implements ModuleInterface
+class SessionModule implements RouterModuleInterface
 {
     /**
      * @inheritDoc

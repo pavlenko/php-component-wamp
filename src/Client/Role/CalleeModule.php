@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
+use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Client\RegistrationCollection;
@@ -15,13 +16,12 @@ use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\MessageCode;
-use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 use React\Promise\CancellablePromiseInterface;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
-class CalleeModule implements ModuleInterface
+class CalleeModule implements ClientModuleInterface
 {
     /**
      * @inheritDoc

@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
+use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\Client\SubscriptionCollection;
@@ -11,10 +12,9 @@ use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\MessageCode;
-use PE\Component\WAMP\Module\ModuleInterface;
 use PE\Component\WAMP\Session;
 
-class SubscriberModule implements ModuleInterface
+class SubscriberModule implements ClientModuleInterface
 {
     /**
      * @inheritDoc
