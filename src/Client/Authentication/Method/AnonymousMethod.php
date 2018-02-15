@@ -5,14 +5,14 @@ namespace PE\Component\WAMP\Client\Authentication\Method;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Session;
 
-class TicketMethod implements MethodInterface
+class AnonymousMethod implements MethodInterface
 {
     /**
      * @inheritDoc
      */
     public function getName()
     {
-        return 'ticket';
+        return 'anonymous';
     }
 
     /**
@@ -20,6 +20,6 @@ class TicketMethod implements MethodInterface
      */
     public function processChallengeMessage(Session $session, ChallengeMessage $message)
     {
-        // TODO: Implement processChallengeMessage() method.
+        // DO NOTHING
     }
 }
