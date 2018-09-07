@@ -4,6 +4,7 @@ namespace PE\Component\WAMP\Router\Role;
 
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\EventMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Message\PublishedMessage;
 use PE\Component\WAMP\Message\PublishMessage;
@@ -12,14 +13,13 @@ use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Router\Event\Events;
-use PE\Component\WAMP\Router\Event\MessageEvent;
+use PE\Component\WAMP\Router\Router;
+use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Router\Subscription;
 use PE\Component\WAMP\Util;
 
-//TODO matchers: exact, prefix, wildcard
-class Broker implements RoleInterface
+class BrokerModule implements RouterModuleInterface
 {
     /**
      * @var Subscription[]
@@ -29,22 +29,27 @@ class Broker implements RoleInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Router $router)
     {
-        return [
-            Events::MESSAGE_RECEIVED => 'onMessageReceived',
-            Events::MESSAGE_SEND     => 'onMessageSend',
-        ];
+        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $router->on(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Router $router)
     {
-        $session = $event->getSession();
-        $message = $event->getMessage();
+        $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $router->off(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+    }
 
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof PublishMessage):
                 $this->processPublishMessage($session, $message);
@@ -59,12 +64,11 @@ class Broker implements RoleInterface
     }
 
     /**
-     * @param MessageEvent $event
+     * @param Message $message
+     * @param Session $session
      */
-    public function onMessageSend(MessageEvent $event)
+    public function onMessageSend(Message $message, Session $session)
     {
-        $message = $event->getMessage();
-
         if ($message instanceof WelcomeMessage) {
             $message->addFeatures('broker', [
                 //TODO
@@ -81,7 +85,7 @@ class Broker implements RoleInterface
         $publicationID = Util::generateID();
 
         foreach ($this->subscriptions as $subscriptionID => $subscription) {
-            if ($subscription->match($message->getTopic())) {
+            if ($subscription->getTopic() === $message->getTopic()) {
                 $subscription->getSession()->send(new EventMessage(
                     $subscriptionID,
                     $publicationID,

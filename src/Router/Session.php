@@ -4,8 +4,6 @@ namespace PE\Component\WAMP\Router;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
-use PE\Component\WAMP\Router\Event\Events;
-use PE\Component\WAMP\Router\Event\MessageEvent;
 
 class Session extends \PE\Component\WAMP\Session
 {

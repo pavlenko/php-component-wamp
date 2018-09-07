@@ -5,9 +5,9 @@ namespace PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Router\Event\Events;
-use PE\Component\WAMP\Router\Event\MessageEvent;
+use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
@@ -17,21 +17,25 @@ class SessionModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Router $router)
     {
-        return [
-            Events::MESSAGE_RECEIVED => ['onMessageReceived', 0]
-        ];
+        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 0);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Router $router)
     {
-        $session = $event->getSession();
-        $message = $event->getMessage();
+        $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+    }
 
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof HelloMessage):
                 $this->processHelloMessage($session, $message);

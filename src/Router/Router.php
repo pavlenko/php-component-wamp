@@ -2,27 +2,27 @@
 
 namespace PE\Component\WAMP\Router;
 
-use PE\Component\WAMP\Module\ModuleInterface;
+use PE\Component\WAMP\Connection\ConnectionInterface;
+use PE\Component\WAMP\Events;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Session\SessionModule;
+use PE\Component\WAMP\Router\Transport\TransportInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
-use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\Message\Message;
-use PE\Component\WAMP\Router\Event\ConnectionEvent;
-use PE\Component\WAMP\Router\Event\Events;
-use PE\Component\WAMP\Router\Event\MessageEvent;
-use PE\Component\WAMP\Router\Role\RoleInterface;
-use PE\Component\WAMP\Router\Transport\TransportInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class Router implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use Events;
+
+    const EVENT_CONNECTION_OPEN  = 'wamp.router.connection_open';
+    const EVENT_CONNECTION_CLOSE = 'wamp.router.connection_close';
+    const EVENT_CONNECTION_ERROR = 'wamp.router.connection_error';
+    const EVENT_MESSAGE_RECEIVED = 'wamp.router.message_received';
+    const EVENT_MESSAGE_SEND     = 'wamp.router.message_send';
 
     /**
      * @var TransportInterface
@@ -35,19 +35,9 @@ final class Router implements LoggerAwareInterface
     private $loop;
 
     /**
-     * @var RoleInterface[]
-     */
-    private $roles = [];
-
-    /**
      * @var RouterModuleInterface[]
      */
     private $modules = [];
-
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
 
     /**
      * @var \SplObjectStorage|Session[]
@@ -56,10 +46,8 @@ final class Router implements LoggerAwareInterface
 
     public function __construct(LoopInterface $loop = null)
     {
-        $this->loop      = $loop ?: Factory::create();
-
-        $this->dispatcher = new EventDispatcher();
-        $this->sessions   = new \SplObjectStorage();
+        $this->loop     = $loop ?: Factory::create();
+        $this->sessions = new \SplObjectStorage();
 
         $this->addModule(new SessionModule());
     }
@@ -77,7 +65,7 @@ final class Router implements LoggerAwareInterface
 
         $this->sessions->attach($connection, $session);
 
-        $this->emit(Events::CONNECTION_OPEN, new ConnectionEvent($session));
+        $this->emit(self::EVENT_CONNECTION_OPEN, $session);
     }
 
     /**
@@ -95,7 +83,7 @@ final class Router implements LoggerAwareInterface
 
         unset($this->sessions[$connection]);
 
-        $this->emit(Events::CONNECTION_CLOSE, new ConnectionEvent($session));
+        $this->emit(self::EVENT_CONNECTION_CLOSE, $session);
     }
 
     /**
@@ -111,7 +99,7 @@ final class Router implements LoggerAwareInterface
 
         $session = $this->sessions[$connection];
 
-        $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($session, $message));
+        $this->emit(self::EVENT_MESSAGE_RECEIVED, $message, $session);
     }
 
     /**
@@ -124,7 +112,7 @@ final class Router implements LoggerAwareInterface
 
         $session = $this->sessions[$connection];
 
-        $this->emit(Events::MESSAGE_SEND, new MessageEvent($session, $message));
+        $this->emit(self::EVENT_MESSAGE_SEND, $message, $session);
 
         $this->logger && $this->logger->debug(json_encode($message));
     }
@@ -140,7 +128,7 @@ final class Router implements LoggerAwareInterface
         $this->logger && $this->logger->error("Router: [{$ex->getCode()}] {$ex->getMessage()}");
         $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
 
-        $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->sessions[$connection]));
+        $this->emit(self::EVENT_CONNECTION_ERROR, $this->sessions[$connection]);
     }
 
     /**
@@ -181,24 +169,6 @@ final class Router implements LoggerAwareInterface
     }
 
     /**
-     * @param RoleInterface $role
-     *
-     * @throws \InvalidArgumentException If role added twice
-     */
-    public function addRole(RoleInterface $role)
-    {
-        $class = get_class($role);
-
-        if (array_key_exists($class, $this->roles)) {
-            throw new \InvalidArgumentException(sprintf('Cannot add role "%s" twice', $class));
-        }
-
-        $this->roles[$class] = $role;
-
-        $this->dispatcher->addSubscriber($role);
-    }
-
-    /**
      * @param RouterModuleInterface $module
      *
      * @throws \InvalidArgumentException
@@ -209,56 +179,8 @@ final class Router implements LoggerAwareInterface
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
+        $module->subscribe($this);
+
         $this->modules[$hash] = $module;
-
-        $this->dispatcher->addSubscriber($module);
-    }
-
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     */
-    public function on($eventName, callable $listener, $priority = 0)
-    {
-        $this->dispatcher->addListener($eventName, $listener, $priority);
-    }
-
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     */
-    public function off($eventName, callable $listener)
-    {
-        $this->dispatcher->removeListener($eventName, $listener);
-    }
-
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     */
-    public function once($eventName, callable $listener, $priority = 0)
-    {
-        $onceListener = function () use (&$onceListener, $eventName, $listener) {
-            $this->off($eventName, $onceListener);
-
-            \call_user_func_array($listener, \func_get_args());
-        };
-
-        $this->on($eventName, $onceListener, $priority);
-    }
-
-    /**
-     * @param string $eventName
-     * @param mixed  $payload
-     */
-    public function emit($eventName, $payload = null)
-    {
-        if (null !== $payload && !($payload instanceof Event)) {
-            $payload = new GenericEvent($payload);
-        }
-
-        $this->dispatcher->dispatch($eventName, $payload);
     }
 }

@@ -2,7 +2,15 @@
 
 namespace PE\Component\WAMP\Client;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+interface ClientModuleInterface
+{
+    /**
+     * @param Client $client
+     */
+    public function subscribe(Client $client);
 
-interface ClientModuleInterface extends EventSubscriberInterface
-{}
+    /**
+     * @param Client $client
+     */
+    public function unsubscribe(Client $client);
+}

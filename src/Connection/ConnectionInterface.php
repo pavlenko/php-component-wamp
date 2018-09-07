@@ -4,6 +4,7 @@ namespace PE\Component\WAMP\Connection;
 
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 interface ConnectionInterface
 {
@@ -58,4 +59,9 @@ interface ConnectionInterface
      * @return self
      */
     public function setTrusted($trusted);
+
+    /**
+     * @return Session
+     */
+     public function getSession();
 }

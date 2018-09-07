@@ -4,13 +4,12 @@ namespace PE\Component\WAMP\Router\Authentication;
 
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AuthenticateMessage;
-use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Authentication\Method\MethodInterface;
-use PE\Component\WAMP\Router\Event\Events;
-use PE\Component\WAMP\Router\Event\MessageEvent;
+use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
@@ -33,25 +32,25 @@ class AuthenticationModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Router $router)
     {
-        return [
-            Events::MESSAGE_RECEIVED => ['onMessageReceived', 10],
-        ];
+        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 10);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Router $router)
     {
-        if (count($this->methods)) {
-            $event->stopPropagation();
-        }
+        $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+    }
 
-        $session = $event->getSession();
-        $message = $event->getMessage();
-
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof HelloMessage):
                 $this->processHelloMessage($session, $message);

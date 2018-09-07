@@ -3,13 +3,13 @@
 namespace PE\Component\WAMP\Client\Authentication;
 
 use PE\Component\WAMP\Client\Authentication\Method\MethodInterface;
+use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Event\Events;
-use PE\Component\WAMP\Client\Event\MessageEvent;
+use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
-use PE\Component\WAMP\Session;
+use PE\Component\WAMP\Message\Message;
 
 class AuthenticationModule implements ClientModuleInterface
 {
@@ -29,22 +29,27 @@ class AuthenticationModule implements ClientModuleInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Client $client)
     {
-        return [
-            Events::MESSAGE_RECEIVED => 'onMessageReceived',
-            Events::MESSAGE_SEND     => 'onMessageSend',
-        ];
+        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Client $client)
     {
-        $session = $event->getSession();
-        $message = $event->getMessage();
+        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+    }
 
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof ChallengeMessage):
                 $this->processChallengeMessage($session, $message);
@@ -53,12 +58,10 @@ class AuthenticationModule implements ClientModuleInterface
     }
 
     /**
-     * @param MessageEvent $event
+     * @param Message $message
      */
-    public function onMessageSend(MessageEvent $event)
+    public function onMessageSend(Message $message)
     {
-        $message = $event->getMessage();
-
         if ($message instanceof HelloMessage) {
             $methods = array_map(function (MethodInterface $method) {
                 return $method->getName();

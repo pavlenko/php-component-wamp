@@ -6,6 +6,7 @@ use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use Ratchet\Server\IoServer;
+use Ratchet\Session\SessionProvider;
 use Ratchet\WebSocket\MessageComponentInterface;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\WebSocket\WsServerInterface;
@@ -28,6 +29,11 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     private $port;
 
     /**
+     * @var bool
+     */
+    private $secure;
+
+    /**
      * @var \SplObjectStorage|ConnectionInterface[]
      */
     private $connections;
@@ -43,15 +49,30 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     private $router;
 
     /**
+     * @var \SessionHandlerInterface|null
+     */
+    private $sessionHandler;
+
+    /**
      * @param string $host
      * @param int    $port
+     * @param bool   $secure
      */
-    public function __construct($host = '127.0.0.1', $port = 8080)
+    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host   = $host;
+        $this->port   = $port;
+        $this->secure = $secure;
 
         $this->connections = new \SplObjectStorage();
+    }
+
+    /**
+     * @param \SessionHandlerInterface|null $sessionHandler
+     */
+    public function setSessionHandler(\SessionHandlerInterface $sessionHandler = null)
+    {
+        $this->sessionHandler = $sessionHandler;
     }
 
     /**
@@ -67,15 +88,18 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
      */
     public function start(Router $router, LoopInterface $loop)
     {
-        $uri = 'tcp://' . $this->host . ':' . $this->port;
+        $uri = ($this->secure ? 'tls' : 'tcp') . '://' . $this->host . ':' . $this->port;
 
         $router->getLogger() && $router->getLogger()->info('Web-socket: listen to ' . $uri);
 
         $this->router = $router;
+
+        $wsServer = $this->sessionHandler
+            ? new SessionProvider(new WsServer($this), $this->sessionHandler)
+            : new WsServer($this);
+
         $this->server = new IoServer(
-            new HttpServer(
-                new WsServer($this)
-            ),
+            new HttpServer($wsServer),
             new Server($uri, $loop),
             $loop
         );

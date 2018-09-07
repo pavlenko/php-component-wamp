@@ -3,29 +3,31 @@
 namespace PE\Component\WAMP\Client;
 
 use PE\Component\WAMP\Client\Session\SessionModule;
-use PE\Component\WAMP\Module\ModuleInterface;
+use PE\Component\WAMP\Client\Transport\TransportInterface;
+use PE\Component\WAMP\Connection\ConnectionInterface;
+use PE\Component\WAMP\Events;
+use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\Message;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
-use PE\Component\WAMP\Client\Event\ConnectionEvent;
-use PE\Component\WAMP\Client\Event\Events;
-use PE\Component\WAMP\Client\Event\MessageEvent;
-use PE\Component\WAMP\Client\Transport\TransportInterface;
-use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\Message\HelloMessage;
-use PE\Component\WAMP\Message\Message;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class Client implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use Events;
 
     const RECONNECT_TIMEOUT  = 1.5;
     const RECONNECT_ATTEMPTS = 15;
+
+    const EVENT_CONNECTION_OPEN     = 'wamp.client.connection_open';
+    const EVENT_CONNECTION_CLOSE    = 'wamp.client.connection_close';
+    const EVENT_CONNECTION_ERROR    = 'wamp.client.connection_error';
+    const EVENT_SESSION_ESTABLISHED = 'wamp.client.session_established';
+    const EVENT_MESSAGE_RECEIVED    = 'wamp.client.message_received';
+    const EVENT_MESSAGE_SEND        = 'wamp.client.message_send';
 
     /**
      * @var string
@@ -68,11 +70,6 @@ final class Client implements LoggerAwareInterface
     private $modules = [];
 
     /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    /**
      * @param string             $realm
      * @param LoopInterface|null $loop
      */
@@ -80,8 +77,6 @@ final class Client implements LoggerAwareInterface
     {
         $this->realm = $realm;
         $this->loop  = $loop ?: Factory::create();
-
-        $this->dispatcher = new EventDispatcher();
 
         $this->addModule(new SessionModule());
     }
@@ -94,11 +89,11 @@ final class Client implements LoggerAwareInterface
     public function processOpen(ConnectionInterface $connection)
     {
         $this->_reconnectAttempt = 0;
-        !$this->logger ?: $this->logger->info('Connection opened');
+        $this->logger && $this->logger->info('Connection opened');
 
         $this->session = new Session($connection, $this);
 
-        $this->emit(Events::CONNECTION_OPEN, new ConnectionEvent($this->session));
+        $this->emit(self::EVENT_CONNECTION_OPEN, $this->session);
 
         $this->session->send(new HelloMessage($this->realm, []));
     }
@@ -113,7 +108,7 @@ final class Client implements LoggerAwareInterface
         if ($this->session) {
             $this->logger && $this->logger->info('Client: close: ' . $reason);
 
-            $this->emit(Events::CONNECTION_CLOSE, new ConnectionEvent($this->session));
+            $this->emit(self::EVENT_CONNECTION_CLOSE, $this->session);
 
             $this->session->shutdown();
             $this->session = null;
@@ -132,7 +127,7 @@ final class Client implements LoggerAwareInterface
         $this->logger && $this->logger->info("Client: {$message->getName()} received");
         $this->logger && $this->logger->debug(json_encode($message));
 
-        $this->emit(Events::MESSAGE_RECEIVED, new MessageEvent($this->session, $message));
+        $this->emit(self::EVENT_MESSAGE_RECEIVED, $message, $this->session);
     }
 
     /**
@@ -144,7 +139,7 @@ final class Client implements LoggerAwareInterface
     {
         $this->logger && $this->logger->info("Client: {$message->getName()} send");
 
-        $this->emit(Events::MESSAGE_SEND, new MessageEvent($this->session, $message));
+        $this->emit(self::EVENT_MESSAGE_SEND, $message, $this->session);
 
         $this->logger && $this->logger->debug(json_encode($message));
     }
@@ -159,7 +154,7 @@ final class Client implements LoggerAwareInterface
         $this->logger && $this->logger->error("Client: [{$ex->getCode()}] {$ex->getMessage()}");
         $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
 
-        $this->emit(Events::CONNECTION_ERROR, new ConnectionEvent($this->session));
+        $this->emit(self::EVENT_CONNECTION_ERROR, $this->session);
     }
 
     /**
@@ -245,56 +240,8 @@ final class Client implements LoggerAwareInterface
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
+        $module->subscribe($this);
+
         $this->modules[$hash] = $module;
-
-        $this->dispatcher->addSubscriber($module);
-    }
-
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     */
-    public function on($eventName, callable $listener, $priority = 0)
-    {
-        $this->dispatcher->addListener($eventName, $listener, $priority);
-    }
-
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     */
-    public function off($eventName, callable $listener)
-    {
-        $this->dispatcher->removeListener($eventName, $listener);
-    }
-
-    /**
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     */
-    public function once($eventName, callable $listener, $priority = 0)
-    {
-        $onceListener = function () use (&$onceListener, $eventName, $listener) {
-            $this->off($eventName, $onceListener);
-
-            \call_user_func_array($listener, \func_get_args());
-        };
-
-        $this->on($eventName, $onceListener, $priority);
-    }
-
-    /**
-     * @param string $eventName
-     * @param mixed  $payload
-     */
-    public function emit($eventName, $payload = null)
-    {
-        if (null !== $payload && !($payload instanceof Event)) {
-            $payload = new GenericEvent($payload);
-        }
-
-        $this->dispatcher->dispatch($eventName, $payload);
     }
 }

@@ -4,12 +4,11 @@ namespace PE\Component\WAMP;
 use PE\Component\WAMP\Client\Authentication\AuthenticationModule;
 use PE\Component\WAMP\Client\Authentication\Method\TicketMethod;
 use PE\Component\WAMP\Client\Client;
-use PE\Component\WAMP\Client\Event\ConnectionEvent;
-use PE\Component\WAMP\Client\Event\Events;
 use PE\Component\WAMP\Client\Role\PublisherModule;
 use PE\Component\WAMP\Client\Role\PublisherAPI;
 use PE\Component\WAMP\Client\Role\SubscriberModule;
 use PE\Component\WAMP\Client\Role\SubscriberAPI;
+use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Client\Transport\WebSocketTransport;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -33,9 +32,7 @@ $client->addModule($authentication);
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 
-$client->on(Events::SESSION_ESTABLISHED, function (ConnectionEvent $event) {
-    $session = $event->getSession();
-
+$client->on(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) {
     $subscriber = new SubscriberAPI($session);
     $subscriber->subscribe('foo', function () {
         echo json_encode(func_get_args()) . "\n";

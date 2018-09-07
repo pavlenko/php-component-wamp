@@ -5,7 +5,6 @@
     - TLS Certificate Authentication
   - Challenge Response Authentication
   - Ticket-based Authentication
-- A HTTP Longpoll Transport for WAMP
 
 ## Message flow
 HELLO

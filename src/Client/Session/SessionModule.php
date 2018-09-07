@@ -2,12 +2,12 @@
 
 namespace PE\Component\WAMP\Client\Session;
 
+use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Event\Events;
-use PE\Component\WAMP\Client\Event\MessageEvent;
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Session;
 
@@ -16,21 +16,25 @@ class SessionModule implements ClientModuleInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Client $client)
     {
-        return [
-            Events::MESSAGE_RECEIVED => 'onMessageReceived'
-        ];
+        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Client $client)
     {
-        $session = $event->getSession();
-        $message = $event->getMessage();
+        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+    }
 
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof WelcomeMessage):
                 $this->processWelcomeMessage($session, $message);

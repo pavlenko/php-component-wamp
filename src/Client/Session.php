@@ -26,4 +26,13 @@ class Session extends \PE\Component\WAMP\Session
         $this->client->processMessageSend($message);
         $this->getConnection()->send($message);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function setSessionID($id)
+    {
+        parent::setSessionID($id);
+        $this->client->emit(Client::EVENT_SESSION_ESTABLISHED, $this);
+    }
 }

@@ -8,6 +8,7 @@ use PE\Component\WAMP\Message\CancelMessage;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\InterruptMessage;
 use PE\Component\WAMP\Message\InvocationMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\RegisterMessage;
@@ -18,12 +19,12 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Router\Call;
-use PE\Component\WAMP\Router\Event\Events;
-use PE\Component\WAMP\Router\Event\MessageEvent;
+use PE\Component\WAMP\Router\Router;
+use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Util;
 
-class Dealer implements RoleInterface
+class DealerModule implements RouterModuleInterface
 {
     /**
      * @var array
@@ -54,22 +55,27 @@ class Dealer implements RoleInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Router $router)
     {
-        return [
-            Events::MESSAGE_RECEIVED => 'onMessageReceived',
-            Events::MESSAGE_SEND     => 'onMessageSend',
-        ];
+        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $router->on(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Router $router)
     {
-        $session = $event->getSession();
-        $message = $event->getMessage();
+        $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $router->off(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+    }
 
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof RegisterMessage):
                 $this->processRegisterMessage($session, $message);
@@ -93,12 +99,11 @@ class Dealer implements RoleInterface
     }
 
     /**
-     * @param MessageEvent $event
+     * @param Message $message
+     * @param Session $session
      */
-    public function onMessageSend(MessageEvent $event)
+    public function onMessageSend(Message $message, Session $session)
     {
-        $message = $event->getMessage();
-
         if ($message instanceof WelcomeMessage) {
             $message->addFeatures('dealer', [
                 //TODO

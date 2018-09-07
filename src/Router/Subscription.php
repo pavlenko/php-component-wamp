@@ -21,7 +21,7 @@ class Subscription
     public function __construct(Session $session, $topic)
     {
         $this->session = $session;
-        $this->topic = $topic;
+        $this->topic   = $topic;
     }
 
     /**

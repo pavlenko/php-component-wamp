@@ -51,4 +51,9 @@ class WebSocketConnection extends Connection
             'type' => 'Ratchet/0.4.1'
         ];
     }
+
+    public function getSession()
+    {
+        return $this->connection->Session ?? null;
+    }
 }

@@ -1,2 +1,0 @@
-[08-Feb-2018 08:25:49 UTC] PHP Warning:  strpos() expects parameter 1 to be string, array given in F:\PROJECTS\pavlenko\php-component-wamp\vendor\symfony\console\Logger\ConsoleLogger.php on line 110
-[08-Feb-2018 08:25:49 UTC] PHP Warning:  strtr() expects parameter 1 to be string, array given in F:\PROJECTS\pavlenko\php-component-wamp\vendor\symfony\console\Logger\ConsoleLogger.php on line 127

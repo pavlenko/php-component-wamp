@@ -2,7 +2,15 @@
 
 namespace PE\Component\WAMP\Router;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+interface RouterModuleInterface
+{
+    /**
+     * @param Router $router
+     */
+    public function subscribe(Router $router);
 
-interface RouterModuleInterface extends EventSubscriberInterface
-{}
+    /**
+     * @param Router $router
+     */
+    public function unsubscribe(Router $router);
+}

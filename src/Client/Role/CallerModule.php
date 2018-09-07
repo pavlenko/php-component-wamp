@@ -3,36 +3,41 @@
 namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\CallCollection;
+use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Event\Events;
-use PE\Component\WAMP\Client\Event\MessageEvent;
+use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\ResultMessage;
 use PE\Component\WAMP\MessageCode;
-use PE\Component\WAMP\Session;
 
 class CallerModule implements ClientModuleInterface
 {
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public function subscribe(Client $client)
     {
-        return [
-            Events::MESSAGE_RECEIVED => 'onMessageReceived',
-            Events::MESSAGE_SEND     => 'onMessageSend',
-        ];
+        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     /**
-     * @param MessageEvent $event
+     * @inheritDoc
      */
-    public function onMessageReceived(MessageEvent $event)
+    public function unsubscribe(Client $client)
     {
-        $session = $event->getSession();
-        $message = $event->getMessage();
+        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+    }
 
+    /**
+     * @param Message $message
+     * @param Session $session
+     */
+    public function onMessageReceived(Message $message, Session $session)
+    {
         switch (true) {
             case ($message instanceof ResultMessage):
                 $this->processResultMessage($session, $message);
@@ -44,12 +49,10 @@ class CallerModule implements ClientModuleInterface
     }
 
     /**
-     * @param MessageEvent $event
+     * @param Message $message
      */
-    public function onMessageSend(MessageEvent $event)
+    public function onMessageSend(Message $message)
     {
-        $message = $event->getMessage();
-
         if ($message instanceof HelloMessage) {
             $message->addFeatures('caller', [
                 //TODO
