@@ -20,7 +20,7 @@ $router->setTransport($transport);
 $router->setLogger($logger);
 
 $authentication = new AuthenticationModule();
-$authentication->addMethod(new TicketMethod());//TODO define tickets
+$authentication->addMethod(new TicketMethod('foo'));
 
 $router->addModule($authentication);
 

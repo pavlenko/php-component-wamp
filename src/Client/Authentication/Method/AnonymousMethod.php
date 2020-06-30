@@ -2,8 +2,8 @@
 
 namespace PE\Component\WAMP\Client\Authentication\Method;
 
+use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Message\ChallengeMessage;
-use PE\Component\WAMP\Session;
 
 class AnonymousMethod implements MethodInterface
 {

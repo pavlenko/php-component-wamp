@@ -7,12 +7,10 @@ use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
-use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\Session;
-use PE\Component\WAMP\Util;
+use PE\Component\WAMP\Router\Session;
 
 class AuthenticationModule implements RouterModuleInterface
 {
@@ -72,6 +70,7 @@ class AuthenticationModule implements RouterModuleInterface
         foreach ($this->methods as $method) {
             if (in_array($method->getName(), $methods, true)) {
                 $method->processHelloMessage($session, $message);
+                $session->setAuthMethod($method->getName());
                 return;
             }
         }
@@ -87,9 +86,11 @@ class AuthenticationModule implements RouterModuleInterface
      */
     private function processAuthenticateMessage(Session $session, AuthenticateMessage $message)
     {
-        $sessionID = Util::generateID();
-
-        $session->setSessionID($sessionID);
-        $session->send(new WelcomeMessage($sessionID, []));
+        foreach ($this->methods as $method) {
+            if ($method->getName() === $session->getAuthMethod()) {
+                $method->processAuthenticateMessage($session, $message);
+                return;
+            }
+        }
     }
 }

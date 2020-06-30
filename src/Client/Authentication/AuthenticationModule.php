@@ -6,7 +6,6 @@ use PE\Component\WAMP\Client\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Session;
-use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
@@ -50,10 +49,8 @@ class AuthenticationModule implements ClientModuleInterface
      */
     public function onMessageReceived(Message $message, Session $session)
     {
-        switch (true) {
-            case ($message instanceof ChallengeMessage):
-                $this->processChallengeMessage($session, $message);
-                break;
+        if ($message instanceof ChallengeMessage) {
+            $this->processChallengeMessage($session, $message);
         }
     }
 
@@ -77,8 +74,13 @@ class AuthenticationModule implements ClientModuleInterface
      */
     private function processChallengeMessage(Session $session, ChallengeMessage $message)
     {
-        $signature = 123456789;
+        foreach ($this->methods as $method) {
+            if ($method->getName() === $message->getAuthenticationMethod()) {
+                $method->processChallengeMessage($session, $message);
+                return;
+            }
+        }
 
-        $session->send(new AuthenticateMessage($signature, []));
+        throw new \LogicException('Unknown authentication method: ' . $message->getAuthenticationMethod());
     }
 }

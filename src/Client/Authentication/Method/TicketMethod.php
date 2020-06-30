@@ -2,11 +2,25 @@
 
 namespace PE\Component\WAMP\Client\Authentication\Method;
 
+use PE\Component\WAMP\Client\Session;
+use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\ChallengeMessage;
-use PE\Component\WAMP\Session;
 
 class TicketMethod implements MethodInterface
 {
+    /**
+     * @var string
+     */
+    private $ticket;
+
+    /**
+     * @param string $ticket
+     */
+    public function __construct($ticket)
+    {
+        $this->ticket = $ticket;
+    }
+
     /**
      * @inheritDoc
      */
@@ -20,6 +34,6 @@ class TicketMethod implements MethodInterface
      */
     public function processChallengeMessage(Session $session, ChallengeMessage $message)
     {
-        // TODO: Implement processChallengeMessage() method.
+        $session->send(new AuthenticateMessage($this->ticket, []));
     }
 }

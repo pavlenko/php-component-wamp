@@ -13,6 +13,11 @@ class Session extends \PE\Component\WAMP\Session
     private $router;
 
     /**
+     * @var string|null
+     */
+    private $authMethod;
+
+    /**
      * @param ConnectionInterface $connection
      * @param Router              $router
      */
@@ -29,5 +34,21 @@ class Session extends \PE\Component\WAMP\Session
     {
         $this->router->processMessageSend($this->getConnection(), $message);
         $this->getConnection()->send($message);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAuthMethod()
+    {
+        return $this->authMethod;
+    }
+
+    /**
+     * @param string $authMethod
+     */
+    public function setAuthMethod($authMethod)
+    {
+        $this->authMethod = $authMethod;
     }
 }

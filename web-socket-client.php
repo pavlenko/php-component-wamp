@@ -26,7 +26,7 @@ $client->setLogger($logger);
 $client->setReconnectAttempts(3);
 
 $authentication = new AuthenticationModule();
-$authentication->addMethod(new TicketMethod());//TODO define ticket
+$authentication->addMethod(new TicketMethod('foo'));
 
 $client->addModule($authentication);
 $client->addModule(new SubscriberModule());

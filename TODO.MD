@@ -4,7 +4,6 @@
     - Cookie-based Authentication
     - TLS Certificate Authentication
   - Challenge Response Authentication
-  - Ticket-based Authentication
 
 ## Message flow
 HELLO
