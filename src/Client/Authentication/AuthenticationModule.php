@@ -56,11 +56,16 @@ class AuthenticationModule implements ClientModuleInterface
 
     /**
      * @param Message $message
+     * @param Session $session
      */
-    public function onMessageSend(Message $message)
+    public function onMessageSend(Message $message, Session $session)
     {
         if ($message instanceof HelloMessage) {
-            $methods = array_map(function (MethodInterface $method) {
+            foreach ($this->methods as $method) {
+                $method->processHelloMessage($session, $message);
+            }
+
+            $methods = array_map(static function (MethodInterface $method) {
                 return $method->getName();
             }, $this->methods);
 
