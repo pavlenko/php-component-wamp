@@ -38,4 +38,13 @@ trait Options
     {
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function setOption($name, $value)
+    {
+        $this->options[$name] = $value;
+    }
 }

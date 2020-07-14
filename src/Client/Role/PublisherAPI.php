@@ -47,7 +47,6 @@ class PublisherAPI
             $this->session->publishRequests[$requestID] = $deferred = new Deferred();
         }
 
-        //TODO process subscriber_blackwhite_listing per message before send
         //TODO process publisher_exclusion here
 
         $this->session->send(new PublishMessage($requestID, $options, $topic, $arguments, $argumentsKw));

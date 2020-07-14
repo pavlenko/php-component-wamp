@@ -14,6 +14,19 @@ use React\Promise\Deferred;
 class PublisherModule implements ClientModuleInterface
 {
     /**
+     * @var PublisherFeatureInterface[]
+     */
+    private $features = [];
+
+    /**
+     * @param PublisherFeatureInterface $feature
+     */
+    public function addFeature(PublisherFeatureInterface $feature)
+    {
+        $this->features[get_class($feature)] = $feature;
+    }
+
+    /**
      * @inheritDoc
      */
     public function subscribe(Client $client)
@@ -53,9 +66,16 @@ class PublisherModule implements ClientModuleInterface
     public function onMessageSend(Message $message)
     {
         if ($message instanceof HelloMessage) {
-            $message->addFeatures('publisher', [
-                //TODO
-            ]);
+            $features = [];
+            foreach ($this->features as $feature) {
+                $features[$feature->getName()] = true;
+            }
+
+            $message->addFeatures('publisher', $features);
+        } else {
+            foreach ($this->features as $feature) {
+                $feature->onMessageSend($message);
+            }
         }
     }
 
