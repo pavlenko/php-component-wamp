@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Router\Role;
+namespace PE\Component\WAMP\Router\Role\Broker;
 
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\EventMessage;
@@ -22,9 +22,22 @@ use PE\Component\WAMP\Util;
 class BrokerModule implements RouterModuleInterface
 {
     /**
+     * @var BrokerFeatureInterface[]
+     */
+    private $features = [];
+
+    /**
      * @var Subscription[]
      */
     private $subscriptions = [];
+
+    /**
+     * @param BrokerFeatureInterface $feature
+     */
+    public function addFeature(BrokerFeatureInterface $feature)
+    {
+        $this->features[get_class($feature)] = $feature;
+    }
 
     /**
      * @inheritDoc
@@ -70,9 +83,12 @@ class BrokerModule implements RouterModuleInterface
     public function onMessageSend(Message $message, Session $session)
     {
         if ($message instanceof WelcomeMessage) {
-            $message->addFeatures('broker', [
-                //TODO
-            ]);
+            $features = [];
+            foreach ($this->features as $feature) {
+                $features[$feature->getName()] = true;
+            }
+
+            $message->addFeatures('broker', $features);
         }
     }
 
@@ -86,6 +102,12 @@ class BrokerModule implements RouterModuleInterface
 
         foreach ($this->subscriptions as $subscriptionID => $subscription) {
             if ($subscription->getTopic() === $message->getTopic()) {
+                foreach ($this->features as $feature) {
+                    if (!$feature->processPublishMessage($session, $message, $subscription)) {
+                        continue;
+                    }
+                }
+
                 $subscription->getSession()->send(new EventMessage(
                     $subscriptionID,
                     $publicationID,
