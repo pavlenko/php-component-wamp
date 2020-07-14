@@ -1,10 +1,10 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role;
+namespace PE\Component\WAMP\Client\Role\Publisher\Feature;
 
 use PE\Component\WAMP\Message\Message;
 
-interface PublisherFeatureInterface
+interface FeatureInterface
 {
     /**
      * @return string

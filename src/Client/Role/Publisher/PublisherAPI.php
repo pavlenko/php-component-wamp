@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role;
+namespace PE\Component\WAMP\Client\Role\Publisher;
 
 use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\Session;

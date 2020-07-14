@@ -1,9 +1,10 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role;
+namespace PE\Component\WAMP\Client\Role\Publisher;
 
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
+use PE\Component\WAMP\Client\Role\Publisher\Feature\FeatureInterface;
 use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -14,14 +15,14 @@ use React\Promise\Deferred;
 class PublisherModule implements ClientModuleInterface
 {
     /**
-     * @var PublisherFeatureInterface[]
+     * @var FeatureInterface[]
      */
     private $features = [];
 
     /**
-     * @param PublisherFeatureInterface $feature
+     * @param FeatureInterface $feature
      */
-    public function addFeature(PublisherFeatureInterface $feature)
+    public function addFeature(FeatureInterface $feature)
     {
         $this->features[get_class($feature)] = $feature;
     }

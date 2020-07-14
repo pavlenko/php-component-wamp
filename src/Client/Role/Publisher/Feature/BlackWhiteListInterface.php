@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role;
+namespace PE\Component\WAMP\Client\Role\Publisher\Feature;
 
 interface BlackWhiteListInterface
 {

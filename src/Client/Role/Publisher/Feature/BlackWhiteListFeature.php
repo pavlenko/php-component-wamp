@@ -1,11 +1,11 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role;
+namespace PE\Component\WAMP\Client\Role\Publisher\Feature;
 
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\PublishMessage;
 
-class PublisherFeatureBlackWhiteList implements PublisherFeatureInterface
+final class BlackWhiteListFeature implements FeatureInterface
 {
     /**
      * @var BlackWhiteListInterface
