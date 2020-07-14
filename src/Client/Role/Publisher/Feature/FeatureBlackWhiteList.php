@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Client\Role\Publisher\Feature;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\PublishMessage;
 
-final class BlackWhiteListFeature implements FeatureInterface
+final class FeatureBlackWhiteList implements FeatureInterface
 {
     /**
      * @var BlackWhiteListInterface
