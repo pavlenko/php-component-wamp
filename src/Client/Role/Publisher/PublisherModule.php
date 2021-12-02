@@ -12,44 +12,31 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\PublishedMessage;
 use React\Promise\Deferred;
 
-class PublisherModule implements ClientModuleInterface
+final class PublisherModule implements ClientModuleInterface
 {
     /**
      * @var FeatureInterface[]
      */
-    private $features = [];
+    private array $features = [];
 
-    /**
-     * @param FeatureInterface $feature
-     */
-    public function addFeature(FeatureInterface $feature)
+    public function addFeature(FeatureInterface $feature): void
     {
         $this->features[get_class($feature)] = $feature;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function subscribe(Client $client)
+    public function subscribe(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function unsubscribe(Client $client)
+    public function unsubscribe(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @param Message $message
-     * @param Session $session
-     */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof PublishedMessage):
@@ -61,10 +48,7 @@ class PublisherModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Message $message
-     */
-    public function onMessageSend(Message $message)
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
             $features = [];
@@ -80,11 +64,7 @@ class PublisherModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session          $session
-     * @param PublishedMessage $message
-     */
-    private function processPublishedMessage(Session $session, PublishedMessage $message)
+    private function processPublishedMessage(Session $session, PublishedMessage $message): void
     {
         if (isset($session->publishRequests[$id = $message->getRequestID()])) {
             /* @var $deferred Deferred */
@@ -95,11 +75,7 @@ class PublisherModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessage(Session $session, ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message): void
     {
         if (isset($session->publishRequests[$id = $message->getErrorRequestID()])) {
             /* @var $deferred Deferred */

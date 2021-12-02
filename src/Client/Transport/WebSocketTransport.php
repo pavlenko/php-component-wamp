@@ -8,35 +8,17 @@ use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Serializer\Serializer;
 
-class WebSocketTransport implements TransportInterface
+final class WebSocketTransport implements TransportInterface
 {
-    /**
-     * @var string
-     */
-    private $host;
+    private string $host;
 
-    /**
-     * @var int
-     */
-    private $port;
+    private int $port;
 
-    /**
-     * @var bool
-     */
-    private $secure;
+    private bool $secure;
 
-    /**
-     * @var int
-     */
-    private $timeout;
+    private int $timeout;
 
-    /**
-     * @param string $host
-     * @param int    $port
-     * @param bool   $secure
-     * @param int    $timeout
-     */
-    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false, $timeout = 20)
+    public function __construct(string $host = '127.0.0.1', int $port = 8080, bool $secure = true, int $timeout = 20)
     {
         $this->host    = $host;
         $this->port    = $port;
@@ -44,10 +26,7 @@ class WebSocketTransport implements TransportInterface
         $this->timeout = $timeout;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function start(Client $client, LoopInterface $loop)
+    public function start(Client $client, LoopInterface $loop): void
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 

@@ -7,18 +7,12 @@ use PE\Component\WAMP\Message\PublishMessage;
 
 final class FeaturePublisherExclusion implements FeatureInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'publisher_exclusion';
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onMessageSend(Message $message)
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof PublishMessage) {
             $message->setOption('exclude_me', true);

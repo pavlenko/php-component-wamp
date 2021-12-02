@@ -6,13 +6,7 @@ use PE\Component\WAMP\Message\Message;
 
 interface FeatureInterface
 {
-    /**
-     * @return string
-     */
-    public function getName();
+    public function getName(): string;
 
-    /**
-     * @param Message $message
-     */
-    public function onMessageSend(Message $message);
+    public function onMessageSend(Message $message): void;
 }

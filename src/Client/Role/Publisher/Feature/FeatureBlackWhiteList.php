@@ -10,14 +10,14 @@ final class FeatureBlackWhiteList implements FeatureInterface
     /**
      * @var BlackWhiteListInterface
      */
-    private $config;
+    private BlackWhiteListInterface $config;
 
-    public function getName()
+    public function getName(): string
     {
         return 'subscriber_blackwhite_listing';
     }
 
-    public function onMessageSend(Message $message)
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof PublishMessage) {
             $blackList = $this->config->getBlackListItems($message->getTopic());

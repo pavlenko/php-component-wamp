@@ -9,32 +9,16 @@ use React\Promise\Deferred;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
-class PublisherAPI
+final class PublisherAPI
 {
-    /**
-     * @var Session
-     */
-    private $session;
+    private Session $session;
 
-    /**
-     * @param Session $session
-     */
     public function __construct(Session $session)
     {
         $this->session = $session;
     }
 
-    /**
-     * @param string $topic
-     * @param array  $arguments
-     * @param array  $argumentsKw
-     * @param array  $options
-     *
-     * @return PromiseInterface
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function publish($topic, array $arguments = [], array $argumentsKw = [], array $options = [])
+    public function publish(string $topic, array $arguments = [], array $argumentsKw = [], array $options = []): PromiseInterface
     {
         $requestID = Util::generateID();
         $deferred  = null;

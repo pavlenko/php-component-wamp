@@ -7,24 +7,24 @@ interface BlackWhiteListInterface
     /**
      * @return string
      */
-    public function getBlackListKey();
+    public function getBlackListKey(): string;
 
     /**
      * @param string $topic
      *
      * @return array
      */
-    public function getBlackListItems($topic);
+    public function getBlackListItems(string $topic): array;
 
     /**
      * @return string
      */
-    public function getWhiteListKey();
+    public function getWhiteListKey(): string;
 
     /**
      * @param string $topic
      *
      * @return array
      */
-    public function getWhiteListItems($topic);
+    public function getWhiteListItems(string $topic): array;
 }

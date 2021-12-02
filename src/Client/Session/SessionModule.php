@@ -11,29 +11,19 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Session;
 
-class SessionModule implements ClientModuleInterface
+final class SessionModule implements ClientModuleInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function subscribe(Client $client)
+    public function subscribe(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function unsubscribe(Client $client)
+    public function unsubscribe(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    /**
-     * @param Message $message
-     * @param Session $session
-     */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof WelcomeMessage):
@@ -48,28 +38,18 @@ class SessionModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session        $session
-     * @param WelcomeMessage $message
-     */
-    private function processWelcomeMessage(Session $session, WelcomeMessage $message)
+    private function processWelcomeMessage(Session $session, WelcomeMessage $message): void
     {
         $session->setSessionID($message->getSessionId());
     }
 
-    /**
-     * @param Session $session
-     */
-    private function processGoodbyeMessage(Session $session)
+    private function processGoodbyeMessage(Session $session): void
     {
         $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 
-    /**
-     * @param Session $session
-     */
-    private function processAbortMessage(Session $session)
+    private function processAbortMessage(Session $session): void
     {
         $session->shutdown();
     }

@@ -6,44 +6,34 @@ use Ratchet\Client\WebSocket;
 use PE\Component\WAMP\Connection\Connection;
 use PE\Component\WAMP\Message\Message;
 
-class WebSocketConnection extends Connection
+final class WebSocketConnection extends Connection
 {
-    private $socket;
+    private WebSocket $socket;
 
-    /**
-     * @param WebSocket $socket
-     */
     public function __construct(WebSocket $socket)
     {
         $this->socket = $socket;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function send(Message $message)
+    public function getSession()
+    {
+        // TODO: Implement getSession() method.
+    }
+
+    public function send(Message $message): void
     {
         $this->socket->send($this->getSerializer()->serialize($message));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function close()
+    public function close(): void
     {
         $this->socket->close();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function ping()
+    public function ping(): void
     {}
 
-    /**
-     * @inheritDoc
-     */
-    public function getTransportDetails()
+    public function getTransportDetails(): array
     {
         return [
             'type' => 'Pawl/0.3.1'
