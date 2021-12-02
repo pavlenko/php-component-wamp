@@ -11,17 +11,17 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Util;
 
-class TicketMethod implements MethodInterface
+final class TicketMethod implements MethodInterface
 {
     /**
      * @var string
      */
-    private $ticket;
+    private string $ticket;
 
     /**
      * @param string $ticket
      */
-    public function __construct($ticket)
+    public function __construct(string $ticket)
     {
         $this->ticket = $ticket;
     }
@@ -29,7 +29,7 @@ class TicketMethod implements MethodInterface
     /**
      * @inheritDoc
      */
-    public function getName()
+    public function getName(): string
     {
         return 'ticket';
     }
@@ -37,7 +37,7 @@ class TicketMethod implements MethodInterface
     /**
      * @inheritDoc
      */
-    public function processHelloMessage(Session $session, HelloMessage $message)
+    public function processHelloMessage(Session $session, HelloMessage $message): void
     {
         $session->send(new ChallengeMessage($this->getName(), []));
     }
@@ -45,7 +45,7 @@ class TicketMethod implements MethodInterface
     /**
      * @inheritDoc
      */
-    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message)
+    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void
     {
         if ($message->getSignature() === $this->ticket) {
             $sessionID = Util::generateID();
@@ -57,3 +57,4 @@ class TicketMethod implements MethodInterface
         }
     }
 }
+

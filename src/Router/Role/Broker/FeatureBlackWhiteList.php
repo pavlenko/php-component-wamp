@@ -11,12 +11,12 @@ final class FeatureBlackWhiteList implements BrokerFeatureInterface
     /**
      * @inheritDoc
      */
-    public function getName()
+    public function getName(): string
     {
         return 'subscriber_blackwhite_listing';
     }
 
-    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription)
+    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription): bool
     {
         if (is_array($message->getOption('exclude')) || is_array($message->getOption('eligible'))) {
             return $this->check(
@@ -47,12 +47,12 @@ final class FeatureBlackWhiteList implements BrokerFeatureInterface
 
     /**
      * @param string $identity
-     * @param array  $blackList
-     * @param array  $whiteList
+     * @param array $blackList
+     * @param array $whiteList
      *
      * @return bool
      */
-    private function check($identity, $blackList, $whiteList)
+    private function check(string $identity, array $blackList, array $whiteList): bool
     {
         if (!empty($whiteList) && !in_array($identity, $whiteList, false)) {
             return false;

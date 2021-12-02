@@ -11,31 +11,31 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Util;
 
-class WAMPCRAMethod implements MethodInterface
+final class WAMPCRAMethod implements MethodInterface
 {
-    private $secret;
-    private $provider;
+    private string $secret;
+    private string $provider;
 
-    private $users;
+    private array $users;
 
     /**
      * @param string $secret
      * @param string $provider
      * @param array  $users
      */
-    public function __construct($secret, $provider, array $users)
+    public function __construct(string $secret, string $provider, array $users)
     {
         $this->secret   = $secret;
         $this->provider = $provider;
         $this->users    = $users;//TODO collection of user objects
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'wampcra';
     }
 
-    public function processHelloMessage(Session $session, HelloMessage $message)
+    public function processHelloMessage(Session $session, HelloMessage $message): void
     {
         $authID = $message->getDetail('authid');
 
@@ -57,7 +57,7 @@ class WAMPCRAMethod implements MethodInterface
         }//TODO else
     }
 
-    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message)
+    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void
     {
         $challenge = $session->challenge;
         $signature = $message->getSignature();

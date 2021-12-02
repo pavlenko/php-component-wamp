@@ -11,17 +11,17 @@ interface MethodInterface
     /**
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @param Session      $session
      * @param HelloMessage $message
      */
-    public function processHelloMessage(Session $session, HelloMessage $message);
+    public function processHelloMessage(Session $session, HelloMessage $message): void;
 
     /**
      * @param Session             $session
      * @param AuthenticateMessage $message
      */
-    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message);
+    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void;
 }

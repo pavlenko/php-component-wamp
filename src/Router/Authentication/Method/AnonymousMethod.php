@@ -8,12 +8,12 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Util;
 
-class AnonymousMethod implements MethodInterface
+final class AnonymousMethod implements MethodInterface
 {
     /**
      * @inheritDoc
      */
-    public function getName()
+    public function getName(): string
     {
         return 'anonymous';
     }
@@ -21,7 +21,7 @@ class AnonymousMethod implements MethodInterface
     /**
      * @inheritDoc
      */
-    public function processHelloMessage(Session $session, HelloMessage $message)
+    public function processHelloMessage(Session $session, HelloMessage $message): void
     {
         $sessionID = Util::generateID();
 
@@ -32,7 +32,7 @@ class AnonymousMethod implements MethodInterface
     /**
      * @inheritDoc
      */
-    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message)
+    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void
     {
         // DO NOTHING
     }

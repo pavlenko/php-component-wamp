@@ -24,38 +24,38 @@ use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Util;
 
-class DealerModule implements RouterModuleInterface
+final class DealerModule implements RouterModuleInterface
 {
     /**
      * @var array
      */
-    private $procedures = [];
+    private array $procedures = [];
 
     /**
      * Calls by request id (for caller)
      *
      * @var Call[]
      */
-    private $calls = [];
+    private array $calls = [];
 
     /**
      * Calls by invocation id (for callee)
      *
      * @var Call[]
      */
-    private $invocations = [];
+    private array $invocations = [];
 
     /**
      * Calls by interrupt id (for callee)
      *
      * @var Call[]
      */
-    private $interrupts = [];
+    private array $interrupts = [];
 
     /**
      * @inheritDoc
      */
-    public function subscribe(Router $router)
+    public function subscribe(Router $router): void
     {
         $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $router->on(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -64,7 +64,7 @@ class DealerModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function unsubscribe(Router $router)
+    public function unsubscribe(Router $router): void
     {
         $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $router->off(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -74,7 +74,7 @@ class DealerModule implements RouterModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof RegisterMessage):
@@ -102,7 +102,7 @@ class DealerModule implements RouterModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageSend(Message $message, Session $session)
+    public function onMessageSend(Message $message, Session $session): void
     {
         if ($message instanceof WelcomeMessage) {
             $message->addFeatures('dealer', [
@@ -117,7 +117,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session         $session
      * @param RegisterMessage $message
      */
-    private function processRegisterMessage(Session $session, RegisterMessage $message)
+    private function processRegisterMessage(Session $session, RegisterMessage $message): void
     {
         $registrationID = Util::generateID();
 
@@ -136,7 +136,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session           $session
      * @param UnregisterMessage $message
      */
-    private function processUnregisterMessage(Session $session, UnregisterMessage $message)
+    private function processUnregisterMessage(Session $session, UnregisterMessage $message): void
     {
         if (in_array($message->getRegistrationID(), $this->procedures, false)) {
             $procedureURI = array_search($message->getRegistrationID(), $this->procedures, false);
@@ -154,7 +154,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session     $session
      * @param CallMessage $message
      */
-    private function processCallMessage(Session $session, CallMessage $message)
+    private function processCallMessage(Session $session, CallMessage $message): void
     {
         if (isset($this->procedures[$message->getProcedureURI()])) {
             $invocationID   = Util::generateID();
@@ -187,7 +187,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session      $session
      * @param YieldMessage $message
      */
-    private function processYieldMessage(Session $session, YieldMessage $message)
+    private function processYieldMessage(Session $session, YieldMessage $message): void
     {
         if (isset($this->invocations[$message->getRequestID()])) {
             $call = $this->invocations[$message->getRequestID()];
@@ -217,7 +217,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session       $session
      * @param CancelMessage $message
      */
-    private function processCancelMessage(Session $session, CancelMessage $message)
+    private function processCancelMessage(Session $session, CancelMessage $message): void
     {
         if (isset($this->calls[$message->getRequestID()])) {
             $call = $this->calls[$message->getRequestID()];
@@ -258,7 +258,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessage(Session $session, ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_INVOCATION:
@@ -274,7 +274,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessageFromInvocation(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromInvocation(Session $session, ErrorMessage $message): void
     {
         if (isset($this->invocations[$message->getErrorRequestID()])) {
             $call = $this->invocations[$message->getErrorRequestID()];
@@ -302,7 +302,7 @@ class DealerModule implements RouterModuleInterface
      * @param Session      $session
      * @param ErrorMessage $message
      */
-    private function processErrorMessageFromInterrupt(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromInterrupt(Session $session, ErrorMessage $message): void
     {
         if (isset($this->interrupts[$message->getErrorRequestID()])) {
             $call = $this->interrupts[$message->getErrorRequestID()];
@@ -320,7 +320,7 @@ class DealerModule implements RouterModuleInterface
     /**
      * @param Call $call
      */
-    private function removeCall(Call $call)
+    private function removeCall(Call $call): void
     {
         unset(
             $this->calls[$call->getCallMessage()->getRequestId()],

@@ -12,17 +12,17 @@ use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session;
 
-class AuthenticationModule implements RouterModuleInterface
+final class AuthenticationModule implements RouterModuleInterface
 {
     /**
      * @var MethodInterface[]
      */
-    private $methods = [];
+    private array $methods = [];
 
     /**
      * @param MethodInterface $method
      */
-    public function addMethod(MethodInterface $method)
+    public function addMethod(MethodInterface $method): void
     {
         $this->methods[] = $method;
     }
@@ -30,7 +30,7 @@ class AuthenticationModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function subscribe(Router $router)
+    public function subscribe(Router $router): void
     {
         $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 10);
     }
@@ -38,7 +38,7 @@ class AuthenticationModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function unsubscribe(Router $router)
+    public function unsubscribe(Router $router): void
     {
         $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
@@ -47,7 +47,7 @@ class AuthenticationModule implements RouterModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof HelloMessage):
@@ -63,7 +63,7 @@ class AuthenticationModule implements RouterModuleInterface
      * @param Session      $session
      * @param HelloMessage $message
      */
-    private function processHelloMessage(Session $session, HelloMessage $message)
+    private function processHelloMessage(Session $session, HelloMessage $message): void
     {
         $methods = (array) $message->getDetail('authmethods', []);
 
@@ -84,7 +84,7 @@ class AuthenticationModule implements RouterModuleInterface
      * @param Session             $session
      * @param AuthenticateMessage $message
      */
-    private function processAuthenticateMessage(Session $session, AuthenticateMessage $message)
+    private function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void
     {
         foreach ($this->methods as $method) {
             if ($method->getName() === $session->getAuthMethod()) {

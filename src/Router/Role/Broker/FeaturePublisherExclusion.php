@@ -11,7 +11,7 @@ final class FeaturePublisherExclusion implements BrokerFeatureInterface
     /**
      * @inheritDoc
      */
-    public function getName()
+    public function getName(): string
     {
         return 'publisher_exclusion';
     }
@@ -19,7 +19,7 @@ final class FeaturePublisherExclusion implements BrokerFeatureInterface
     /**
      * @inheritDoc
      */
-    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription)
+    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription): bool
     {
         return false === (bool) $message->getOption('exclude_me')
             && $session->getSessionID() === $subscription->getSession()->getSessionID();

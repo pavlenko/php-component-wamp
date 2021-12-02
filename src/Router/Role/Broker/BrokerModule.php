@@ -19,22 +19,22 @@ use PE\Component\WAMP\Router\Session;
 use PE\Component\WAMP\Router\Subscription;
 use PE\Component\WAMP\Util;
 
-class BrokerModule implements RouterModuleInterface
+final class BrokerModule implements RouterModuleInterface
 {
     /**
      * @var BrokerFeatureInterface[]
      */
-    private $features = [];
+    private array $features = [];
 
     /**
      * @var Subscription[]
      */
-    private $subscriptions = [];
+    private array $subscriptions = [];
 
     /**
      * @param BrokerFeatureInterface $feature
      */
-    public function addFeature(BrokerFeatureInterface $feature)
+    public function addFeature(BrokerFeatureInterface $feature): void
     {
         $this->features[get_class($feature)] = $feature;
     }
@@ -42,7 +42,7 @@ class BrokerModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function subscribe(Router $router)
+    public function subscribe(Router $router): void
     {
         $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $router->on(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -51,7 +51,7 @@ class BrokerModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function unsubscribe(Router $router)
+    public function unsubscribe(Router $router): void
     {
         $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $router->off(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -61,7 +61,7 @@ class BrokerModule implements RouterModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof PublishMessage):
@@ -80,7 +80,7 @@ class BrokerModule implements RouterModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageSend(Message $message, Session $session)
+    public function onMessageSend(Message $message, Session $session): void
     {
         if ($message instanceof WelcomeMessage) {
             $features = [];
@@ -96,7 +96,7 @@ class BrokerModule implements RouterModuleInterface
      * @param Session        $session
      * @param PublishMessage $message
      */
-    private function processPublishMessage(Session $session, PublishMessage $message)
+    private function processPublishMessage(Session $session, PublishMessage $message): void
     {
         $publicationID = Util::generateID();
 
@@ -128,7 +128,7 @@ class BrokerModule implements RouterModuleInterface
      * @param Session          $session
      * @param SubscribeMessage $message
      */
-    private function processSubscribeMessage(Session $session, SubscribeMessage $message)
+    private function processSubscribeMessage(Session $session, SubscribeMessage $message): void
     {
         $subscriptionID = Util::generateID();
 
@@ -148,7 +148,7 @@ class BrokerModule implements RouterModuleInterface
      * @param Session            $session
      * @param UnsubscribeMessage $message
      */
-    private function processUnsubscribeMessage(Session $session, UnsubscribeMessage $message)
+    private function processUnsubscribeMessage(Session $session, UnsubscribeMessage $message): void
     {
         if (isset($this->subscriptions[$message->getSubscriptionID()])) {
             $session->send(new UnsubscribedMessage($message->getRequestID()));

@@ -11,7 +11,7 @@ interface BrokerFeatureInterface
     /**
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @param Session        $session
@@ -20,5 +20,5 @@ interface BrokerFeatureInterface
      *
      * @return bool
      */
-    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription);
+    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription): bool;
 }
