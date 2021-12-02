@@ -7,130 +7,76 @@ use PE\Component\WAMP\Message\CancelMessage;
 use PE\Component\WAMP\Message\InterruptMessage;
 use PE\Component\WAMP\Message\InvocationMessage;
 
-class Call
+final class Call
 {
-    /**
-     * @var Session
-     */
-    private $calleeSession;
+    private Session $calleeSession;
 
-    /**
-     * @var Session
-     */
-    private $callerSession;
+    private Session $callerSession;
 
-    /**
-     * @var CallMessage
-     */
-    private $callMessage;
+    private CallMessage $callMessage;
 
-    /**
-     * @var InvocationMessage
-     */
-    private $invocationMessage;
+    private InvocationMessage $invocationMessage;
 
-    /**
-     * @var CancelMessage
-     */
-    private $cancelMessage;
+    private CancelMessage $cancelMessage;
 
-    /**
-     * @var InterruptMessage
-     */
-    private $interruptMessage;
+    private InterruptMessage $interruptMessage;
 
-    /**
-     * @return Session
-     */
-    public function getCalleeSession()
+    public function getCalleeSession(): Session
     {
         return $this->calleeSession;
     }
 
-    /**
-     * @param Session $session
-     */
-    public function setCalleeSession(Session $session)
+    public function setCalleeSession(Session $session): void
     {
         $this->calleeSession = $session;
     }
 
-    /**
-     * @return Session
-     */
-    public function getCallerSession()
+    public function getCallerSession(): Session
     {
         return $this->callerSession;
     }
 
-    /**
-     * @param Session $session
-     */
-    public function setCallerSession(Session $session)
+    public function setCallerSession(Session $session): void
     {
         $this->callerSession = $session;
     }
 
-    /**
-     * @return CallMessage
-     */
-    public function getCallMessage()
+    public function getCallMessage(): CallMessage
     {
         return $this->callMessage;
     }
 
-    /**
-     * @param CallMessage $message
-     */
-    public function setCallMessage(CallMessage $message)
+    public function setCallMessage(CallMessage $message): void
     {
         $this->callMessage = $message;
     }
 
-    /**
-     * @return InvocationMessage
-     */
-    public function getInvocationMessage()
+    public function getInvocationMessage(): InvocationMessage
     {
         return $this->invocationMessage;
     }
 
-    /**
-     * @param InvocationMessage $message
-     */
-    public function setInvocationMessage(InvocationMessage $message)
+    public function setInvocationMessage(InvocationMessage $message): void
     {
         $this->invocationMessage = $message;
     }
 
-    /**
-     * @return CancelMessage
-     */
-    public function getCancelMessage()
+    public function getCancelMessage(): CancelMessage
     {
         return $this->cancelMessage;
     }
 
-    /**
-     * @param CancelMessage $message
-     */
-    public function setCancelMessage(CancelMessage $message)
+    public function setCancelMessage(CancelMessage $message): void
     {
         $this->cancelMessage = $message;
     }
 
-    /**
-     * @return InterruptMessage
-     */
-    public function getInterruptMessage()
+    public function getInterruptMessage(): InterruptMessage
     {
         return $this->interruptMessage;
     }
 
-    /**
-     * @param InterruptMessage $message
-     */
-    public function setInterruptMessage(InterruptMessage $message)
+    public function setInterruptMessage(InterruptMessage $message): void
     {
         $this->interruptMessage = $message;
     }

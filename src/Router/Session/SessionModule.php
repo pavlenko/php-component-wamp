@@ -12,12 +12,12 @@ use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Session;
 use PE\Component\WAMP\Util;
 
-class SessionModule implements RouterModuleInterface
+final class SessionModule implements RouterModuleInterface
 {
     /**
      * @inheritDoc
      */
-    public function subscribe(Router $router)
+    public function subscribe(Router $router): void
     {
         $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 0);
     }
@@ -25,7 +25,7 @@ class SessionModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function unsubscribe(Router $router)
+    public function unsubscribe(Router $router): void
     {
         $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
@@ -34,7 +34,7 @@ class SessionModule implements RouterModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof HelloMessage):
@@ -50,7 +50,7 @@ class SessionModule implements RouterModuleInterface
      * @param Session      $session
      * @param HelloMessage $message
      */
-    private function processHelloMessage(Session $session, HelloMessage $message)
+    private function processHelloMessage(Session $session, HelloMessage $message): void
     {
         $sessionID = Util::generateID();
 
@@ -62,7 +62,7 @@ class SessionModule implements RouterModuleInterface
      * @param Session        $session
      * @param GoodbyeMessage $message
      */
-    private function processGoodbyeMessage(Session $session, GoodbyeMessage $message)
+    private function processGoodbyeMessage(Session $session, GoodbyeMessage $message): void
     {
         $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
         $session->shutdown();

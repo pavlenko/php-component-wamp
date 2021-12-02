@@ -27,7 +27,7 @@ final class Router implements LoggerAwareInterface
     /**
      * @var TransportInterface
      */
-    private $transport;
+    private TransportInterface $transport;
 
     /**
      * @var LoopInterface
@@ -37,7 +37,7 @@ final class Router implements LoggerAwareInterface
     /**
      * @var RouterModuleInterface[]
      */
-    private $modules = [];
+    private array $modules = [];
 
     /**
      * @var \SplObjectStorage|Session[]
@@ -57,7 +57,7 @@ final class Router implements LoggerAwareInterface
      *
      * @param ConnectionInterface $connection
      */
-    public function processOpen(ConnectionInterface $connection)
+    public function processOpen(ConnectionInterface $connection): void
     {
         $this->logger && $this->logger->info('Router: open');
 
@@ -73,7 +73,7 @@ final class Router implements LoggerAwareInterface
      *
      * @param ConnectionInterface $connection
      */
-    public function processClose(ConnectionInterface $connection)
+    public function processClose(ConnectionInterface $connection): void
     {
         $this->logger && $this->logger->info('Router: close');
 
@@ -92,7 +92,7 @@ final class Router implements LoggerAwareInterface
      * @param ConnectionInterface $connection
      * @param Message             $message
      */
-    public function processMessageReceived(ConnectionInterface $connection, Message $message)
+    public function processMessageReceived(ConnectionInterface $connection, Message $message): void
     {
         $this->logger && $this->logger->info("Router: {$message->getName()} received");
         $this->logger && $this->logger->debug(json_encode($message));
@@ -106,7 +106,7 @@ final class Router implements LoggerAwareInterface
      * @param ConnectionInterface $connection
      * @param Message             $message
      */
-    public function processMessageSend(ConnectionInterface $connection, Message $message)
+    public function processMessageSend(ConnectionInterface $connection, Message $message): void
     {
         $this->logger && $this->logger->info("Router: {$message->getName()} send");
 
@@ -123,7 +123,7 @@ final class Router implements LoggerAwareInterface
      * @param ConnectionInterface $connection
      * @param \Exception          $ex
      */
-    public function processError(ConnectionInterface $connection, \Exception $ex)
+    public function processError(ConnectionInterface $connection, \Exception $ex): void
     {
         $this->logger && $this->logger->error("Router: [{$ex->getCode()}] {$ex->getMessage()}");
         $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
@@ -131,23 +131,17 @@ final class Router implements LoggerAwareInterface
         $this->emit(self::EVENT_CONNECTION_ERROR, $this->sessions[$connection]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setTransport(TransportInterface $transport)
+    public function setTransport(TransportInterface $transport): void
     {
         $this->transport = $transport;
     }
 
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         return $this->logger;
     }
 
-    public function start($startLoop = true)
+    public function start(bool $startLoop = true): void
     {
         if (null === $this->transport) {
             throw new \RuntimeException('Transport not set via setTransport()');
@@ -162,7 +156,7 @@ final class Router implements LoggerAwareInterface
         }
     }
 
-    public function stop()
+    public function stop(): void
     {
         $this->logger && $this->logger->info('Router: stop');
         $this->transport->stop();
@@ -173,7 +167,7 @@ final class Router implements LoggerAwareInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function addModule(RouterModuleInterface $module)
+    public function addModule(RouterModuleInterface $module): void
     {
         if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
             throw new \InvalidArgumentException('Cannot add same module twice');

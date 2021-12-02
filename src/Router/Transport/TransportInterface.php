@@ -11,10 +11,10 @@ interface TransportInterface
      * @param Router        $router
      * @param LoopInterface $loop
      */
-    public function start(Router $router, LoopInterface $loop);
+    public function start(Router $router, LoopInterface $loop): void;
 
     /**
      * Stop the router
      */
-    public function stop();
+    public function stop(): void;
 }

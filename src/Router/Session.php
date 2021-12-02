@@ -5,49 +5,30 @@ namespace PE\Component\WAMP\Router;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
 
-class Session extends \PE\Component\WAMP\Session
+final class Session extends \PE\Component\WAMP\Session
 {
-    /**
-     * @var Router
-     */
-    private $router;
+    private Router $router;
 
-    /**
-     * @var string|null
-     */
-    private $authMethod;
+    private ?string $authMethod;
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param Router              $router
-     */
     public function __construct(ConnectionInterface $connection, Router $router)
     {
         parent::__construct($connection);
         $this->router = $router;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function send(Message $message)
+    public function send(Message $message): void
     {
         $this->router->processMessageSend($this->getConnection(), $message);
         $this->getConnection()->send($message);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getAuthMethod()
+    public function getAuthMethod(): ?string
     {
         return $this->authMethod;
     }
 
-    /**
-     * @param string $authMethod
-     */
-    public function setAuthMethod($authMethod)
+    public function setAuthMethod(string $authMethod): void
     {
         $this->authMethod = $authMethod;
     }

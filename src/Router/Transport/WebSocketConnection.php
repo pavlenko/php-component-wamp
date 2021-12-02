@@ -5,13 +5,14 @@ namespace PE\Component\WAMP\Router\Transport;
 use Ratchet\ConnectionInterface;
 use PE\Component\WAMP\Connection\Connection;
 use PE\Component\WAMP\Message\Message;
+use Symfony\Component\HttpFoundation\Session\Session;
 
-class WebSocketConnection extends Connection
+final class WebSocketConnection extends Connection
 {
     /**
      * @var ConnectionInterface
      */
-    private $connection;
+    private ConnectionInterface $connection;
 
     public function __construct(ConnectionInterface $connection)
     {
@@ -21,7 +22,7 @@ class WebSocketConnection extends Connection
     /**
      * @inheritDoc
      */
-    public function send(Message $message)
+    public function send(Message $message): void
     {
         $this->connection->send($this->getSerializer()->serialize($message));
     }
@@ -29,7 +30,7 @@ class WebSocketConnection extends Connection
     /**
      * @inheritDoc
      */
-    public function close()
+    public function close(): void
     {
         $this->connection->close();
     }
@@ -37,7 +38,7 @@ class WebSocketConnection extends Connection
     /**
      * @inheritDoc
      */
-    public function ping()
+    public function ping(): void
     {
         // TODO: Implement ping() method.
     }
@@ -45,14 +46,14 @@ class WebSocketConnection extends Connection
     /**
      * @inheritDoc
      */
-    public function getTransportDetails()
+    public function getTransportDetails(): array
     {
         return [
             'type' => 'Ratchet/0.4.1'
         ];
     }
 
-    public function getSession()
+    public function getSession(): ?Session
     {
         return $this->connection->Session ?? null;
     }

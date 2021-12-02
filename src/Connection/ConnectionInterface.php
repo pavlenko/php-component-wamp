@@ -27,5 +27,5 @@ interface ConnectionInterface
 
     public function setTrusted(bool $trusted): ConnectionInterface;
 
-     public function getSession(): Session;
+     public function getSession(): ?Session;
 }

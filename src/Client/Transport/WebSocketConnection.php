@@ -5,6 +5,7 @@ namespace PE\Component\WAMP\Client\Transport;
 use Ratchet\Client\WebSocket;
 use PE\Component\WAMP\Connection\Connection;
 use PE\Component\WAMP\Message\Message;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 final class WebSocketConnection extends Connection
 {
@@ -15,7 +16,7 @@ final class WebSocketConnection extends Connection
         $this->socket = $socket;
     }
 
-    public function getSession()
+    public function getSession(): ?Session
     {
         // TODO: Implement getSession() method.
     }

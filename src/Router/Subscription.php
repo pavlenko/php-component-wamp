@@ -2,40 +2,24 @@
 
 namespace PE\Component\WAMP\Router;
 
-class Subscription
+final class Subscription
 {
-    /**
-     * @var Session
-     */
-    private $session;
+    private Session $session;
 
-    /**
-     * @var string
-     */
-    private $topic;
+    private string $topic;
 
-    /**
-     * @param Session $session
-     * @param string  $topic
-     */
-    public function __construct(Session $session, $topic)
+    public function __construct(Session $session, string $topic)
     {
         $this->session = $session;
         $this->topic   = $topic;
     }
 
-    /**
-     * @return Session
-     */
-    public function getSession()
+    public function getSession(): Session
     {
         return $this->session;
     }
 
-    /**
-     * @return string
-     */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }

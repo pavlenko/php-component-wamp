@@ -16,22 +16,22 @@ use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Serializer\Serializer;
 
-class WebSocketTransport implements TransportInterface, MessageComponentInterface, WsServerInterface
+final class WebSocketTransport implements TransportInterface, MessageComponentInterface, WsServerInterface
 {
     /**
      * @var string
      */
-    private $host;
+    private string $host;
 
     /**
      * @var int
      */
-    private $port;
+    private int $port;
 
     /**
      * @var bool
      */
-    private $secure;
+    private bool $secure;
 
     /**
      * @var \SplObjectStorage|ConnectionInterface[]
@@ -41,24 +41,24 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @var IoServer
      */
-    private $server;
+    private IoServer $server;
 
     /**
      * @var Router
      */
-    private $router;
+    private Router $router;
 
     /**
      * @var \SessionHandlerInterface|null
      */
-    private $sessionHandler;
+    private ?\SessionHandlerInterface $sessionHandler;
 
     /**
      * @param string $host
-     * @param int    $port
-     * @param bool   $secure
+     * @param int $port
+     * @param bool $secure
      */
-    public function __construct($host = '127.0.0.1', $port = 8080, $secure = false)
+    public function __construct(string $host = '127.0.0.1', int $port = 8080, bool $secure = false)
     {
         $this->host   = $host;
         $this->port   = $port;
@@ -70,7 +70,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @param \SessionHandlerInterface|null $sessionHandler
      */
-    public function setSessionHandler(\SessionHandlerInterface $sessionHandler = null)
+    public function setSessionHandler(\SessionHandlerInterface $sessionHandler = null): void
     {
         $this->sessionHandler = $sessionHandler;
     }
@@ -78,7 +78,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function getSubProtocols()
+    public function getSubProtocols(): array
     {
         return ['wamp.2.json'];
     }
@@ -86,7 +86,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function start(Router $router, LoopInterface $loop)
+    public function start(Router $router, LoopInterface $loop): void
     {
         $uri = ($this->secure ? 'tls' : 'tcp') . '://' . $this->host . ':' . $this->port;
 
@@ -108,7 +108,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function stop()
+    public function stop(): void
     {
         if ($this->server) {
             $this->server->socket->close();
@@ -122,7 +122,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function onOpen(RatchetConnectionInterface $ratchetConnection)
+    public function onOpen(RatchetConnectionInterface $ratchetConnection): void
     {
         $connection = new WebSocketConnection($ratchetConnection);
         $connection->setSerializer(new Serializer());
@@ -135,7 +135,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function onClose(RatchetConnectionInterface $ratchetConnection)
+    public function onClose(RatchetConnectionInterface $ratchetConnection): void
     {
         $connection = $this->connections[$ratchetConnection];
 
@@ -149,7 +149,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function onError(RatchetConnectionInterface $ratchetConnection, \Exception $exception)
+    public function onError(RatchetConnectionInterface $ratchetConnection, \Exception $exception): void
     {
         $connection = $this->connections[$ratchetConnection];
 
@@ -159,7 +159,7 @@ class WebSocketTransport implements TransportInterface, MessageComponentInterfac
     /**
      * @inheritDoc
      */
-    public function onMessage(RatchetConnectionInterface $ratchetConnection, MessageInterface $message)
+    public function onMessage(RatchetConnectionInterface $ratchetConnection, MessageInterface $message): void
     {
         $connection = $this->connections[$ratchetConnection];
 

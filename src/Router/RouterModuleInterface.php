@@ -4,13 +4,7 @@ namespace PE\Component\WAMP\Router;
 
 interface RouterModuleInterface
 {
-    /**
-     * @param Router $router
-     */
-    public function subscribe(Router $router);
+    public function subscribe(Router $router): void;
 
-    /**
-     * @param Router $router
-     */
-    public function unsubscribe(Router $router);
+    public function unsubscribe(Router $router): void;
 }
