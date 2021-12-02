@@ -12,12 +12,12 @@ use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 
-class CalleeAPI
+final class CalleeAPI
 {
     /**
      * @var Session
      */
-    private $session;
+    private Session $session;
 
     /**
      * @param Session $session
@@ -28,7 +28,7 @@ class CalleeAPI
     }
 
     /**
-     * @param string   $procedureURI
+     * @param string $procedureURI
      * @param callable $callback
      * @param array    $options
      *
@@ -36,7 +36,7 @@ class CalleeAPI
      *
      * @throws \InvalidArgumentException
      */
-    public function register($procedureURI, callable $callback, array $options = [])
+    public function register(string $procedureURI, callable $callback, array $options = []): PromiseInterface
     {
         if (!($this->session->registrations instanceof RegistrationCollection)) {
             $this->session->registrations = new RegistrationCollection();
@@ -66,7 +66,7 @@ class CalleeAPI
      *
      * @throws \InvalidArgumentException
      */
-    public function unregister($procedureURI)
+    public function unregister(string $procedureURI)
     {
         $requestID     = Util::generateID();
         $registrations = $this->session->registrations ?: new RegistrationCollection();

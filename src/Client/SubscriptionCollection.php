@@ -7,12 +7,12 @@ class SubscriptionCollection
     /**
      * @var Subscription[]
      */
-    private $subscriptions = [];
+    private array $subscriptions = [];
 
     /**
      * @param Subscription $subscription
      */
-    public function add(Subscription $subscription)
+    public function add(Subscription $subscription): void
     {
         $this->subscriptions[spl_object_hash($subscription)] = $subscription;
     }
@@ -20,7 +20,7 @@ class SubscriptionCollection
     /**
      * @param Subscription $subscription
      */
-    public function remove(Subscription $subscription)
+    public function remove(Subscription $subscription): void
     {
         if ($key = array_search($subscription, $this->subscriptions, true)) {
             unset($this->subscriptions[$key]);
@@ -28,12 +28,12 @@ class SubscriptionCollection
     }
 
     /**
-     * @param string   $topic
+     * @param string $topic
      * @param callable $callback
      *
      * @return Subscription|null
      */
-    public function findByTopicAndCallable($topic, callable $callback)
+    public function findByTopicAndCallable(string $topic, callable $callback): ?Subscription
     {
         $filtered = array_filter($this->subscriptions, function (Subscription $subscription) use ($topic, $callback) {
             return $subscription->getTopic() === $topic && $subscription->getCallback() === $callback;
@@ -47,7 +47,7 @@ class SubscriptionCollection
      *
      * @return Subscription|null
      */
-    public function findBySubscribeRequestID($id)
+    public function findBySubscribeRequestID(int $id): ?Subscription
     {
         $filtered = array_filter($this->subscriptions, function (Subscription $subscription) use ($id) {
             return $subscription->getSubscribeRequestID() === $id;
@@ -61,7 +61,7 @@ class SubscriptionCollection
      *
      * @return Subscription|null
      */
-    public function findByUnsubscribeRequestID($id)
+    public function findByUnsubscribeRequestID(int $id): ?Subscription
     {
         $filtered = array_filter($this->subscriptions, function (Subscription $subscription) use ($id) {
             return $subscription->getUnsubscribeRequestID() === $id;
@@ -75,7 +75,7 @@ class SubscriptionCollection
      *
      * @return Subscription|null
      */
-    public function findBySubscriptionID($id)
+    public function findBySubscriptionID(int $id): ?Subscription
     {
         $filtered = array_filter($this->subscriptions, function (Subscription $subscription) use ($id) {
             return $subscription->getSubscriptionID() === $id;

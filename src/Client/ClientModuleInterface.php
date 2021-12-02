@@ -4,13 +4,7 @@ namespace PE\Component\WAMP\Client;
 
 interface ClientModuleInterface
 {
-    /**
-     * @param Client $client
-     */
-    public function subscribe(Client $client);
+    public function subscribe(Client $client): void;
 
-    /**
-     * @param Client $client
-     */
-    public function unsubscribe(Client $client);
+     public function unsubscribe(Client $client): void;
 }

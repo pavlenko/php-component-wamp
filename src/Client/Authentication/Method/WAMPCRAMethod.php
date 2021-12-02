@@ -7,32 +7,28 @@ use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 
-class WAMPCRAMethod implements MethodInterface
+final class WAMPCRAMethod implements MethodInterface
 {
-    private $secret;
-    private $authID;
+    private string $secret;
+    private string $authID;
 
-    /**
-     * @param $secret
-     * @param $authID
-     */
-    public function __construct($secret, $authID)
+    public function __construct(string $secret, string $authID)
     {
         $this->secret = $secret;
         $this->authID = $authID;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'wampcra';
     }
 
-    public function processHelloMessage(Session $session, HelloMessage $message)
+    public function processHelloMessage(Session $session, HelloMessage $message): void
     {
         $message->setDetail('authid', $this->authID);
     }
 
-    public function processChallengeMessage(Session $session, ChallengeMessage $message)
+    public function processChallengeMessage(Session $session, ChallengeMessage $message): void
     {
         $extra = $message->getExtra();
 

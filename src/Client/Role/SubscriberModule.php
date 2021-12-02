@@ -14,31 +14,21 @@ use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\MessageCode;
 
-class SubscriberModule implements ClientModuleInterface
+final class SubscriberModule implements ClientModuleInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function subscribe(Client $client)
+    public function subscribe(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function unsubscribe(Client $client)
+    public function unsubscribe(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @param Message $message
-     * @param Session $session
-     */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof SubscribedMessage):
@@ -56,10 +46,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Message $message
-     */
-    public function onMessageSend(Message $message)
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('subscriber', [
@@ -68,11 +55,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session           $session
-     * @param SubscribedMessage $message
-     */
-    private function processSubscribedMessage(Session $session, SubscribedMessage $message)
+    private function processSubscribedMessage(Session $session, SubscribedMessage $message): void
     {
         $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
 
@@ -84,11 +67,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session             $session
-     * @param UnsubscribedMessage $message
-     */
-    private function processUnsubscribedMessage(Session $session, UnsubscribedMessage $message)
+    private function processUnsubscribedMessage(Session $session, UnsubscribedMessage $message): void
     {
         $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
 
@@ -100,11 +79,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param EventMessage $message
-     */
-    private function processEventMessage(Session $session, EventMessage $message)
+    private function processEventMessage(Session $session, EventMessage $message): void
     {
         $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
 
@@ -119,11 +94,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessage(Session $session, ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_SUBSCRIBE:
@@ -135,11 +106,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessageFromSubscribe(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromSubscribe(Session $session, ErrorMessage $message): void
     {
         $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
 
@@ -151,11 +118,7 @@ class SubscriberModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessageFromUnsubscribe(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromUnsubscribe(Session $session, ErrorMessage $message): void
     {
         $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
 

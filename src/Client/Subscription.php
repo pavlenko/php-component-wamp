@@ -9,7 +9,7 @@ class Subscription
     /**
      * @var string
      */
-    private $topic;
+    private string $topic;
 
     /**
      * @var callable
@@ -19,33 +19,33 @@ class Subscription
     /**
      * @var int
      */
-    private $subscribeRequestID;
+    private int $subscribeRequestID;
 
     /**
      * @var int
      */
-    private $unsubscribeRequestID;
+    private int $unsubscribeRequestID;
 
     /**
      * @var int
      */
-    private $subscriptionID;
+    private int $subscriptionID;
 
     /**
      * @var Deferred
      */
-    private $subscribeDeferred;
+    private Deferred $subscribeDeferred;
 
     /**
      * @var Deferred
      */
-    private $unsubscribeDeferred;
+    private Deferred $unsubscribeDeferred;
 
     /**
-     * @param string   $topic
+     * @param string $topic
      * @param callable $callback
      */
-    public function __construct($topic, callable $callback)
+    public function __construct(string $topic, callable $callback)
     {
         $this->topic    = $topic;
         $this->callback = $callback;
@@ -54,7 +54,7 @@ class Subscription
     /**
      * @return string
      */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }
@@ -62,7 +62,7 @@ class Subscription
     /**
      * @return callable
      */
-    public function getCallback()
+    public function getCallback(): callable
     {
         return $this->callback;
     }
@@ -70,7 +70,7 @@ class Subscription
     /**
      * @return int
      */
-    public function getSubscribeRequestID()
+    public function getSubscribeRequestID(): int
     {
         return $this->subscribeRequestID;
     }
@@ -78,15 +78,15 @@ class Subscription
     /**
      * @param int $subscribeRequestID
      */
-    public function setSubscribeRequestID($subscribeRequestID)
+    public function setSubscribeRequestID(int $subscribeRequestID): void
     {
-        $this->subscribeRequestID = (int) $subscribeRequestID;
+        $this->subscribeRequestID = $subscribeRequestID;
     }
 
     /**
      * @return int
      */
-    public function getUnsubscribeRequestID()
+    public function getUnsubscribeRequestID(): int
     {
         return $this->unsubscribeRequestID;
     }
@@ -94,15 +94,15 @@ class Subscription
     /**
      * @param int $unsubscribeRequestID
      */
-    public function setUnsubscribeRequestID($unsubscribeRequestID)
+    public function setUnsubscribeRequestID(int $unsubscribeRequestID)
     {
-        $this->unsubscribeRequestID = (int) $unsubscribeRequestID;
+        $this->unsubscribeRequestID = $unsubscribeRequestID;
     }
 
     /**
      * @return int
      */
-    public function getSubscriptionID()
+    public function getSubscriptionID(): int
     {
         return $this->subscriptionID;
     }
@@ -110,15 +110,15 @@ class Subscription
     /**
      * @param int $subscriptionID
      */
-    public function setSubscriptionID($subscriptionID)
+    public function setSubscriptionID(int $subscriptionID): void
     {
-        $this->subscriptionID = (int) $subscriptionID;
+        $this->subscriptionID = $subscriptionID;
     }
 
     /**
      * @return Deferred
      */
-    public function getSubscribeDeferred()
+    public function getSubscribeDeferred(): Deferred
     {
         return $this->subscribeDeferred;
     }
@@ -126,7 +126,7 @@ class Subscription
     /**
      * @param Deferred $deferred
      */
-    public function setSubscribeDeferred(Deferred $deferred)
+    public function setSubscribeDeferred(Deferred $deferred): void
     {
         $this->subscribeDeferred = $deferred;
     }
@@ -134,7 +134,7 @@ class Subscription
     /**
      * @return Deferred
      */
-    public function getUnsubscribeDeferred()
+    public function getUnsubscribeDeferred(): Deferred
     {
         return $this->unsubscribeDeferred;
     }
@@ -142,7 +142,7 @@ class Subscription
     /**
      * @param Deferred $deferred
      */
-    public function setUnsubscribeDeferred(Deferred $deferred)
+    public function setUnsubscribeDeferred(Deferred $deferred): void
     {
         $this->unsubscribeDeferred = $deferred;
     }

@@ -12,31 +12,21 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\ResultMessage;
 use PE\Component\WAMP\MessageCode;
 
-class CallerModule implements ClientModuleInterface
+final class CallerModule implements ClientModuleInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function subscribe(Client $client)
+    public function subscribe(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function unsubscribe(Client $client)
+    public function unsubscribe(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @param Message $message
-     * @param Session $session
-     */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof ResultMessage):
@@ -48,10 +38,7 @@ class CallerModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Message $message
-     */
-    public function onMessageSend(Message $message)
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('caller', [
@@ -60,11 +47,7 @@ class CallerModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session       $session
-     * @param ResultMessage $message
-     */
-    private function processResultMessage(Session $session, ResultMessage $message)
+    private function processResultMessage(Session $session, ResultMessage $message): void
     {
         $calls = $session->callRequests ?: new CallCollection();
 
@@ -81,11 +64,7 @@ class CallerModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessage(Session $session, ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_CALL:
@@ -94,11 +73,7 @@ class CallerModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessageFromCall(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromCall(Session $session, ErrorMessage $message): void
     {
         $calls = $session->callRequests ?: new CallCollection();
 

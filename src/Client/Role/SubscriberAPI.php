@@ -12,12 +12,12 @@ use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 
-class SubscriberAPI
+final class SubscriberAPI
 {
     /**
      * @var Session
      */
-    private $session;
+    private Session $session;
 
     /**
      * @param Session $session
@@ -28,13 +28,13 @@ class SubscriberAPI
     }
 
     /**
-     * @param string     $topic
+     * @param string $topic
      * @param callable   $callback
      * @param array|null $options
      *
      * @return PromiseInterface
      */
-    public function subscribe($topic, callable $callback, array $options = null)
+    public function subscribe(string $topic, callable $callback, array $options = null): PromiseInterface
     {
         $requestID = Util::generateID();
         $options   = $options ?: [];
@@ -55,14 +55,14 @@ class SubscriberAPI
     }
 
     /**
-     * @param string   $topic
+     * @param string $topic
      * @param callable $callback
      *
      * @return PromiseInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function unsubscribe($topic, callable $callback)
+    public function unsubscribe(string $topic, callable $callback): PromiseInterface
     {
         $requestID     = Util::generateID();
         $subscriptions = $this->session->subscriptions ?: new SubscriptionCollection();

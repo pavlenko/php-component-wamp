@@ -12,7 +12,7 @@ class CallCollection
     /**
      * @param Call $call
      */
-    public function add(Call $call)
+    public function add(Call $call): void
     {
         $this->calls[spl_object_hash($call)] = $call;
     }
@@ -20,7 +20,7 @@ class CallCollection
     /**
      * @param Call $call
      */
-    public function remove(Call $call)
+    public function remove(Call $call): void
     {
         if ($key = array_search($call, $this->calls, true)) {
             unset($this->calls[$key]);
@@ -32,7 +32,7 @@ class CallCollection
      *
      * @return Call|null
      */
-    public function findByRequestID($id)
+    public function findByRequestID(int $id): ?Call
     {
         $filtered = array_filter($this->calls, function (Call $call) use ($id) {
             return $call->getRequestID() === $id;

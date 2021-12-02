@@ -10,7 +10,7 @@ class Session extends \PE\Component\WAMP\Session
     /**
      * @var Client
      */
-    private $client;
+    private Client $client;
 
     public function __construct(ConnectionInterface $connection, Client $client)
     {
@@ -21,7 +21,7 @@ class Session extends \PE\Component\WAMP\Session
     /**
      * @inheritDoc
      */
-    public function send(Message $message)
+    public function send(Message $message): void
     {
         $this->client->processMessageSend($message);
         $this->getConnection()->send($message);
@@ -30,7 +30,7 @@ class Session extends \PE\Component\WAMP\Session
     /**
      * @inheritDoc
      */
-    public function setSessionID($id)
+    public function setSessionID(int $id): void
     {
         parent::setSessionID($id);
         $this->client->emit(Client::EVENT_SESSION_ESTABLISHED, $this);

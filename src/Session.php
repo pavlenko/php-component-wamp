@@ -89,7 +89,7 @@ abstract class Session
     /**
      * @return int
      */
-    public function getSessionID()
+    public function getSessionID(): int
     {
         return $this->id;
     }
@@ -97,7 +97,7 @@ abstract class Session
     /**
      * @param int $id
      */
-    public function setSessionID($id)
+    public function setSessionID(int $id): void
     {
         $this->id = $id;
     }

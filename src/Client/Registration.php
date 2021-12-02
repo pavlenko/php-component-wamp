@@ -7,9 +7,9 @@ use React\Promise\Deferred;
 class Registration
 {
     /**
-     * @var int
+     * @var string
      */
-    private $procedureURI;
+    private string $procedureURI;
 
     /**
      * @var callable
@@ -19,46 +19,46 @@ class Registration
     /**
      * @var int
      */
-    private $registrationID;
+    private int $registrationID;
 
     /**
      * @var int
      */
-    private $registerRequestID;
+    private int $registerRequestID;
 
     /**
      * @var int
      */
-    private $unregisterRequestID;
+    private int $unregisterRequestID;
 
     /**
      * @var Deferred
      */
-    private $registerDeferred;
+    private Deferred $registerDeferred;
 
     /**
      * @var Deferred
      */
-    private $unregisterDeferred;
+    private Deferred $unregisterDeferred;
 
-    public function __construct($procedureURI, callable $callback)
+    public function __construct(int $procedureURI, callable $callback)
     {
         $this->procedureURI = $procedureURI;
         $this->callback     = $callback;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getProcedureURI()
+    public function getProcedureURI(): string
     {
         return $this->procedureURI;
     }
 
     /**
-     * @param int $procedureURI
+     * @param string $procedureURI
      */
-    public function setProcedureURI($procedureURI)
+    public function setProcedureURI(string $procedureURI): void
     {
         $this->procedureURI = $procedureURI;
     }
@@ -66,7 +66,7 @@ class Registration
     /**
      * @return callable
      */
-    public function getCallback()
+    public function getCallback(): callable
     {
         return $this->callback;
     }
@@ -74,7 +74,7 @@ class Registration
     /**
      * @param callable $callback
      */
-    public function setCallback($callback)
+    public function setCallback(callable $callback): void
     {
         $this->callback = $callback;
     }
@@ -82,7 +82,7 @@ class Registration
     /**
      * @return int
      */
-    public function getRegistrationID()
+    public function getRegistrationID(): int
     {
         return $this->registrationID;
     }
@@ -90,7 +90,7 @@ class Registration
     /**
      * @param int $registrationID
      */
-    public function setRegistrationID($registrationID)
+    public function setRegistrationID(int $registrationID): void
     {
         $this->registrationID = (int) $registrationID;
     }
@@ -98,7 +98,7 @@ class Registration
     /**
      * @return int
      */
-    public function getRegisterRequestID()
+    public function getRegisterRequestID(): int
     {
         return $this->registerRequestID;
     }
@@ -106,7 +106,7 @@ class Registration
     /**
      * @param int $registerRequestID
      */
-    public function setRegisterRequestID($registerRequestID)
+    public function setRegisterRequestID(int $registerRequestID): void
     {
         $this->registerRequestID = (int) $registerRequestID;
     }
@@ -114,7 +114,7 @@ class Registration
     /**
      * @return int
      */
-    public function getUnregisterRequestID()
+    public function getUnregisterRequestID(): int
     {
         return $this->unregisterRequestID;
     }
@@ -122,7 +122,7 @@ class Registration
     /**
      * @param int $unregisterRequestID
      */
-    public function setUnregisterRequestID($unregisterRequestID)
+    public function setUnregisterRequestID(int $unregisterRequestID): void
     {
         $this->unregisterRequestID = (int) $unregisterRequestID;
     }
@@ -130,7 +130,7 @@ class Registration
     /**
      * @return Deferred
      */
-    public function getRegisterDeferred()
+    public function getRegisterDeferred(): Deferred
     {
         return $this->registerDeferred;
     }
@@ -138,7 +138,7 @@ class Registration
     /**
      * @param Deferred $deferred
      */
-    public function setRegisterDeferred(Deferred $deferred)
+    public function setRegisterDeferred(Deferred $deferred): void
     {
         $this->registerDeferred = $deferred;
     }
@@ -146,7 +146,7 @@ class Registration
     /**
      * @return Deferred
      */
-    public function getUnregisterDeferred()
+    public function getUnregisterDeferred(): Deferred
     {
         return $this->unregisterDeferred;
     }
@@ -154,7 +154,7 @@ class Registration
     /**
      * @param Deferred $deferred
      */
-    public function setUnregisterDeferred(Deferred $deferred)
+    public function setUnregisterDeferred(Deferred $deferred): void
     {
         $this->unregisterDeferred = $deferred;
     }

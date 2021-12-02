@@ -10,17 +10,17 @@ use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 
-class AuthenticationModule implements ClientModuleInterface
+final class AuthenticationModule implements ClientModuleInterface
 {
     /**
      * @var MethodInterface[]
      */
-    private $methods = [];
+    private array $methods = [];
 
     /**
      * @param MethodInterface $method
      */
-    public function addMethod(MethodInterface $method)
+    public function addMethod(MethodInterface $method): void
     {
         $this->methods[] = $method;
     }
@@ -28,7 +28,7 @@ class AuthenticationModule implements ClientModuleInterface
     /**
      * @inheritDoc
      */
-    public function subscribe(Client $client)
+    public function subscribe(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -37,7 +37,7 @@ class AuthenticationModule implements ClientModuleInterface
     /**
      * @inheritDoc
      */
-    public function unsubscribe(Client $client)
+    public function unsubscribe(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -47,7 +47,7 @@ class AuthenticationModule implements ClientModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         if ($message instanceof ChallengeMessage) {
             $this->processChallengeMessage($session, $message);
@@ -58,7 +58,7 @@ class AuthenticationModule implements ClientModuleInterface
      * @param Message $message
      * @param Session $session
      */
-    public function onMessageSend(Message $message, Session $session)
+    public function onMessageSend(Message $message, Session $session): void
     {
         if ($message instanceof HelloMessage) {
             foreach ($this->methods as $method) {
@@ -77,7 +77,7 @@ class AuthenticationModule implements ClientModuleInterface
      * @param Session          $session
      * @param ChallengeMessage $message
      */
-    private function processChallengeMessage(Session $session, ChallengeMessage $message)
+    private function processChallengeMessage(Session $session, ChallengeMessage $message): void
     {
         foreach ($this->methods as $method) {
             if ($method->getName() === $message->getAuthenticationMethod()) {

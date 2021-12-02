@@ -21,31 +21,21 @@ use React\Promise\CancellablePromiseInterface;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
-class CalleeModule implements ClientModuleInterface
+final class CalleeModule implements ClientModuleInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function subscribe(Client $client)
+    public function subscribe(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function unsubscribe(Client $client)
+    public function unsubscribe(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @param Message $message
-     * @param Session $session
-     */
-    public function onMessageReceived(Message $message, Session $session)
+    public function onMessageReceived(Message $message, Session $session): void
     {
         switch (true) {
             case ($message instanceof RegisteredMessage):
@@ -66,10 +56,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Message $message
-     */
-    public function onMessageSend(Message $message)
+     public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('callee', [
@@ -78,11 +65,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session           $session
-     * @param RegisteredMessage $message
-     */
-    private function processRegisteredMessage(Session $session, RegisteredMessage $message)
+    private function processRegisteredMessage(Session $session, RegisteredMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -94,11 +77,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session             $session
-     * @param UnregisteredMessage $message
-     */
-    private function processUnregisteredMessage(Session $session, UnregisteredMessage $message)
+    private function processUnregisteredMessage(Session $session, UnregisteredMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -186,13 +165,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session          $session
-     * @param InterruptMessage $message
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function processInterruptMessage(Session $session, InterruptMessage $message)
+    private function processInterruptMessage(Session $session, InterruptMessage $message): void
     {
         if (isset($session->invocationCancellers[$message->getRequestID()])) {
             $callable = $session->invocationCancellers[$message->getRequestID()];
@@ -204,11 +177,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessage(Session $session, ErrorMessage $message)
+    private function processErrorMessage(Session $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_REGISTER:
@@ -220,11 +189,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessageFromRegister(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromRegister(Session $session, ErrorMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -236,11 +201,7 @@ class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session      $session
-     * @param ErrorMessage $message
-     */
-    private function processErrorMessageFromUnregister(Session $session, ErrorMessage $message)
+    private function processErrorMessageFromUnregister(Session $session, ErrorMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 

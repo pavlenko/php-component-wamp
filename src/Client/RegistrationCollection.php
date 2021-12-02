@@ -7,7 +7,7 @@ class RegistrationCollection
     /**
      * @var Registration[]
      */
-    private $registrations = [];
+    private array $registrations = [];
 
     /**
      * @param Registration $registration
@@ -32,7 +32,7 @@ class RegistrationCollection
      *
      * @return Registration|null
      */
-    public function findByProcedureURI($procedureURI)
+    public function findByProcedureURI(string $procedureURI): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($procedureURI) {
             return $registration->getProcedureURI() === $procedureURI;
@@ -46,7 +46,7 @@ class RegistrationCollection
      *
      * @return Registration|null
      */
-    public function findByRegisterRequestID($id)
+    public function findByRegisterRequestID(int $id): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($id) {
             return $registration->getRegisterRequestID() === $id;
@@ -60,7 +60,7 @@ class RegistrationCollection
      *
      * @return Registration|null
      */
-    public function findByUnregisterRequestID($id)
+    public function findByUnregisterRequestID(int $id): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($id) {
             return $registration->getUnregisterRequestID() === $id;
@@ -74,7 +74,7 @@ class RegistrationCollection
      *
      * @return Registration|null
      */
-    public function findByRegistrationID($id)
+    public function findByRegistrationID(int $id): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($id) {
             return $registration->getRegistrationID() === $id;

@@ -11,12 +11,12 @@ use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 
-class CallerAPI
+final class CallerAPI
 {
     /**
      * @var Session
      */
-    private $session;
+    private Session $session;
 
     /**
      * @param Session $session
@@ -26,15 +26,7 @@ class CallerAPI
         $this->session = $session;
     }
 
-    /**
-     * @param string $procedureURI
-     * @param array  $arguments
-     * @param array  $argumentsKw
-     * @param array  $options
-     *
-     * @return PromiseInterface
-     */
-    public function call($procedureURI, array $arguments = [], array $argumentsKw = [], array $options = [])
+    public function call(string $procedureURI, array $arguments = [], array $argumentsKw = [], array $options = []): PromiseInterface
     {
         $requestID = Util::generateID();
 
