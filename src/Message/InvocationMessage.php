@@ -11,7 +11,7 @@ use PE\Component\WAMP\MessageCode;
  * <code>[INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict, CALL.Arguments|list]</code>
  * <code>[INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict, CALL.Arguments|list, CALL.ArgumentsKw|dict]</code>
  */
-class InvocationMessage extends Message
+final class InvocationMessage extends Message
 {
     use RequestID;
     use Details;
@@ -20,16 +20,16 @@ class InvocationMessage extends Message
     /**
      * @var int
      */
-    private $registrationID;
+    private int $registrationID;
 
     /**
-     * @param int        $requestID
-     * @param int        $registrationID
+     * @param int $requestID
+     * @param int $registrationID
      * @param array      $details
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
-    public function __construct($requestID, $registrationID, array $details, array $arguments = null, array $argumentsKw = null)
+    public function __construct(int $requestID, int $registrationID, array $details, array $arguments = null, array $argumentsKw = null)
     {
         $this->setRequestID($requestID);
         $this->setRegistrationID($registrationID);
@@ -41,7 +41,7 @@ class InvocationMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_INVOCATION;
     }
@@ -49,7 +49,7 @@ class InvocationMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'INVOCATION';
     }
@@ -57,7 +57,7 @@ class InvocationMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getRequestID(), $this->getRegistrationID(), $this->getDetails()],
@@ -68,7 +68,7 @@ class InvocationMessage extends Message
     /**
      * @return int
      */
-    public function getRegistrationID()
+    public function getRegistrationID(): int
     {
         return $this->registrationID;
     }
@@ -78,9 +78,9 @@ class InvocationMessage extends Message
      *
      * @return self
      */
-    public function setRegistrationID($registrationID)
+    public function setRegistrationID(int $registrationID): InvocationMessage
     {
-        $this->registrationID = (int) $registrationID;
+        $this->registrationID = $registrationID;
         return $this;
     }
 }

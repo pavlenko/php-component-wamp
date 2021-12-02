@@ -11,7 +11,7 @@ use PE\Component\WAMP\MessageCode;
  * <code>[PUBLISH, Request|id, Options|dict, Topic|uri, Arguments|list]</code>
  * <code>[PUBLISH, Request|id, Options|dict, Topic|uri, Arguments|list, ArgumentsKw|dict]</code>
  */
-class PublishMessage extends Message implements ActionInterface
+final class PublishMessage extends Message implements ActionInterface
 {
     use RequestID;
     use Options;
@@ -20,16 +20,16 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @var string
      */
-    private $topic;
+    private string $topic;
 
     /**
-     * @param int        $requestID
+     * @param int $requestID
      * @param array      $options
-     * @param string     $topic
+     * @param string $topic
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
-    public function __construct($requestID, array $options, $topic, array $arguments = null, array $argumentsKw = null)
+    public function __construct(int $requestID, array $options, string $topic, array $arguments = null, array $argumentsKw = null)
     {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -41,7 +41,7 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_PUBLISH;
     }
@@ -49,7 +49,7 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'PUBLISH';
     }
@@ -57,7 +57,7 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getRequestID(), $this->getOptions(), $this->getTopic()],
@@ -68,7 +68,7 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionUri()
+    public function getActionUri(): string
     {
         return $this->getTopic();
     }
@@ -76,7 +76,7 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionName()
+    public function getActionName(): string
     {
         return 'publish';
     }
@@ -84,7 +84,7 @@ class PublishMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }
@@ -94,9 +94,9 @@ class PublishMessage extends Message implements ActionInterface
      *
      * @return self
      */
-    public function setTopic($topic)
+    public function setTopic(string $topic): PublishMessage
     {
-        $this->topic = (string) $topic;
+        $this->topic = $topic;
         return $this;
     }
 }

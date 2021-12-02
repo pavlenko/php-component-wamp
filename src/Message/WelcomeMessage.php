@@ -7,20 +7,20 @@ use PE\Component\WAMP\MessageCode;
 /**
  * <code>[WELCOME, Session|id, Details|dict]</code>
  */
-class WelcomeMessage extends Message
+final class WelcomeMessage extends Message
 {
     use Details;
 
     /**
      * @var int
      */
-    private $sessionId;
+    private int $sessionId;
 
     /**
-     * @param int   $sessionId
+     * @param int $sessionId
      * @param array $details
      */
-    public function __construct($sessionId, array $details)
+    public function __construct(int $sessionId, array $details)
     {
         $this->setSessionId($sessionId);
         $this->setDetails($details);
@@ -29,7 +29,7 @@ class WelcomeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_WELCOME;
     }
@@ -37,7 +37,7 @@ class WelcomeMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'WELCOME';
     }
@@ -45,7 +45,7 @@ class WelcomeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getSessionId(), $this->getDetails()];
     }
@@ -53,7 +53,7 @@ class WelcomeMessage extends Message
     /**
      * @return int
      */
-    public function getSessionId()
+    public function getSessionId(): int
     {
         return $this->sessionId;
     }
@@ -63,9 +63,9 @@ class WelcomeMessage extends Message
      *
      * @return self
      */
-    public function setSessionId($sessionId)
+    public function setSessionId(int $sessionId): WelcomeMessage
     {
-        $this->sessionId = (int) $sessionId;
+        $this->sessionId = $sessionId;
         return $this;
     }
 }

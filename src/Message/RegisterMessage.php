@@ -9,7 +9,7 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[REGISTER, Request|id, Options|dict, Procedure|uri]</code>
  */
-class RegisterMessage extends Message implements ActionInterface
+final class RegisterMessage extends Message implements ActionInterface
 {
     use RequestID;
     use Options;
@@ -17,14 +17,14 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @var string
      */
-    private $procedureURI;
+    private string $procedureURI;
 
     /**
-     * @param int    $requestID
+     * @param int $requestID
      * @param array  $options
      * @param string $procedureURI
      */
-    public function __construct($requestID, array $options, $procedureURI)
+    public function __construct(int $requestID, array $options, string $procedureURI)
     {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -34,7 +34,7 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_REGISTER;
     }
@@ -42,7 +42,7 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'REGISTER';
     }
@@ -50,7 +50,7 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getOptions(), $this->getProcedureURI()];
     }
@@ -58,7 +58,7 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionUri()
+    public function getActionUri(): string
     {
         return $this->getProcedureURI();
     }
@@ -66,7 +66,7 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionName()
+    public function getActionName(): string
     {
         return 'register';
     }
@@ -74,7 +74,7 @@ class RegisterMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getProcedureURI()
+    public function getProcedureURI(): string
     {
         return $this->procedureURI;
     }
@@ -84,9 +84,9 @@ class RegisterMessage extends Message implements ActionInterface
      *
      * @return self
      */
-    public function setProcedureURI($procedureURI)
+    public function setProcedureURI(string $procedureURI): RegisterMessage
     {
-        $this->procedureURI = (string) $procedureURI;
+        $this->procedureURI = $procedureURI;
         return $this;
     }
 }

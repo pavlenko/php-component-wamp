@@ -8,35 +8,37 @@ use PE\Component\WAMP\MessageCode;
  * <code>[HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer]</code>
  * <code>[HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer, Discard|string]</code>
  */
-class HeartbeatMessage extends Message
+final class HeartbeatMessage extends Message
 {
     /**
      * @var int
      */
-    private $incomingSeq;
+    private int $incomingSeq;
 
     /**
      * @var int
      */
-    private $outgoingSeq;
+    private int $outgoingSeq;
 
     /**
      * @var string|null
      */
-    private $discard;
+    private ?string $discard;
 
     /**
-     * @param int         $incomingSeq
-     * @param int         $outgoingSeq
+     * @param int $incomingSeq
+     * @param int $outgoingSeq
      * @param string|null $discard
      */
-    public function __construct($incomingSeq, $outgoingSeq, $discard = null)
-    {}
+    public function __construct(int $incomingSeq, int $outgoingSeq, string $discard = null)
+    {
+        //TODO
+    }
 
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_HEARTBEAT;
     }
@@ -44,7 +46,7 @@ class HeartbeatMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'HEARTBEAT';
     }
@@ -52,7 +54,7 @@ class HeartbeatMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         $parts = [$this->getIncomingSeq(), $this->getOutgoingSeq()];
 
@@ -66,7 +68,7 @@ class HeartbeatMessage extends Message
     /**
      * @return int
      */
-    public function getIncomingSeq()
+    public function getIncomingSeq(): int
     {
         return $this->incomingSeq;
     }
@@ -76,16 +78,16 @@ class HeartbeatMessage extends Message
      *
      * @return self
      */
-    public function setIncomingSeq($incomingSeq)
+    public function setIncomingSeq(int $incomingSeq): HeartbeatMessage
     {
-        $this->incomingSeq = (int) $incomingSeq;
+        $this->incomingSeq = $incomingSeq;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getOutgoingSeq()
+    public function getOutgoingSeq(): int
     {
         return $this->outgoingSeq;
     }
@@ -95,28 +97,28 @@ class HeartbeatMessage extends Message
      *
      * @return self
      */
-    public function setOutgoingSeq($outgoingSeq)
+    public function setOutgoingSeq(int $outgoingSeq): HeartbeatMessage
     {
-        $this->outgoingSeq = (int) $outgoingSeq;
+        $this->outgoingSeq = $outgoingSeq;
         return $this;
     }
 
     /**
      * @return null|string
      */
-    public function getDiscard()
+    public function getDiscard(): ?string
     {
         return $this->discard;
     }
 
     /**
-     * @param null|string $discard
+     * @param string|null $discard
      *
      * @return self
      */
-    public function setDiscard($discard)
+    public function setDiscard(?string $discard): HeartbeatMessage
     {
-        $this->discard = $discard ? (string) $discard : null;
+        $this->discard = $discard ? $discard : null;
         return $this;
     }
 }

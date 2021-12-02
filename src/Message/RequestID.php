@@ -7,12 +7,12 @@ trait RequestID
     /**
      * @var int
      */
-    private $requestID = 0;
+    private int $requestID = 0;
 
     /**
      * @return int
      */
-    public function getRequestID()
+    public function getRequestID(): int
     {
         return $this->requestID;
     }
@@ -22,9 +22,9 @@ trait RequestID
      *
      * @return self
      */
-    public function setRequestID($requestID)
+    public function setRequestID(int $requestID): self
     {
-        $this->requestID = (int) $requestID;
+        $this->requestID = $requestID;
         return $this;
     }
 }

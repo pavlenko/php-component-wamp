@@ -9,20 +9,20 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[UNREGISTER, Request|id, REGISTERED.Registration|id]</code>
  */
-class UnregisterMessage extends Message
+final class UnregisterMessage extends Message
 {
     use RequestID;
 
     /**
      * @var int
      */
-    private $registrationID;
+    private int $registrationID;
 
     /**
      * @param int $requestID
      * @param int $registrationID
      */
-    public function __construct($requestID, $registrationID)
+    public function __construct(int $requestID, int $registrationID)
     {
         $this->setRequestID($requestID);
         $this->setRegistrationID($registrationID);
@@ -31,7 +31,7 @@ class UnregisterMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_UNREGISTER;
     }
@@ -39,7 +39,7 @@ class UnregisterMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'UNREGISTER';
     }
@@ -47,7 +47,7 @@ class UnregisterMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getRegistrationID()];
     }
@@ -55,7 +55,7 @@ class UnregisterMessage extends Message
     /**
      * @return int
      */
-    public function getRegistrationID()
+    public function getRegistrationID(): int
     {
         return $this->registrationID;
     }
@@ -65,9 +65,9 @@ class UnregisterMessage extends Message
      *
      * @return self
      */
-    public function setRegistrationID($registrationID)
+    public function setRegistrationID(int $registrationID): UnregisterMessage
     {
-        $this->registrationID = (int) $registrationID;
+        $this->registrationID = $registrationID;
         return $this;
     }
 }

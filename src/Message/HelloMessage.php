@@ -9,20 +9,20 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[HELLO, Realm|uri, Details|dict]</code>
  */
-class HelloMessage extends Message
+final class HelloMessage extends Message
 {
     use Details;
 
     /**
      * @var string
      */
-    private $realm;
+    private string $realm;
 
     /**
      * @param string $realm
      * @param array  $details
      */
-    public function __construct($realm, array $details)
+    public function __construct(string $realm, array $details)
     {
         $this->setRealm($realm);
         $this->setDetails($details);
@@ -31,7 +31,7 @@ class HelloMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_HELLO;
     }
@@ -39,7 +39,7 @@ class HelloMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'HELLO';
     }
@@ -47,7 +47,7 @@ class HelloMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRealm(), $this->getDetails()];
     }
@@ -55,7 +55,7 @@ class HelloMessage extends Message
     /**
      * @return string
      */
-    public function getRealm()
+    public function getRealm(): string
     {
         return $this->realm;
     }
@@ -65,7 +65,7 @@ class HelloMessage extends Message
      *
      * @return self
      */
-    public function setRealm($realm)
+    public function setRealm($realm): HelloMessage
     {
         $this->realm = (string) $realm;
         return $this;

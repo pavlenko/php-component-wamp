@@ -15,7 +15,7 @@ final class MessageFactory
      *
      * @throws \InvalidArgumentException If input data invalid
      */
-    public static function createFromArray(array $data)
+    public static function createFromArray(array $data): Message
     {
         if ($data !== array_values($data)) {
             throw new \InvalidArgumentException('Invalid WAMP message format');
@@ -127,7 +127,7 @@ final class MessageFactory
      *
      * @throws \InvalidArgumentException If the message didn't have a request id
      */
-    public static function createErrorMessageFromMessage(Message $message, $errorUri = null)
+    public static function createErrorMessageFromMessage(Message $message, string $errorUri = null): ErrorMessage
     {
         if ($errorUri === null) {
             $errorUri = ErrorURI::_UNKNOWN;

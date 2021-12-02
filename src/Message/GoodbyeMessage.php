@@ -7,20 +7,20 @@ use PE\Component\WAMP\MessageCode;
 /**
  * <code>[GOODBYE, Details|dict, Reason|uri]</code>
  */
-class GoodbyeMessage extends Message
+final class GoodbyeMessage extends Message
 {
     use Details;
 
     /**
      * @var string
      */
-    private $reason;
+    private string $reason;
 
     /**
      * @param array  $details
      * @param string $reason
      */
-    public function __construct(array $details, $reason)
+    public function __construct(array $details, string $reason)
     {
         $this->setDetails($details);
         $this->setReason($reason);
@@ -29,7 +29,7 @@ class GoodbyeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_GOODBYE;
     }
@@ -37,7 +37,7 @@ class GoodbyeMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'GOODBYE';
     }
@@ -45,7 +45,7 @@ class GoodbyeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getDetails(), $this->getReason()];
     }
@@ -53,7 +53,7 @@ class GoodbyeMessage extends Message
     /**
      * @return string
      */
-    public function getReason()
+    public function getReason(): string
     {
         return $this->reason;
     }
@@ -63,9 +63,9 @@ class GoodbyeMessage extends Message
      *
      * @return self
      */
-    public function setReason($reason)
+    public function setReason(string $reason): GoodbyeMessage
     {
-        $this->reason = (string) $reason;
+        $this->reason = $reason;
         return $this;
     }
 }

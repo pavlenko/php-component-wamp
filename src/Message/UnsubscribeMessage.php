@@ -9,20 +9,20 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[UNSUBSCRIBE, Request|id, SUBSCRIBED.Subscription|id]</code>
  */
-class UnsubscribeMessage extends Message
+final class UnsubscribeMessage extends Message
 {
     use RequestID;
 
     /**
      * @var int
      */
-    private $subscriptionID;
+    private int $subscriptionID;
 
     /**
      * @param int $requestID
      * @param int $subscriptionID
      */
-    public function __construct($requestID, $subscriptionID)
+    public function __construct(int $requestID, int $subscriptionID)
     {
         $this->setRequestID($requestID);
         $this->setSubscriptionID($subscriptionID);
@@ -31,7 +31,7 @@ class UnsubscribeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_UNSUBSCRIBE;
     }
@@ -39,7 +39,7 @@ class UnsubscribeMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'UNSUBSCRIBE';
     }
@@ -47,7 +47,7 @@ class UnsubscribeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getSubscriptionID()];
     }
@@ -55,7 +55,7 @@ class UnsubscribeMessage extends Message
     /**
      * @return int
      */
-    public function getSubscriptionID()
+    public function getSubscriptionID(): int
     {
         return $this->subscriptionID;
     }
@@ -65,9 +65,9 @@ class UnsubscribeMessage extends Message
      *
      * @return self
      */
-    public function setSubscriptionID($subscriptionID)
+    public function setSubscriptionID(int $subscriptionID): UnsubscribeMessage
     {
-        $this->subscriptionID = (int) $subscriptionID;
+        $this->subscriptionID = $subscriptionID;
         return $this;
     }
 }

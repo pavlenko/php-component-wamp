@@ -7,17 +7,17 @@ abstract class Message implements \JsonSerializable
     /**
      * @return int
      */
-    abstract public function getCode();
+    abstract public function getCode(): int;
 
     /**
      * @return string
      */
-    abstract public function getName();
+    abstract public function getName(): string;
 
     /**
      * @return array
      */
-    abstract public function getParts();
+    abstract public function getParts(): array;
 
     /**
      * @inheritDoc

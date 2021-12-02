@@ -10,16 +10,16 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[INTERRUPT, INVOCATION.Request|id, Options|dict]</code>
  */
-class InterruptMessage extends Message
+final class InterruptMessage extends Message
 {
     use RequestID;
     use Options;
 
     /**
-     * @param int   $requestID
+     * @param int $requestID
      * @param array $options
      */
-    public function __construct($requestID, array $options)
+    public function __construct(int $requestID, array $options)
     {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -28,7 +28,7 @@ class InterruptMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_INTERRUPT;
     }
@@ -36,7 +36,7 @@ class InterruptMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'INTERRUPT';
     }
@@ -44,7 +44,7 @@ class InterruptMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getOptions()];
     }

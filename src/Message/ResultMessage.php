@@ -11,19 +11,19 @@ use PE\Component\WAMP\MessageCode;
  * <code>[RESULT, CALL.Request|id, Details|dict, YIELD.Arguments|list]</code>
  * <code>[RESULT, CALL.Request|id, Details|dict, YIELD.Arguments|list, YIELD.ArgumentsKw|dict]</code>
  */
-class ResultMessage extends Message
+final class ResultMessage extends Message
 {
     use RequestID;
     use Details;
     use Arguments;
 
     /**
-     * @param int        $requestID
+     * @param int $requestID
      * @param array      $details
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
-    public function __construct($requestID, array $details, array $arguments = null, array $argumentsKw = null)
+    public function __construct(int $requestID, array $details, array $arguments = null, array $argumentsKw = null)
     {
         $this->setRequestID($requestID);
         $this->setDetails($details);
@@ -34,7 +34,7 @@ class ResultMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_RESULT;
     }
@@ -42,7 +42,7 @@ class ResultMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'RESULT';
     }
@@ -50,7 +50,7 @@ class ResultMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getRequestID(), $this->getDetails()],

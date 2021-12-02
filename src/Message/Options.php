@@ -7,12 +7,12 @@ trait Options
     /**
      * @var array
      */
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -22,7 +22,7 @@ trait Options
      *
      * @return self
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         $this->options = $options;
         return $this;
@@ -34,7 +34,7 @@ trait Options
      *
      * @return mixed
      */
-    public function getOption($name, $default = null)
+    public function getOption(string $name, $default = null)
     {
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
@@ -43,8 +43,9 @@ trait Options
      * @param string $name
      * @param mixed  $value
      */
-    public function setOption($name, $value)
+    public function setOption(string $name, $value)
     {
         $this->options[$name] = $value;
     }
 }
+

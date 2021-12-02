@@ -11,19 +11,19 @@ use PE\Component\WAMP\MessageCode;
  * <code>[YIELD, INVOCATION.Request|id, Options|dict, Arguments|list]</code>
  * <code>[YIELD, INVOCATION.Request|id, Options|dict, Arguments|list, ArgumentsKw|dict]</code>
  */
-class YieldMessage extends Message
+final class YieldMessage extends Message
 {
     use RequestID;
     use Options;
     use Arguments;
 
     /**
-     * @param int        $requestID
+     * @param int $requestID
      * @param array      $options
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
-    public function __construct($requestID, array $options, array $arguments = null, array $argumentsKw = null)
+    public function __construct(int $requestID, array $options, array $arguments = null, array $argumentsKw = null)
     {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -34,7 +34,7 @@ class YieldMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_YIELD;
     }
@@ -42,7 +42,7 @@ class YieldMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'YIELD';
     }
@@ -50,7 +50,7 @@ class YieldMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getRequestID(), $this->getOptions()],

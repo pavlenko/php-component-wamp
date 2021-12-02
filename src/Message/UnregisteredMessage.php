@@ -9,14 +9,14 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[UNREGISTERED, UNREGISTER.Request|id]</code>
  */
-class UnregisteredMessage extends Message
+final class UnregisteredMessage extends Message
 {
     use RequestID;
 
     /**
      * @param int $requestID
      */
-    public function __construct($requestID)
+    public function __construct(int $requestID)
     {
         $this->setRequestID($requestID);
     }
@@ -24,7 +24,7 @@ class UnregisteredMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_UNREGISTERED;
     }
@@ -32,7 +32,7 @@ class UnregisteredMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'UNREGISTERED';
     }
@@ -40,7 +40,7 @@ class UnregisteredMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID()];
     }

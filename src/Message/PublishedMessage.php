@@ -9,20 +9,20 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[PUBLISHED, PUBLISH.Request|id, Publication|id]</code>
  */
-class PublishedMessage extends Message
+final class PublishedMessage extends Message
 {
     use RequestID;
 
     /**
      * @var int
      */
-    private $publicationID;
+    private int $publicationID;
 
     /**
      * @param int $requestID
      * @param int $publicationID
      */
-    public function __construct($requestID, $publicationID)
+    public function __construct(int $requestID, int $publicationID)
     {
         $this->setRequestID($requestID);
         $this->setPublicationID($publicationID);
@@ -31,7 +31,7 @@ class PublishedMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_PUBLISHED;
     }
@@ -39,7 +39,7 @@ class PublishedMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'PUBLISHED';
     }
@@ -47,7 +47,7 @@ class PublishedMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getPublicationID()];
     }
@@ -55,7 +55,7 @@ class PublishedMessage extends Message
     /**
      * @return int
      */
-    public function getPublicationID()
+    public function getPublicationID(): int
     {
         return $this->publicationID;
     }
@@ -65,7 +65,7 @@ class PublishedMessage extends Message
      *
      * @return self
      */
-    public function setPublicationID($publicationID)
+    public function setPublicationID(int $publicationID): PublishedMessage
     {
         $this->publicationID = (int) $publicationID;
         return $this;

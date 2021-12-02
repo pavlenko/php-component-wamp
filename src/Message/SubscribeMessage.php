@@ -9,7 +9,7 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[SUBSCRIBE, Request|id, Options|dict, Topic|uri]</code>
  */
-class SubscribeMessage extends Message implements ActionInterface
+final class SubscribeMessage extends Message implements ActionInterface
 {
     use RequestID;
     use Options;
@@ -17,14 +17,14 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @var string
      */
-    private $topic;
+    private string $topic;
 
     /**
-     * @param int    $requestID
+     * @param int $requestID
      * @param array  $options
      * @param string $topic
      */
-    public function __construct($requestID, array $options, $topic)
+    public function __construct(int $requestID, array $options, string $topic)
     {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -34,7 +34,7 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_SUBSCRIBE;
     }
@@ -42,7 +42,7 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'SUBSCRIBE';
     }
@@ -50,7 +50,7 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getOptions(), $this->getTopic()];
     }
@@ -58,7 +58,7 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionUri()
+    public function getActionUri(): string
     {
         return $this->getTopic();
     }
@@ -66,7 +66,7 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionName()
+    public function getActionName(): string
     {
         return 'subscribe';
     }
@@ -74,7 +74,7 @@ class SubscribeMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }
@@ -84,7 +84,7 @@ class SubscribeMessage extends Message implements ActionInterface
      *
      * @return self
      */
-    public function setTopic($topic)
+    public function setTopic(string $topic): SubscribeMessage
     {
         $this->topic = (string) $topic;
         return $this;

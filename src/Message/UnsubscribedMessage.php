@@ -9,14 +9,14 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[UNSUBSCRIBED, UNSUBSCRIBE.Request|id]</code>
  */
-class UnsubscribedMessage extends Message
+final class UnsubscribedMessage extends Message
 {
     use RequestID;
 
     /**
      * @param int $requestID
      */
-    public function __construct($requestID)
+    public function __construct(int $requestID)
     {
         $this->setRequestID($requestID);
     }
@@ -24,7 +24,7 @@ class UnsubscribedMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_UNSUBSCRIBED;
     }
@@ -32,7 +32,7 @@ class UnsubscribedMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'UNSUBSCRIBED';
     }
@@ -40,7 +40,7 @@ class UnsubscribedMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID()];
     }
