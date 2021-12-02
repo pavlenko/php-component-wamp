@@ -9,12 +9,12 @@ interface ActionInterface
      *
      * @return string
      */
-    public function getActionUri();
+    public function getActionUri(): string;
 
     /**
      * Get action name: "publish", "subscribe", "register", "call"
      *
      * @return string
      */
-    public function getActionName();
+    public function getActionName(): string;
 }

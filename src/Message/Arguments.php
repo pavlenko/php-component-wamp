@@ -7,17 +7,17 @@ trait Arguments
     /**
      * @var array
      */
-    private $arguments = [];
+    private array $arguments = [];
 
     /**
      * @var array
      */
-    private $argumentsKw = [];
+    private array $argumentsKw = [];
 
     /**
      * @return array
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -27,7 +27,7 @@ trait Arguments
      *
      * @return self
      */
-    public function setArguments(array $arguments = null)
+    public function setArguments(array $arguments = null): self
     {
         $this->arguments = $arguments ?: [];
         return $this;
@@ -36,7 +36,7 @@ trait Arguments
     /**
      * @return array
      */
-    public function getArgumentsKw()
+    public function getArgumentsKw(): array
     {
         return $this->argumentsKw;
     }
@@ -46,7 +46,7 @@ trait Arguments
      *
      * @return self
      */
-    public function setArgumentsKw(array $argumentsKw = null)
+    public function setArgumentsKw(array $argumentsKw = null): self
     {
         $this->argumentsKw = $argumentsKw ?: [];
         return $this;
@@ -55,7 +55,7 @@ trait Arguments
     /**
      * @return array
      */
-    protected function getArgumentsParts()
+    protected function getArgumentsParts(): array
     {
         $parts = [];
 

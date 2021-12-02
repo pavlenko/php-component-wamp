@@ -10,23 +10,23 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[CHALLENGE, AuthMethod|string, Extra|dict]</code>
  */
-class ChallengeMessage extends Message
+final class ChallengeMessage extends Message
 {
     /**
      * @var string
      */
-    private $authenticationMethod;
+    private string $authenticationMethod;
 
     /**
      * @var array
      */
-    private $extra = [];
+    private array $extra = [];
 
     /**
      * @param string $authenticationMethod
      * @param array  $extra
      */
-    public function __construct($authenticationMethod, array $extra)
+    public function __construct(string $authenticationMethod, array $extra)
     {
         $this->setAuthenticationMethod($authenticationMethod);
         $this->setExtra($extra);
@@ -35,7 +35,7 @@ class ChallengeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_CHALLENGE;
     }
@@ -43,7 +43,7 @@ class ChallengeMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'CHALLENGE';
     }
@@ -51,7 +51,7 @@ class ChallengeMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getAuthenticationMethod(), $this->getExtra()];
     }
@@ -59,7 +59,7 @@ class ChallengeMessage extends Message
     /**
      * @return string
      */
-    public function getAuthenticationMethod()
+    public function getAuthenticationMethod(): string
     {
         return $this->authenticationMethod;
     }
@@ -69,7 +69,7 @@ class ChallengeMessage extends Message
      *
      * @return self
      */
-    public function setAuthenticationMethod($authenticationMethod)
+    public function setAuthenticationMethod(string $authenticationMethod): ChallengeMessage
     {
         $this->authenticationMethod = (string) $authenticationMethod;
         return $this;
@@ -78,7 +78,7 @@ class ChallengeMessage extends Message
     /**
      * @return array
      */
-    public function getExtra()
+    public function getExtra(): array
     {
         return $this->extra;
     }
@@ -88,7 +88,7 @@ class ChallengeMessage extends Message
      *
      * @return self
      */
-    public function setExtra(array $extra)
+    public function setExtra(array $extra): ChallengeMessage
     {
         $this->extra = $extra;
         return $this;

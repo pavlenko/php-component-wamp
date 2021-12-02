@@ -10,23 +10,23 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[AUTHENTICATE, Signature|string, Extra|dict]</code>
  */
-class AuthenticateMessage extends Message
+final class AuthenticateMessage extends Message
 {
     /**
      * @var string
      */
-    private $signature;
+    private string $signature;
 
     /**
      * @var array
      */
-    private $extra;
+    private array $extra;
 
     /**
      * @param string $signature
      * @param array  $extra
      */
-    public function __construct($signature, array $extra)
+    public function __construct(string $signature, array $extra)
     {
         $this->setSignature($signature);
         $this->setExtra($extra);
@@ -35,7 +35,7 @@ class AuthenticateMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_AUTHENTICATE;
     }
@@ -43,7 +43,7 @@ class AuthenticateMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'AUTHENTICATE';
     }
@@ -51,7 +51,7 @@ class AuthenticateMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getSignature(), $this->getExtra()];
     }
@@ -59,7 +59,7 @@ class AuthenticateMessage extends Message
     /**
      * @return string
      */
-    public function getSignature()
+    public function getSignature(): string
     {
         return $this->signature;
     }
@@ -69,7 +69,7 @@ class AuthenticateMessage extends Message
      *
      * @return self
      */
-    public function setSignature($signature)
+    public function setSignature(string $signature): AuthenticateMessage
     {
         $this->signature = (string) $signature;
         return $this;
@@ -78,7 +78,7 @@ class AuthenticateMessage extends Message
     /**
      * @return array
      */
-    public function getExtra()
+    public function getExtra(): array
     {
         return $this->extra;
     }
@@ -88,7 +88,7 @@ class AuthenticateMessage extends Message
      *
      * @return self
      */
-    public function setExtra(array $extra)
+    public function setExtra(array $extra): AuthenticateMessage
     {
         $this->extra = $extra;
         return $this;

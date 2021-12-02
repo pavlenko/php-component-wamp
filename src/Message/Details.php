@@ -7,12 +7,12 @@ trait Details
     /**
      * @var array
      */
-    private $details = [];
+    private array $details = [];
 
     /**
      * @return array
      */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }
@@ -22,7 +22,7 @@ trait Details
      *
      * @return $this
      */
-    public function setDetails(array $details)
+    public function setDetails(array $details): self
     {
         $this->details = $details;
         return $this;
@@ -34,7 +34,7 @@ trait Details
      *
      * @return mixed
      */
-    public function getDetail($name, $default = null)
+    public function getDetail(string $name, $default = null)
     {
         return array_key_exists($name, $this->details) ? $this->details[$name] : $default;
     }
@@ -45,7 +45,7 @@ trait Details
      *
      * @return $this
      */
-    public function setDetail($name, $value)
+    public function setDetail(string $name, $value): self
     {
         $this->details[$name] = $value;
         return $this;
@@ -57,7 +57,7 @@ trait Details
      *
      * @return $this
      */
-    public function addFeatures($name, array $features)
+    public function addFeatures(string $name, array $features): self
     {
         if (!isset($this->details['roles'])) {
             $this->details['roles'] = [];

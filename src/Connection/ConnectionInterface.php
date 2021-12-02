@@ -8,60 +8,24 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 interface ConnectionInterface
 {
-    /**
-     * @param Message $message
-     */
-    public function send(Message $message);
+    public function send(Message $message): void;
 
-    /**
-     * Close transport
-     */
-    public function close();
+    public function close(): void;
 
-    /**
-     * Ping
-     */
-    public function ping();
+    public function ping(): void;
 
     /**
      * @return mixed
      */
     public function getTransportDetails();
 
-    /**
-     * Get serializer
-     *
-     * @return SerializerInterface
-     */
-    public function getSerializer();
+    public function getSerializer(): SerializerInterface;
 
-    /**
-     * Set serializer
-     *
-     * @param SerializerInterface $serializer
-     *
-     * @return self
-     */
-    public function setSerializer(SerializerInterface $serializer);
+    public function setSerializer(SerializerInterface $serializer): ConnectionInterface;
 
-    /**
-     * Checks if a transport is trusted
-     *
-     * @return bool
-     */
-    public function isTrusted();
+    public function isTrusted(): bool;
 
-    /**
-     * Set transport as trusted
-     *
-     * @param bool $trusted
-     *
-     * @return self
-     */
-    public function setTrusted($trusted);
+    public function setTrusted(bool $trusted): ConnectionInterface;
 
-    /**
-     * @return Session
-     */
-     public function getSession();
+     public function getSession(): Session;
 }

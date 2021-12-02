@@ -11,7 +11,7 @@ use PE\Component\WAMP\MessageCode;
  * <code>[CALL, Request|id, Options|dict, Procedure|uri, Arguments|list]</code>
  * <code>[CALL, Request|id, Options|dict, Procedure|uri, Arguments|list, ArgumentsKw|dict]</code>
  */
-class CallMessage extends Message implements ActionInterface
+final class CallMessage extends Message implements ActionInterface
 {
     use RequestID;
     use Options;
@@ -20,21 +20,21 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @var string
      */
-    private $procedureURI;
+    private string $procedureURI;
 
     /**
-     * @param int        $requestID
+     * @param int $requestID
      * @param array      $options
-     * @param string     $procedureURI
+     * @param string $procedureURI
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
     public function __construct(
-        $requestID,
-        array $options,
-        $procedureURI,
-        array $arguments = null,
-        array $argumentsKw = null
+        int    $requestID,
+        array  $options,
+        string $procedureURI,
+        array  $arguments = null,
+        array  $argumentsKw = null
     ) {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -46,7 +46,7 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_CALL;
     }
@@ -54,7 +54,7 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'CALL';
     }
@@ -62,7 +62,7 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getRequestID(), $this->getOptions(), $this->getProcedureURI()],
@@ -73,7 +73,7 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionUri()
+    public function getActionUri(): string
     {
         return $this->getProcedureURI();
     }
@@ -81,7 +81,7 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @inheritDoc
      */
-    public function getActionName()
+    public function getActionName(): string
     {
         return 'call';
     }
@@ -89,7 +89,7 @@ class CallMessage extends Message implements ActionInterface
     /**
      * @return string
      */
-    public function getProcedureURI()
+    public function getProcedureURI(): string
     {
         return $this->procedureURI;
     }
@@ -99,7 +99,7 @@ class CallMessage extends Message implements ActionInterface
      *
      * @return self
      */
-    public function setProcedureURI($procedureURI)
+    public function setProcedureURI(string $procedureURI): CallMessage
     {
         $this->procedureURI = (string) $procedureURI;
         return $this;

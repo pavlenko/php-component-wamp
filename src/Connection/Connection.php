@@ -6,47 +6,29 @@ use PE\Component\WAMP\Serializer\SerializerInterface;
 
 abstract class Connection implements ConnectionInterface
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
+    private SerializerInterface $serializer;
 
-    /**
-     * @var bool
-     */
-    private $trusted;
+    private bool $trusted;
 
-    /**
-     * @inheritDoc
-     */
-    public function getSerializer()
+    public function getSerializer(): SerializerInterface
     {
         return $this->serializer;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): self
     {
         $this->serializer = $serializer;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isTrusted()
+    public function isTrusted(): bool
     {
-        return (bool) $this->trusted;
+        return $this->trusted;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setTrusted($trusted)
+    public function setTrusted(bool $trusted): self
     {
-        $this->trusted = (bool) $trusted;
+        $this->trusted = $trusted;
         return $this;
     }
 }

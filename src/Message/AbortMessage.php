@@ -7,65 +7,48 @@ use PE\Component\WAMP\MessageCode;
 /**
  * <code>[ABORT, Details|dict, Reason|uri]</code>
  */
-class AbortMessage extends Message
+final class AbortMessage extends Message
 {
     use Details;
 
     /**
      * @var string
      */
-    private $responseUri;
+    private string $responseUri;
 
     /**
      * @param array  $details
      * @param string $responseUri
      */
-    public function __construct(array $details, $responseUri)
+    public function __construct(array $details, string $responseUri)
     {
         $this->setDetails($details);
         $this->setResponseUri($responseUri);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getCode()
+    public function getCode(): int
     {
        return MessageCode::_ABORT;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'ABORT';
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getDetails(), $this->getResponseUri()];
     }
 
-    /**
-     * @return string
-     */
-    public function getResponseUri()
+    public function getResponseUri(): string
     {
         return $this->responseUri;
     }
 
-    /**
-     * @param string $responseUri
-     *
-     * @return self
-     */
-    public function setResponseUri($responseUri)
+    public function setResponseUri(string $responseUri): AbortMessage
     {
-        $this->responseUri = (string) $responseUri;
+        $this->responseUri = $responseUri;
         return $this;
     }
 }

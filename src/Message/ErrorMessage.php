@@ -9,7 +9,7 @@ use PE\Component\WAMP\MessageCode;
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list]</code>
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list, ArgumentsKw|dict]</code>
  */
-class ErrorMessage extends Message
+final class ErrorMessage extends Message
 {
     use Details;
     use Arguments;
@@ -17,33 +17,33 @@ class ErrorMessage extends Message
     /**
      * @var int
      */
-    private $errorMessageCode;
+    private int $errorMessageCode;
 
     /**
      * @var int
      */
-    private $errorRequestID;
+    private int $errorRequestID;
 
     /**
      * @var string
      */
-    private $errorURI;
+    private string $errorURI;
 
     /**
-     * @param int        $errorMessageCode
-     * @param int        $errorRequestID
+     * @param int $errorMessageCode
+     * @param int $errorRequestID
      * @param array      $details
-     * @param string     $errorUri
+     * @param string $errorUri
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
     public function __construct(
-        $errorMessageCode,
-        $errorRequestID,
-        array $details,
-        $errorUri,
-        array $arguments = null,
-        array $argumentsKw = null
+        int    $errorMessageCode,
+        int    $errorRequestID,
+        array  $details,
+        string $errorUri,
+        array  $arguments = null,
+        array  $argumentsKw = null
     ) {
         $this->setErrorMessageCode($errorMessageCode);
         $this->setErrorRequestID($errorRequestID);
@@ -56,7 +56,7 @@ class ErrorMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_ERROR;
     }
@@ -64,7 +64,7 @@ class ErrorMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'ERROR';
     }
@@ -72,7 +72,7 @@ class ErrorMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getErrorMessageCode(), $this->getErrorRequestID(), $this->getDetails(), $this->getErrorURI()],
@@ -83,7 +83,7 @@ class ErrorMessage extends Message
     /**
      * @return int
      */
-    public function getErrorMessageCode()
+    public function getErrorMessageCode(): int
     {
         return $this->errorMessageCode;
     }
@@ -93,16 +93,16 @@ class ErrorMessage extends Message
      *
      * @return self
      */
-    public function setErrorMessageCode($errorMessageCode)
+    public function setErrorMessageCode(int $errorMessageCode): ErrorMessage
     {
-        $this->errorMessageCode = (int) $errorMessageCode;
+        $this->errorMessageCode = $errorMessageCode;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getErrorRequestID()
+    public function getErrorRequestID(): int
     {
         return $this->errorRequestID;
     }
@@ -112,16 +112,16 @@ class ErrorMessage extends Message
      *
      * @return self
      */
-    public function setErrorRequestID($errorRequestID)
+    public function setErrorRequestID(int $errorRequestID): ErrorMessage
     {
-        $this->errorRequestID = (int) $errorRequestID;
+        $this->errorRequestID = $errorRequestID;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getErrorURI()
+    public function getErrorURI(): string
     {
         return $this->errorURI;
     }
@@ -131,7 +131,7 @@ class ErrorMessage extends Message
      *
      * @return self
      */
-    public function setErrorURI($errorURI)
+    public function setErrorURI(string $errorURI): ErrorMessage
     {
         $this->errorURI = $errorURI;
         return $this;

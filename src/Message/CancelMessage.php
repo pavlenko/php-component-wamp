@@ -10,16 +10,16 @@ use PE\Component\WAMP\MessageCode;
  *
  * <code>[CANCEL, CALL.Request|id, Options|dict]</code>
  */
-class CancelMessage extends Message
+final class CancelMessage extends Message
 {
     use RequestID;
     use Options;
 
     /**
-     * @param int   $requestID
+     * @param int $requestID
      * @param array $options
      */
-    public function __construct($requestID, array $options)
+    public function __construct(int $requestID, array $options)
     {
         $this->setRequestID($requestID);
         $this->setOptions($options);
@@ -28,7 +28,7 @@ class CancelMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_CANCEL;
     }
@@ -36,7 +36,7 @@ class CancelMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'CANCEL';
     }
@@ -44,7 +44,7 @@ class CancelMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return [$this->getRequestID(), $this->getOptions()];
     }

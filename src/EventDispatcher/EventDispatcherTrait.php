@@ -8,58 +8,38 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 trait EventDispatcherTrait
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getDispatcher(): EventDispatcherInterface
     {
         return $this->dispatcher;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     *
      * @deprecated
      */
-    public function on($eventName, callable $listener, $priority = 0)
+    public function on(string $eventName, callable $listener, int $priority = 0): void
     {
         $this->dispatcher->addListener($eventName, $listener, $priority);
     }
 
     /**
-     * @param string   $eventName
-     * @param callable $listener
-     *
      * @deprecated
      */
-    public function off($eventName, callable $listener)
+    public function off(string $eventName, callable $listener): void
     {
         $this->dispatcher->removeListener($eventName, $listener);
     }
 
     /**
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     *
      * @deprecated
      */
-    public function once($eventName, callable $listener, $priority = 0)
+    public function once(string $eventName, callable $listener, int $priority = 0): void
     {
         $onceListener = function () use (&$onceListener, $eventName, $listener) {
             $this->off($eventName, $onceListener);
@@ -71,12 +51,9 @@ trait EventDispatcherTrait
     }
 
     /**
-     * @param string $eventName
-     * @param mixed  $payload
-     *
      * @deprecated
      */
-    public function emit($eventName, $payload = null)
+    public function emit(string $eventName, $payload = null): void
     {
         if (null !== $payload && !($payload instanceof Event)) {
             $payload = new GenericEvent($payload);

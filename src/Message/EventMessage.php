@@ -11,7 +11,7 @@ use PE\Component\WAMP\MessageCode;
  * <code>[EVENT, SUBSCRIBED.Subscription|id, PUBLISHED.Publication|id, Details|dict, PUBLISH.Arguments|list]</code>
  * <code>[EVENT, SUBSCRIBED.Subscription|id, PUBLISHED.Publication|id, Details|dict, PUBLISH.Arguments|list, PUBLISH.ArgumentsKw|dict]</code>
  */
-class EventMessage extends Message
+final class EventMessage extends Message
 {
     use Details;
     use Arguments;
@@ -19,23 +19,23 @@ class EventMessage extends Message
     /**
      * @var int
      */
-    private $subscriptionID;
+    private int $subscriptionID;
 
     /**
      * @var int
      */
-    private $publicationID;
+    private int $publicationID;
 
     /**
-     * @param int        $subscriptionID
-     * @param int        $publicationID
+     * @param int $subscriptionID
+     * @param int $publicationID
      * @param array      $details
      * @param array|null $arguments
      * @param array|null $argumentsKw
      */
     public function __construct(
-        $subscriptionID,
-        $publicationID,
+        int   $subscriptionID,
+        int   $publicationID,
         array $details,
         array $arguments = null,
         array $argumentsKw = null
@@ -50,7 +50,7 @@ class EventMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getCode()
+    public function getCode(): int
     {
         return MessageCode::_EVENT;
     }
@@ -58,7 +58,7 @@ class EventMessage extends Message
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'EVENT';
     }
@@ -66,7 +66,7 @@ class EventMessage extends Message
     /**
      * @inheritDoc
      */
-    public function getParts()
+    public function getParts(): array
     {
         return array_merge(
             [$this->getSubscriptionID(), $this->getPublicationID(), $this->getDetails()],
@@ -77,7 +77,7 @@ class EventMessage extends Message
     /**
      * @return int
      */
-    public function getSubscriptionID()
+    public function getSubscriptionID(): int
     {
         return $this->subscriptionID;
     }
@@ -87,16 +87,16 @@ class EventMessage extends Message
      *
      * @return self
      */
-    public function setSubscriptionID($subscriptionID)
+    public function setSubscriptionID(int $subscriptionID): EventMessage
     {
-        $this->subscriptionID = (int) $subscriptionID;
+        $this->subscriptionID = $subscriptionID;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getPublicationID()
+    public function getPublicationID(): int
     {
         return $this->publicationID;
     }
@@ -106,9 +106,9 @@ class EventMessage extends Message
      *
      * @return self
      */
-    public function setPublicationID($publicationID)
+    public function setPublicationID(int $publicationID): EventMessage
     {
-        $this->publicationID = (int) $publicationID;
+        $this->publicationID = $publicationID;
         return $this;
     }
 }
