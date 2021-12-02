@@ -7,38 +7,17 @@ use PE\Component\WAMP\Message\Message;
 
 abstract class Session
 {
-    /**
-     * Associated connection
-     *
-     * @var ConnectionInterface
-     */
-    private $connection;
+    private ConnectionInterface $connection;
 
-    /**
-     * Generated session id
-     *
-     * @var int
-     */
-    private $id;
+    private int $id;
 
-    /**
-     * Session stored data
-     *
-     * @var array
-     */
-    private $data = [];
+    private array $data = [];
 
-    /**
-     * @param ConnectionInterface $connection
-     */
     public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __get($name)
     {
         return array_key_exists($name, $this->data)
@@ -46,71 +25,44 @@ abstract class Session
             : null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __set($name, $value)
     {
         $this->data[$name] = $value;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __isset($name)
     {
         return array_key_exists($name, $this->data);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __unset($name)
     {
         unset($this->data[$name]);
     }
 
-    /**
-     * @return ConnectionInterface
-     */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface
     {
         return $this->connection;
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     */
-    public function setConnection(ConnectionInterface $connection)
+    public function setConnection(ConnectionInterface $connection): void
     {
         $this->connection = $connection;
     }
 
-    /**
-     * @return int
-     */
     public function getSessionID(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
     public function setSessionID(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @param Message $message
-     */
-    abstract public function send(Message $message);
+    abstract public function send(Message $message): void;
 
-    /**
-     * Shutdown session
-     */
-    public function shutdown()
+    public function shutdown(): void
     {
         $this->connection->close();
     }

@@ -7,14 +7,14 @@ trait Events
     /**
      * @var array
      */
-    private $listeners = [];
+    private array $listeners = [];
 
     /**
      * @param string   $event
      * @param callable $listener
      * @param int      $priority
      */
-    public function on(string $event, callable $listener, int $priority = 0)
+    public function on(string $event, callable $listener, int $priority = 0): void
     {
         $this->listeners[$event][$priority][] = $listener;
     }
@@ -23,7 +23,7 @@ trait Events
      * @param string   $event
      * @param callable $listener
      */
-    public function off(string $event, callable $listener)
+    public function off(string $event, callable $listener): void
     {
         if (empty($this->listeners[$event])) {
             return;
@@ -50,7 +50,7 @@ trait Events
      * @param string $event
      * @param mixed  ...$arguments
      */
-    public function emit(string $event, ...$arguments)
+    public function emit(string $event, ...$arguments): void
     {
         if (empty($this->listeners[$event])) {
             return;

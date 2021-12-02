@@ -5,12 +5,12 @@ namespace PE\Component\WAMP\Serializer;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
 
-class Serializer implements SerializerInterface
+final class Serializer implements SerializerInterface
 {
     /**
      * @inheritDoc
      */
-    public function serialize(Message $message)
+    public function serialize(Message $message): string
     {
         return json_encode($message);
     }
@@ -18,7 +18,7 @@ class Serializer implements SerializerInterface
     /**
      * @inheritDoc
      */
-    public function deserialize($message)
+    public function deserialize(string $message): Message
     {
         $data = json_decode($message, true);
 

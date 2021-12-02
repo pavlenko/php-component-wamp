@@ -11,7 +11,7 @@ interface SerializerInterface
      *
      * @return string
      */
-    public function serialize(Message $message);
+    public function serialize(Message $message): string;
 
     /**
      * @param string $message
@@ -20,5 +20,5 @@ interface SerializerInterface
      *
      * @throws \InvalidArgumentException If cannot deserialize or deserialized data invalid
      */
-    public function deserialize($message);
+    public function deserialize(string $message): Message;
 }

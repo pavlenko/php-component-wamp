@@ -2,19 +2,19 @@
 
 namespace PE\Component\WAMP;
 
-class Util
+final class Util
 {
     /**
      * Generate a unique id for sessions and requests
      *
      * @return int
      */
-    public static function generateID()
+    public static function generateID(): int
     {
         $filter      = 0x1fffffffffffff; // 53 bits
         $randomBytes = openssl_random_pseudo_bytes(8);
 
-        list($high, $low) = array_values(unpack('N2', $randomBytes));
+        [$high, $low] = array_values(unpack('N2', $randomBytes));
 
         return abs(($high << 32 | $low) & $filter);
     }
@@ -25,7 +25,7 @@ class Util
      * @param $uri
      * @return boolean
      */
-    public static function uriIsValid($uri)
+    public static function uriIsValid($uri): bool
     {
         return !!preg_match('/^([0-9a-z_]+\.)*([0-9a-z_]+)$/', $uri);
     }
@@ -39,13 +39,13 @@ class Util
      * @param int $keyLen
      * @return string
      */
-    public static function getDerivedKey($key, $salt, $iterations = 1000, $keyLen = 32)
+    public static function getDerivedKey(string $key, string $salt, int $iterations = 1000, int $keyLen = 32): string
     {
         if (function_exists("hash_pbkdf2")) {
             $key = hash_pbkdf2('sha256', $key, $salt, $iterations, $keyLen, true);
         } else {
             // PHP v5.4 compatibility
-            $key = static::compat_pbkdf2('sha256', $key, $salt, $iterations, $keyLen, true);
+            $key = Util::compat_pbkdf2('sha256', $key, $salt, $iterations, $keyLen, true);
         }
 
         return base64_encode($key);
@@ -67,7 +67,7 @@ class Util
      *
      * @return string
      */
-    public static function compat_pbkdf2($algo, $password, $salt, $iterations, $length = 0, $rawOutput = false)
+    public static function compat_pbkdf2(string $algo, string $password, string $salt, int $iterations, int $length = 0, bool $rawOutput = false): ?string
     {
         // check for hashing algorithm
         if (!in_array(strtolower($algo), hash_algos())) {
