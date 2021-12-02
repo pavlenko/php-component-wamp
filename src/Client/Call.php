@@ -9,18 +9,18 @@ class Call
     /**
      * @var int
      */
-    private $requestID;
+    private int $requestID;
 
     /**
      * @var Deferred
      */
-    private $deferred;
+    private Deferred $deferred;
 
     /**
      * @param int      $requestID
      * @param Deferred $deferred
      */
-    public function __construct($requestID, Deferred $deferred)
+    public function __construct(int $requestID, Deferred $deferred)
     {
         $this->requestID = $requestID;
         $this->deferred  = $deferred;
@@ -29,7 +29,7 @@ class Call
     /**
      * @return int
      */
-    public function getRequestID()
+    public function getRequestID(): int
     {
         return $this->requestID;
     }
@@ -37,7 +37,7 @@ class Call
     /**
      * @return Deferred
      */
-    public function getDeferred()
+    public function getDeferred(): Deferred
     {
         return $this->deferred;
     }
