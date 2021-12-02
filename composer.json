@@ -19,7 +19,8 @@
     "react/http": "^0.8.1",
     "react/http-client": "^0.5.8",
     "react/promise": "^2.5",
-    "symfony/event-dispatcher": "^2.7|^3.0|^4.0"
+    "symfony/event-dispatcher": "^2.7|^3.0|^4.0",
+    "ext-json": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "~5.0",

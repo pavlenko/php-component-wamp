@@ -32,48 +32,48 @@ final class Client implements LoggerAwareInterface
     /**
      * @var string
      */
-    private $realm;
+    private string $realm;
 
     /**
      * @var TransportInterface
      */
-    private $transport;
+    private TransportInterface $transport;
+
+    /**
+     * @var float
+     */
+    private float $reconnectTimeout = self::RECONNECT_TIMEOUT;
 
     /**
      * @var int
      */
-    private $reconnectTimeout = self::RECONNECT_TIMEOUT;
+    private int $reconnectAttempts = self::RECONNECT_ATTEMPTS;
 
     /**
      * @var int
      */
-    private $reconnectAttempts = self::RECONNECT_ATTEMPTS;
-
-    /**
-     * @var int
-     */
-    private $_reconnectAttempt = 0;
+    private int $_reconnectAttempt = 0;
 
     /**
      * @var LoopInterface
      */
-    private $loop;
+    private LoopInterface $loop;
 
     /**
-     * @var Session
+     * @var Session|null
      */
-    private $session;
+    private ?Session $session;
 
     /**
      * @var ClientModuleInterface[]
      */
-    private $modules = [];
+    private array $modules = [];
 
     /**
-     * @param string             $realm
+     * @param string $realm
      * @param LoopInterface|null $loop
      */
-    public function __construct($realm, LoopInterface $loop = null)
+    public function __construct(string $realm, LoopInterface $loop = null)
     {
         $this->realm = $realm;
         $this->loop  = $loop ?: Factory::create();
@@ -86,7 +86,7 @@ final class Client implements LoggerAwareInterface
      *
      * @param ConnectionInterface $connection
      */
-    public function processOpen(ConnectionInterface $connection)
+    public function processOpen(ConnectionInterface $connection): void
     {
         $this->_reconnectAttempt = 0;
         $this->logger && $this->logger->info('Connection opened');
@@ -103,7 +103,7 @@ final class Client implements LoggerAwareInterface
      *
      * @param string $reason
      */
-    public function processClose($reason)
+    public function processClose(string $reason): void
     {
         if ($this->session) {
             $this->logger && $this->logger->info('Client: close: ' . $reason);
@@ -122,7 +122,7 @@ final class Client implements LoggerAwareInterface
      *
      * @param Message $message
      */
-    public function processMessageReceived(Message $message)
+    public function processMessageReceived(Message $message): void
     {
         $this->logger && $this->logger->info("Client: {$message->getName()} received");
         $this->logger && $this->logger->debug(json_encode($message));
@@ -135,7 +135,7 @@ final class Client implements LoggerAwareInterface
      *
      * @param Message $message
      */
-    public function processMessageSend(Message $message)
+    public function processMessageSend(Message $message): void
     {
         $this->logger && $this->logger->info("Client: {$message->getName()} send");
 
@@ -149,7 +149,7 @@ final class Client implements LoggerAwareInterface
      *
      * @param \Exception $ex
      */
-    public function processError(\Exception $ex)
+    public function processError(\Exception $ex): void
     {
         $this->logger && $this->logger->error("Client: [{$ex->getCode()}] {$ex->getMessage()}");
         $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
@@ -158,9 +158,9 @@ final class Client implements LoggerAwareInterface
     }
 
     /**
-     * @inheritDoc
+     * @param TransportInterface $transport
      */
-    public function setTransport(TransportInterface $transport)
+    public function setTransport(TransportInterface $transport): void
     {
         $this->transport = $transport;
     }
@@ -168,25 +168,25 @@ final class Client implements LoggerAwareInterface
     /**
      * @return LoggerInterface
      */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         return $this->logger;
     }
 
     /**
-     * @inheritDoc
+     * @param float $timeout
      */
-    public function setReconnectTimeout($timeout)
+    public function setReconnectTimeout(float $timeout): void
     {
-        $this->reconnectTimeout = (int) $timeout;
+        $this->reconnectTimeout = $timeout;
     }
 
     /**
-     * @inheritDoc
+     * @param int $attempts
      */
-    public function setReconnectAttempts($attempts)
+    public function setReconnectAttempts(int $attempts): void
     {
-        $this->reconnectAttempts = (int) $attempts;
+        $this->reconnectAttempts = $attempts;
     }
 
     /**
@@ -194,7 +194,7 @@ final class Client implements LoggerAwareInterface
      *
      * @throws \RuntimeException
      */
-    public function connect($startLoop = true)
+    public function connect(bool $startLoop = true): void
     {
         if (null === $this->transport) {
             throw new \RuntimeException('Transport not set via setTransport()');
@@ -212,7 +212,7 @@ final class Client implements LoggerAwareInterface
     /**
      * Reconnect logic
      */
-    private function reconnect()
+    private function reconnect(): void
     {
         if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
             // Max retry attempts reached
@@ -234,7 +234,7 @@ final class Client implements LoggerAwareInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function addModule(ClientModuleInterface $module)
+    public function addModule(ClientModuleInterface $module): void
     {
         if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
             throw new \InvalidArgumentException('Cannot add same module twice');
