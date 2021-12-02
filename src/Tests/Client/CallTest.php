@@ -6,7 +6,7 @@ use PE\Component\WAMP\Client\Call;
 use PHPUnit\Framework\TestCase;
 use React\Promise\Deferred;
 
-class CallTest extends TestCase
+final class CallTest extends TestCase
 {
     public function testConstructor(): void
     {

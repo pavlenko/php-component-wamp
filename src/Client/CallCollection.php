@@ -7,7 +7,7 @@ class CallCollection
     /**
      * @var Call[]
      */
-    private $calls = [];
+    private array $calls = [];
 
     /**
      * @param Call $call
