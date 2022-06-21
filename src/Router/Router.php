@@ -7,15 +7,13 @@ use PE\Component\WAMP\Events;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 
-final class Router implements LoggerAwareInterface
+final class Router
 {
-    use LoggerAwareTrait;
     use Events;
 
     const EVENT_CONNECTION_OPEN  = 'wamp.router.connection_open';
@@ -24,15 +22,9 @@ final class Router implements LoggerAwareInterface
     const EVENT_MESSAGE_RECEIVED = 'wamp.router.message_received';
     const EVENT_MESSAGE_SEND     = 'wamp.router.message_send';
 
-    /**
-     * @var TransportInterface
-     */
-    private TransportInterface $transport;
-
-    /**
-     * @var LoopInterface
-     */
-    private $loop;
+    private ?TransportInterface $transport = null;
+    private LoopInterface $loop;
+    private LoggerInterface $logger;
 
     /**
      * @var RouterModuleInterface[]
@@ -44,22 +36,18 @@ final class Router implements LoggerAwareInterface
      */
     private $sessions;
 
-    public function __construct(LoopInterface $loop = null)
+    public function __construct(LoopInterface $loop = null, LoggerInterface $logger = null)
     {
         $this->loop     = $loop ?: Factory::create();
+        $this->logger   = $logger ?: new NullLogger();
         $this->sessions = new \SplObjectStorage();
 
         $this->addModule(new SessionModule());
     }
 
-    /**
-     * Handle connection open (called directly from transport)
-     *
-     * @param ConnectionInterface $connection
-     */
     public function processOpen(ConnectionInterface $connection): void
     {
-        $this->logger && $this->logger->info('Router: open');
+        $this->logger->info('Router: open');
 
         $session = new Session($connection, $this);
 
@@ -68,14 +56,9 @@ final class Router implements LoggerAwareInterface
         $this->emit(self::EVENT_CONNECTION_OPEN, $session);
     }
 
-    /**
-     * Handle connection close (called directly from transport)
-     *
-     * @param ConnectionInterface $connection
-     */
     public function processClose(ConnectionInterface $connection): void
     {
-        $this->logger && $this->logger->info('Router: close');
+        $this->logger->info('Router: close');
 
         $session = $this->sessions[$connection];
 
@@ -86,47 +69,30 @@ final class Router implements LoggerAwareInterface
         $this->emit(self::EVENT_CONNECTION_CLOSE, $session);
     }
 
-    /**
-     * Handle received message (called directly from transport)
-     *
-     * @param ConnectionInterface $connection
-     * @param Message             $message
-     */
     public function processMessageReceived(ConnectionInterface $connection, Message $message): void
     {
-        $this->logger && $this->logger->info("Router: {$message->getName()} received");
-        $this->logger && $this->logger->debug(json_encode($message));
+        $this->logger->info("Router: {$message->getName()} received");
+        $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
 
         $this->emit(self::EVENT_MESSAGE_RECEIVED, $message, $session);
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param Message             $message
-     */
     public function processMessageSend(ConnectionInterface $connection, Message $message): void
     {
-        $this->logger && $this->logger->info("Router: {$message->getName()} send");
+        $this->logger->info("Router: {$message->getName()} send");
+        $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
 
         $this->emit(self::EVENT_MESSAGE_SEND, $message, $session);
-
-        $this->logger && $this->logger->debug(json_encode($message));
     }
 
-    /**
-     * Handle connection error (called directly from transport)
-     *
-     * @param ConnectionInterface $connection
-     * @param \Exception          $ex
-     */
-    public function processError(ConnectionInterface $connection, \Exception $ex): void
+    public function processError(ConnectionInterface $connection, \Throwable $exception): void
     {
-        $this->logger && $this->logger->error("Router: [{$ex->getCode()}] {$ex->getMessage()}");
-        $this->logger && $this->logger->debug("\n{$ex->getTraceAsString()}");
+        $this->logger->error("Router: [{$exception->getCode()}] {$exception->getMessage()}");
+        $this->logger->debug("\n{$exception->getTraceAsString()}");
 
         $this->emit(self::EVENT_CONNECTION_ERROR, $this->sessions[$connection]);
     }
@@ -147,8 +113,7 @@ final class Router implements LoggerAwareInterface
             throw new \RuntimeException('Transport not set via setTransport()');
         }
 
-        $this->logger && $this->logger->info('Router: start');
-
+        $this->logger->info('Router: start');
         $this->transport->start($this, $this->loop);
 
         if ($startLoop) {
@@ -158,23 +123,18 @@ final class Router implements LoggerAwareInterface
 
     public function stop(): void
     {
-        $this->logger && $this->logger->info('Router: stop');
+        $this->logger->info('Router: stop');
         $this->transport->stop();
     }
 
-    /**
-     * @param RouterModuleInterface $module
-     *
-     * @throws \InvalidArgumentException
-     */
     public function addModule(RouterModuleInterface $module): void
     {
-        if (array_key_exists($hash = spl_object_hash($module), $this->modules)) {
+        $hash = spl_object_hash($module);
+        if (array_key_exists($hash, $this->modules)) {
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
         $module->subscribe($this);
-
         $this->modules[$hash] = $module;
     }
 }
