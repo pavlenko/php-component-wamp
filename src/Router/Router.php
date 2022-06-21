@@ -82,11 +82,11 @@ final class Router
     public function processMessageSend(ConnectionInterface $connection, Message $message): void
     {
         $this->logger->info("Router: {$message->getName()} send");
-        $this->logger->debug(json_encode($message));
 
         $session = $this->sessions[$connection];
 
         $this->emit(self::EVENT_MESSAGE_SEND, $message, $session);
+        $this->logger->debug(json_encode($message));
     }
 
     public function processError(ConnectionInterface $connection, \Throwable $exception): void

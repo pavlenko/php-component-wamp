@@ -15,7 +15,6 @@
     "php": ">=7.4",
     "react/event-loop": "^0.4",
     "react/promise": "^2.5",
-    "symfony/event-dispatcher": "^2.7|^3.0|^4.0",
     "ext-json": "*",
     "ext-openssl": "*"
   },

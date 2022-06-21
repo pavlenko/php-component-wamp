@@ -30,7 +30,7 @@ final class WebSocketTransport implements TransportInterface
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 
-        $client->getLogger() && $client->getLogger()->info('Web-socket: connecting to {url} ...', ['url' => $url]);
+        $client->getLogger()->info('Web-socket: connecting to {url} ...', ['url' => $url]);
 
         $connector = new Connector(
             $loop,
