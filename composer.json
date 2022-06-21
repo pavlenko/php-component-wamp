@@ -13,17 +13,17 @@
   ],
   "require": {
     "php": ">=7.4",
-    "cboden/ratchet": "^0.4",
-    "ratchet/pawl": "^0.3",
     "react/event-loop": "^0.4",
-    "react/http": "^0.8.1",
-    "react/http-client": "^0.5.8",
     "react/promise": "^2.5",
     "symfony/event-dispatcher": "^2.7|^3.0|^4.0",
     "ext-json": "*",
     "ext-openssl": "*"
   },
   "require-dev": {
+    "cboden/ratchet": "^0.4",
+    "react/http": "^0.8.1",
+    "react/http-client": "^0.5.8",
+    "ratchet/pawl": "^0.3",
     "phpunit/phpunit": "~5.0",
     "symfony/console": "^3.4"
   },
