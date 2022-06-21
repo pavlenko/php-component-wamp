@@ -15,9 +15,8 @@ $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 
 $transport = new WebSocketTransport('127.0.0.1', 1337);
 
-$router = new Router();
+$router = new Router(null, $logger);
 $router->setTransport($transport);
-$router->setLogger($logger);
 
 $authentication = new AuthenticationModule();
 $authentication->addMethod(new TicketMethod('foo'));

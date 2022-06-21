@@ -20,9 +20,8 @@ $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 
 $transport = new WebSocketTransport('127.0.0.1', 1337, false, 5);
 
-$client = new Client('realm1');
+$client = new Client('realm1', null, $logger);
 $client->setTransport($transport);
-$client->setLogger($logger);
 $client->setReconnectAttempts(3);
 
 $authentication = new AuthenticationModule();
