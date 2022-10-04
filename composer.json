@@ -13,14 +13,14 @@
   ],
   "require": {
     "php": ">=7.4",
-    "react/event-loop": "^0.4",
+    "react/event-loop": "^1.2",
     "react/promise": "^2.5",
     "ext-json": "*",
     "ext-openssl": "*"
   },
   "require-dev": {
     "cboden/ratchet": "^0.4",
-    "react/http": "^0.8.1",
+    "react/http": "^1.7.0",
     "react/http-client": "^0.5.8",
     "ratchet/pawl": "^0.3",
     "phpunit/phpunit": "~5.0",
