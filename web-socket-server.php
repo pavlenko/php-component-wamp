@@ -5,6 +5,7 @@ use PE\Component\WAMP\Router\Authentication\AuthenticationModule;
 use PE\Component\WAMP\Router\Authentication\Method\TicketMethod;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\Transport\WebSocketTransport;
+use React\EventLoop\Loop;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,7 +16,7 @@ $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 
 $transport = new WebSocketTransport('127.0.0.1', 1337);
 
-$router = new Router(null, $logger);
+$router = new Router(new Factory(), Loop::get(), $logger);
 $router->setTransport($transport);
 
 $authentication = new AuthenticationModule();

@@ -10,7 +10,6 @@ use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 
 final class Router
@@ -38,10 +37,10 @@ final class Router
      */
     private $sessions;
 
-    public function __construct(FactoryInterface $factory, LoopInterface $loop = null, LoggerInterface $logger = null)
+    public function __construct(FactoryInterface $factory, LoopInterface $loop, LoggerInterface $logger = null)
     {
         $this->factory  = $factory;
-        $this->loop     = $loop ?: Factory::create();
+        $this->loop     = $loop;
         $this->logger   = $logger ?: new NullLogger();
         $this->sessions = new \SplObjectStorage();
 
