@@ -1,4 +1,6 @@
 # TODO
+- Common
+  - Remove create object instances everywhere when possible
 - Authentication
   - Transport-level Authentication
     - Cookie-based Authentication
