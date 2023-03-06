@@ -4,6 +4,7 @@ namespace PE\Component\WAMP\Router;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Events;
+use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
@@ -25,6 +26,7 @@ final class Router
     private ?TransportInterface $transport = null;
     private LoopInterface $loop;
     private LoggerInterface $logger;
+    private FactoryInterface $factory;
 
     /**
      * @var RouterModuleInterface[]
@@ -36,8 +38,9 @@ final class Router
      */
     private $sessions;
 
-    public function __construct(LoopInterface $loop = null, LoggerInterface $logger = null)
+    public function __construct(FactoryInterface $factory, LoopInterface $loop = null, LoggerInterface $logger = null)
     {
+        $this->factory  = $factory;
         $this->loop     = $loop ?: Factory::create();
         $this->logger   = $logger ?: new NullLogger();
         $this->sessions = new \SplObjectStorage();
@@ -49,7 +52,7 @@ final class Router
     {
         $this->logger->info('Router: open');
 
-        $session = new Session($connection, $this);
+        $session = $this->factory->createRouterSession($connection, $this);
 
         $this->sessions->attach($connection, $session);
 
