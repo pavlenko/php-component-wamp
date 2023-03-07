@@ -2,9 +2,9 @@
 
 namespace PE\Component\WAMP\Client;
 
-use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\SessionBaseInterface;
 
-interface SessionInterface
+interface SessionInterface extends SessionBaseInterface
 {
-    public function send(Message $message): void;
+    // Nothing to implement, just typed interface
 }

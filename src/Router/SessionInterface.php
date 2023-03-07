@@ -2,9 +2,21 @@
 
 namespace PE\Component\WAMP\Router;
 
-use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\SessionBaseInterface;
 
-interface SessionInterface
+interface SessionInterface extends SessionBaseInterface
 {
-    public function send(Message $message): void;
+    /**
+     * Get successfully used authentication method
+     *
+     * @return string|null
+     */
+    public function getAuthMethod(): ?string;
+
+    /**
+     * Set successfully used authentication method
+     *
+     * @param string $authMethod
+     */
+    public function setAuthMethod(string $authMethod): void;
 }

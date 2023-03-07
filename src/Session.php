@@ -3,9 +3,11 @@
 namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\Message\Message;
 
-abstract class Session
+/**
+ * TODO maybe create trait
+ */
+abstract class Session implements SessionBaseInterface
 {
     private ConnectionInterface $connection;
 
@@ -18,24 +20,22 @@ abstract class Session
         $this->connection = $connection;
     }
 
-    public function __get($name)
+    public function __get(string $name)
     {
-        return array_key_exists($name, $this->data)
-            ? $this->data[$name]
-            : null;
+        return array_key_exists($name, $this->data) ? $this->data[$name] : null;
     }
 
-    public function __set($name, $value)
+    public function __set(string $name, $value): void
     {
         $this->data[$name] = $value;
     }
 
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return array_key_exists($name, $this->data);
     }
 
-    public function __unset($name)
+    public function __unset(string $name): void
     {
         unset($this->data[$name]);
     }
@@ -59,8 +59,6 @@ abstract class Session
     {
         $this->id = $id;
     }
-
-    abstract public function send(Message $message): void;
 
     public function shutdown(): void
     {
