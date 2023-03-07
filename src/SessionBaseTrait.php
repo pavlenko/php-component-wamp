@@ -4,15 +4,10 @@ namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
 
-/**
- * TODO maybe create trait
- */
-abstract class Session implements SessionBaseInterface
+trait SessionBaseTrait
 {
     private ConnectionInterface $connection;
-
     private int $id;
-
     private array $data = [];
 
     public function __construct(ConnectionInterface $connection)

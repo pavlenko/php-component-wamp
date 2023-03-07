@@ -9,7 +9,7 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\Session;
+use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 
 final class SessionModule implements RouterModuleInterface
@@ -32,9 +32,9 @@ final class SessionModule implements RouterModuleInterface
 
     /**
      * @param Message $message
-     * @param Session $session
+     * @param SessionBaseTrait $session
      */
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionBaseTrait $session): void
     {
         switch (true) {
             case ($message instanceof HelloMessage):
@@ -47,10 +47,10 @@ final class SessionModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session      $session
+     * @param SessionBaseTrait      $session
      * @param HelloMessage $message
      */
-    private function processHelloMessage(Session $session, HelloMessage $message): void
+    private function processHelloMessage(SessionBaseTrait $session, HelloMessage $message): void
     {
         $sessionID = Util::generateID();
 
@@ -59,10 +59,10 @@ final class SessionModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session        $session
+     * @param SessionBaseTrait        $session
      * @param GoodbyeMessage $message
      */
-    private function processGoodbyeMessage(Session $session, GoodbyeMessage $message): void
+    private function processGoodbyeMessage(SessionBaseTrait $session, GoodbyeMessage $message): void
     {
         $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
         $session->shutdown();

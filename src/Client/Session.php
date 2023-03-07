@@ -4,9 +4,14 @@ namespace PE\Component\WAMP\Client;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\SessionBaseTrait;
 
-class Session extends \PE\Component\WAMP\Session implements SessionInterface
+final class Session implements SessionInterface
 {
+    use SessionBaseTrait {
+        __construct as public constructor;
+    }
+
     /**
      * @var Client
      */
@@ -14,7 +19,7 @@ class Session extends \PE\Component\WAMP\Session implements SessionInterface
 
     public function __construct(ConnectionInterface $connection, Client $client)
     {
-        parent::__construct($connection);
+        $this->constructor($connection);
         $this->client = $client;
     }
 

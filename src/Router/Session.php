@@ -4,16 +4,20 @@ namespace PE\Component\WAMP\Router;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\SessionBaseTrait;
 
-final class Session extends \PE\Component\WAMP\Session implements SessionInterface
+final class Session implements SessionInterface
 {
-    private Router $router;
+    use SessionBaseTrait {
+        __construct as public constructor;
+    }
 
+    private Router $router;
     private ?string $authMethod;
 
     public function __construct(ConnectionInterface $connection, Router $router)
     {
-        parent::__construct($connection);
+        $this->constructor($connection);
         $this->router = $router;
     }
 

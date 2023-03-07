@@ -6,7 +6,7 @@ use PE\Component\WAMP\Client\Subscription;
 use PE\Component\WAMP\Client\SubscriptionCollection;
 use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
-use PE\Component\WAMP\Session;
+use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
@@ -15,14 +15,14 @@ use React\Promise\RejectedPromise;
 final class SubscriberAPI
 {
     /**
-     * @var Session
+     * @var SessionBaseTrait
      */
-    private Session $session;
+    private SessionBaseTrait $session;
 
     /**
-     * @param Session $session
+     * @param SessionBaseTrait $session
      */
-    public function __construct(Session $session)
+    public function __construct(SessionBaseTrait $session)
     {
         $this->session = $session;
     }

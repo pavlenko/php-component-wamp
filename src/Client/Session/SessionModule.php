@@ -9,7 +9,7 @@ use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Session;
+use PE\Component\WAMP\SessionBaseTrait;
 
 final class SessionModule implements ClientModuleInterface
 {
@@ -23,7 +23,7 @@ final class SessionModule implements ClientModuleInterface
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionBaseTrait $session): void
     {
         switch (true) {
             case ($message instanceof WelcomeMessage):
@@ -38,18 +38,18 @@ final class SessionModule implements ClientModuleInterface
         }
     }
 
-    private function processWelcomeMessage(Session $session, WelcomeMessage $message): void
+    private function processWelcomeMessage(SessionBaseTrait $session, WelcomeMessage $message): void
     {
         $session->setSessionID($message->getSessionId());
     }
 
-    private function processGoodbyeMessage(Session $session): void
+    private function processGoodbyeMessage(SessionBaseTrait $session): void
     {
         $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 
-    private function processAbortMessage(Session $session): void
+    private function processAbortMessage(SessionBaseTrait $session): void
     {
         $session->shutdown();
     }
