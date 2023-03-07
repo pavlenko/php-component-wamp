@@ -4,7 +4,17 @@ namespace PE\Component\WAMP\Router;
 
 interface RouterModuleInterface
 {
-    public function subscribe(Router $router): void;
+    /**
+     * Attach module to router instance
+     *
+     * @param Router $router
+     */
+    public function attach(Router $router): void;
 
-    public function unsubscribe(Router $router): void;
+    /**
+     * Detach module from router instance
+     *
+     * @param Router $router
+     */
+    public function detach(Router $router): void;
 }

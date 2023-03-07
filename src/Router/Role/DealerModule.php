@@ -55,7 +55,7 @@ final class DealerModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function subscribe(Router $router): void
+    public function attach(Router $router): void
     {
         $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $router->on(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
@@ -64,7 +64,7 @@ final class DealerModule implements RouterModuleInterface
     /**
      * @inheritDoc
      */
-    public function unsubscribe(Router $router): void
+    public function detach(Router $router): void
     {
         $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $router->off(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
