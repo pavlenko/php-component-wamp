@@ -1,7 +1,14 @@
 <?php
 
-namespace PE\Component\WAMP\Router;
+namespace PE\Component\WAMP\Router\Role\Broker;
 
+use PE\Component\WAMP\Router\SessionInterface;
+
+/**
+ * Subscription DTO
+ *
+ * @codeCoverageIgnore
+ */
 final class Subscription
 {
     private SessionInterface $session;

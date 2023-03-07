@@ -16,7 +16,6 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\SessionInterface;
-use PE\Component\WAMP\Router\Subscription;
 use PE\Component\WAMP\Util;
 
 final class BrokerModule implements RouterModuleInterface
