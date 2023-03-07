@@ -104,11 +104,6 @@ final class Router
         $this->transport = $transport;
     }
 
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
     public function start(bool $startLoop = true): void
     {
         if (null === $this->transport) {
@@ -116,7 +111,7 @@ final class Router
         }
 
         $this->logger->info('Router: start');
-        $this->transport->start($this, $this->loop);
+        $this->transport->start($this, $this->loop, $this->logger);
 
         if ($startLoop) {
             $this->loop->run();

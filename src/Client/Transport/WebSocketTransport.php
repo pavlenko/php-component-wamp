@@ -3,6 +3,7 @@
 namespace PE\Component\WAMP\Client\Transport;
 
 use PE\Component\WAMP\Client\Client;
+use Psr\Log\LoggerInterface;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
@@ -26,11 +27,11 @@ final class WebSocketTransport implements TransportInterface
         $this->timeout = $timeout;
     }
 
-    public function start(Client $client, LoopInterface $loop): void
+    public function start(Client $client, LoopInterface $loop, LoggerInterface $logger): void
     {
         $url = ($this->secure ? 'wss' : 'ws') . '://' . $this->host . ':' . $this->port;
 
-        $client->getLogger()->info('Web-socket: connecting to {url} ...', ['url' => $url]);
+        $logger->info('Web-socket: connecting to {url} ...', ['url' => $url]);
 
         $connector = new Connector(
             $loop,

@@ -111,11 +111,6 @@ final class Client
         $this->transport = $transport;
     }
 
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
     public function setReconnectTimeout(float $timeout): void
     {
         $this->reconnectTimeout = $timeout;
@@ -134,7 +129,7 @@ final class Client
 
         $this->logger && $this->logger->info('Client: connecting...');
 
-        $this->transport->start($this, $this->loop);
+        $this->transport->start($this, $this->loop, $this->logger);
 
         if ($startLoop) {
             $this->loop->run();
@@ -154,7 +149,7 @@ final class Client
         $this->_reconnectAttempt++;
 
         $this->loop->addTimer($this->reconnectTimeout, function () {
-            $this->transport->start($this, $this->loop);
+            $this->transport->start($this, $this->loop, $this->logger);
         });
     }
 

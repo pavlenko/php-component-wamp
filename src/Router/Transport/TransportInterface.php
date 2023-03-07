@@ -2,16 +2,20 @@
 
 namespace PE\Component\WAMP\Router\Transport;
 
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PE\Component\WAMP\Router\Router;
 
 interface TransportInterface
 {
     /**
-     * @param Router        $router
+     * Start transport
+     *
+     * @param Router $router
      * @param LoopInterface $loop
+     * @param LoggerInterface $logger
      */
-    public function start(Router $router, LoopInterface $loop): void;
+    public function start(Router $router, LoopInterface $loop, LoggerInterface $logger): void;
 
     /**
      * Stop the router

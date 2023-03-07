@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Router\Transport;
 
+use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Ratchet\Http\HttpServer;
 use Ratchet\RFC6455\Messaging\MessageInterface;
@@ -86,11 +87,11 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
     /**
      * @inheritDoc
      */
-    public function start(Router $router, LoopInterface $loop): void
+    public function start(Router $router, LoopInterface $loop, LoggerInterface $logger): void
     {
         $uri = ($this->secure ? 'tls' : 'tcp') . '://' . $this->host . ':' . $this->port;
 
-        $router->getLogger() && $router->getLogger()->info('Web-socket: listen to ' . $uri);
+        $logger->info('Web-socket: listen to ' . $uri);
 
         $this->router = $router;
 
