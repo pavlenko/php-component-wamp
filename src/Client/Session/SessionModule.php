@@ -13,12 +13,12 @@ use PE\Component\WAMP\Session;
 
 final class SessionModule implements ClientModuleInterface
 {
-    public function subscribe(Client $client): void
+    public function attach(Client $client): void
     {
         $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    public function unsubscribe(Client $client): void
+    public function detach(Client $client): void
     {
         $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }

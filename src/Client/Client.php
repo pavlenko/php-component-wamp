@@ -164,7 +164,7 @@ final class Client
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
-        $module->subscribe($this);
+        $module->attach($this);
         $this->modules[$hash] = $module;
     }
 }
