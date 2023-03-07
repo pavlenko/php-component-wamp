@@ -11,23 +11,24 @@ use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Util;
+use PE\Component\WAMP\Util\EventsInterface;
 
 final class SessionModule implements RouterModuleInterface
 {
     /**
      * @inheritDoc
      */
-    public function attach(Router $router): void
+    public function attach(EventsInterface $events): void
     {
-        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     /**
      * @inheritDoc
      */
-    public function detach(Router $router): void
+    public function detach(EventsInterface $events): void
     {
-        $router->off(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     /**

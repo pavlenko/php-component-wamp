@@ -3,19 +3,17 @@
 namespace PE\Component\WAMP\Router;
 
 use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\Events;
 use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
+use PE\Component\WAMP\Util\EventsInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
 
 final class Router
 {
-    use Events;
-
     const EVENT_CONNECTION_OPEN  = 'wamp.router.connection_open';
     const EVENT_CONNECTION_CLOSE = 'wamp.router.connection_close';
     const EVENT_CONNECTION_ERROR = 'wamp.router.connection_error';
@@ -24,6 +22,7 @@ final class Router
 
     private ?TransportInterface $transport = null;
     private FactoryInterface $factory;
+    private EventsInterface $events;
     private LoopInterface $loop;
     private LoggerInterface $logger;
 
@@ -37,10 +36,11 @@ final class Router
      */
     private $sessions;
 
-    public function __construct(FactoryInterface $factory, LoopInterface $loop, LoggerInterface $logger = null)
+    public function __construct(FactoryInterface $factory, LoopInterface $loop, EventsInterface $events = null, LoggerInterface $logger = null)
     {
         $this->factory  = $factory;
         $this->loop     = $loop;
+        $this->events   = $events ?: new \PE\Component\WAMP\Util\Events();
         $this->logger   = $logger ?: new NullLogger();
         $this->sessions = new \SplObjectStorage();
 
@@ -55,7 +55,7 @@ final class Router
 
         $this->sessions->attach($connection, $session);
 
-        $this->emit(self::EVENT_CONNECTION_OPEN, $session);
+        $this->events->trigger(self::EVENT_CONNECTION_OPEN, $session);
     }
 
     public function processClose(ConnectionInterface $connection): void
@@ -68,7 +68,7 @@ final class Router
 
         unset($this->sessions[$connection]);
 
-        $this->emit(self::EVENT_CONNECTION_CLOSE, $session);
+        $this->events->trigger(self::EVENT_CONNECTION_CLOSE, $session);
     }
 
     public function processMessageReceived(ConnectionInterface $connection, Message $message): void
@@ -78,7 +78,7 @@ final class Router
 
         $session = $this->sessions[$connection];
 
-        $this->emit(self::EVENT_MESSAGE_RECEIVED, $message, $session);
+        $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $session);
     }
 
     public function processMessageSend(ConnectionInterface $connection, Message $message): void
@@ -87,7 +87,7 @@ final class Router
 
         $session = $this->sessions[$connection];
 
-        $this->emit(self::EVENT_MESSAGE_SEND, $message, $session);
+        $this->events->trigger(self::EVENT_MESSAGE_SEND, $message, $session);
         $this->logger->debug(json_encode($message));
     }
 
@@ -96,7 +96,7 @@ final class Router
         $this->logger->error("Router: [{$exception->getCode()}] {$exception->getMessage()}");
         $this->logger->debug("\n{$exception->getTraceAsString()}");
 
-        $this->emit(self::EVENT_CONNECTION_ERROR, $this->sessions[$connection]);
+        $this->events->trigger(self::EVENT_CONNECTION_ERROR, $this->sessions[$connection]);
     }
 
     public function setTransport(TransportInterface $transport): void
@@ -131,7 +131,7 @@ final class Router
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
-        $module->attach($this);
+        $module->attach($this->events);
         $this->modules[$hash] = $module;
     }
 }

@@ -2,19 +2,21 @@
 
 namespace PE\Component\WAMP\Router;
 
+use PE\Component\WAMP\Util\EventsInterface;
+
 interface RouterModuleInterface
 {
     /**
      * Attach module to router instance
      *
-     * @param Router $router
+     * @param EventsInterface $events
      */
-    public function attach(Router $router): void;
+    public function attach(EventsInterface $events): void;
 
     /**
      * Detach module from router instance
      *
-     * @param Router $router
+     * @param EventsInterface $events
      */
-    public function detach(Router $router): void;
+    public function detach(EventsInterface $events): void;
 }
