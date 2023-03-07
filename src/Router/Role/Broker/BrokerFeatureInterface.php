@@ -3,7 +3,7 @@
 namespace PE\Component\WAMP\Router\Role\Broker;
 
 use PE\Component\WAMP\Message\PublishMessage;
-use PE\Component\WAMP\Router\Session;
+use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Router\Subscription;
 
 interface BrokerFeatureInterface
@@ -14,11 +14,11 @@ interface BrokerFeatureInterface
     public function getName(): string;
 
     /**
-     * @param Session        $session
+     * @param SessionInterface $session
      * @param PublishMessage $message
-     * @param Subscription   $subscription
+     * @param Subscription $subscription
      *
      * @return bool
      */
-    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription): bool;
+    public function processPublishMessage(SessionInterface $session, PublishMessage $message, Subscription $subscription): bool;
 }

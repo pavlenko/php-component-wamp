@@ -10,7 +10,7 @@ use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Router\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\Router\Session;
+use PE\Component\WAMP\Router\SessionInterface;
 
 final class AuthenticationModule implements RouterModuleInterface
 {
@@ -45,9 +45,9 @@ final class AuthenticationModule implements RouterModuleInterface
 
     /**
      * @param Message $message
-     * @param Session $session
+     * @param SessionInterface $session
      */
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof HelloMessage):
@@ -60,10 +60,10 @@ final class AuthenticationModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session      $session
+     * @param SessionInterface $session
      * @param HelloMessage $message
      */
-    private function processHelloMessage(Session $session, HelloMessage $message): void
+    private function processHelloMessage(SessionInterface $session, HelloMessage $message): void
     {
         $methods = (array) $message->getDetail('authmethods', []);
 
@@ -81,10 +81,10 @@ final class AuthenticationModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session             $session
+     * @param SessionInterface $session
      * @param AuthenticateMessage $message
      */
-    private function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void
+    private function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
     {
         foreach ($this->methods as $method) {
             if ($method->getName() === $session->getAuthMethod()) {

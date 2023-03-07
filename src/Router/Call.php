@@ -9,9 +9,9 @@ use PE\Component\WAMP\Message\InvocationMessage;
 
 final class Call
 {
-    private Session $calleeSession;
+    private SessionInterface $calleeSession;
 
-    private Session $callerSession;
+    private SessionInterface $callerSession;
 
     private CallMessage $callMessage;
 
@@ -26,17 +26,17 @@ final class Call
         return $this->calleeSession;
     }
 
-    public function setCalleeSession(Session $session): void
+    public function setCalleeSession(SessionInterface $session): void
     {
         $this->calleeSession = $session;
     }
 
-    public function getCallerSession(): Session
+    public function getCallerSession(): SessionInterface
     {
         return $this->callerSession;
     }
 
-    public function setCallerSession(Session $session): void
+    public function setCallerSession(SessionInterface $session): void
     {
         $this->callerSession = $session;
     }

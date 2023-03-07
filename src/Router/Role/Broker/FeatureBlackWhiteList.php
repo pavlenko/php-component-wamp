@@ -3,7 +3,7 @@
 namespace PE\Component\WAMP\Router\Role\Broker;
 
 use PE\Component\WAMP\Message\PublishMessage;
-use PE\Component\WAMP\Router\Session;
+use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Router\Subscription;
 
 final class FeatureBlackWhiteList implements BrokerFeatureInterface
@@ -16,7 +16,7 @@ final class FeatureBlackWhiteList implements BrokerFeatureInterface
         return 'subscriber_blackwhite_listing';
     }
 
-    public function processPublishMessage(Session $session, PublishMessage $message, Subscription $subscription): bool
+    public function processPublishMessage(SessionInterface $session, PublishMessage $message, Subscription $subscription): bool
     {
         if (is_array($message->getOption('exclude')) || is_array($message->getOption('eligible'))) {
             return $this->check(

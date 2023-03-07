@@ -8,44 +8,29 @@ use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Router\Session;
+use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Util;
 
 final class TicketMethod implements MethodInterface
 {
-    /**
-     * @var string
-     */
     private string $ticket;
 
-    /**
-     * @param string $ticket
-     */
     public function __construct(string $ticket)
     {
         $this->ticket = $ticket;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getName(): string
     {
         return 'ticket';
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function processHelloMessage(Session $session, HelloMessage $message): void
+    public function processHelloMessage(SessionInterface $session, HelloMessage $message): void
     {
         $session->send(new ChallengeMessage($this->getName(), []));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
     {
         if ($message->getSignature() === $this->ticket) {
             $sessionID = Util::generateID();

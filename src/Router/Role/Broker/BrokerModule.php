@@ -15,7 +15,7 @@ use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\Router\Session;
+use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Router\Subscription;
 use PE\Component\WAMP\Util;
 
@@ -59,9 +59,9 @@ final class BrokerModule implements RouterModuleInterface
 
     /**
      * @param Message $message
-     * @param Session $session
+     * @param SessionInterface $session
      */
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof PublishMessage):
@@ -78,9 +78,8 @@ final class BrokerModule implements RouterModuleInterface
 
     /**
      * @param Message $message
-     * @param Session $session
      */
-    public function onMessageSend(Message $message, Session $session): void
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof WelcomeMessage) {
             $features = [];
@@ -93,10 +92,10 @@ final class BrokerModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session        $session
+     * @param SessionInterface $session
      * @param PublishMessage $message
      */
-    private function processPublishMessage(Session $session, PublishMessage $message): void
+    private function processPublishMessage(SessionInterface $session, PublishMessage $message): void
     {
         $publicationID = Util::generateID();
 
@@ -104,7 +103,8 @@ final class BrokerModule implements RouterModuleInterface
             if ($subscription->getTopic() === $message->getTopic()) {
                 foreach ($this->features as $feature) {
                     if (!$feature->processPublishMessage($session, $message, $subscription)) {
-                        continue;
+                        //TODO what is do here???
+                        break;
                     }
                 }
 
@@ -125,10 +125,10 @@ final class BrokerModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session          $session
+     * @param SessionInterface $session
      * @param SubscribeMessage $message
      */
-    private function processSubscribeMessage(Session $session, SubscribeMessage $message): void
+    private function processSubscribeMessage(SessionInterface $session, SubscribeMessage $message): void
     {
         $subscriptionID = Util::generateID();
 
@@ -145,10 +145,10 @@ final class BrokerModule implements RouterModuleInterface
     }
 
     /**
-     * @param Session            $session
+     * @param SessionInterface $session
      * @param UnsubscribeMessage $message
      */
-    private function processUnsubscribeMessage(Session $session, UnsubscribeMessage $message): void
+    private function processUnsubscribeMessage(SessionInterface $session, UnsubscribeMessage $message): void
     {
         if (isset($this->subscriptions[$message->getSubscriptionID()])) {
             $session->send(new UnsubscribedMessage($message->getRequestID()));

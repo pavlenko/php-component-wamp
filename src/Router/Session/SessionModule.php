@@ -9,7 +9,7 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\SessionBaseTrait;
+use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Util;
 
 final class SessionModule implements RouterModuleInterface
@@ -19,7 +19,7 @@ final class SessionModule implements RouterModuleInterface
      */
     public function attach(Router $router): void
     {
-        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 0);
+        $router->on(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     /**
@@ -32,9 +32,9 @@ final class SessionModule implements RouterModuleInterface
 
     /**
      * @param Message $message
-     * @param SessionBaseTrait $session
+     * @param SessionInterface $session
      */
-    public function onMessageReceived(Message $message, SessionBaseTrait $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof HelloMessage):
@@ -47,10 +47,9 @@ final class SessionModule implements RouterModuleInterface
     }
 
     /**
-     * @param SessionBaseTrait      $session
-     * @param HelloMessage $message
+     * @param SessionInterface $session
      */
-    private function processHelloMessage(SessionBaseTrait $session, HelloMessage $message): void
+    private function processHelloMessage(SessionInterface $session/*, HelloMessage $message*/): void
     {
         $sessionID = Util::generateID();
 
@@ -59,10 +58,9 @@ final class SessionModule implements RouterModuleInterface
     }
 
     /**
-     * @param SessionBaseTrait        $session
-     * @param GoodbyeMessage $message
+     * @param SessionInterface $session
      */
-    private function processGoodbyeMessage(SessionBaseTrait $session, GoodbyeMessage $message): void
+    private function processGoodbyeMessage(SessionInterface $session/*, GoodbyeMessage $message*/): void
     {
         $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
         $session->shutdown();

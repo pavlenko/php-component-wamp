@@ -4,7 +4,7 @@ namespace PE\Component\WAMP\Router\Authentication\Method;
 
 use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\HelloMessage;
-use PE\Component\WAMP\Router\Session;
+use PE\Component\WAMP\Router\SessionInterface;
 
 interface MethodInterface
 {
@@ -14,14 +14,14 @@ interface MethodInterface
     public function getName(): string;
 
     /**
-     * @param Session      $session
+     * @param SessionInterface $session
      * @param HelloMessage $message
      */
-    public function processHelloMessage(Session $session, HelloMessage $message): void;
+    public function processHelloMessage(SessionInterface $session, HelloMessage $message): void;
 
     /**
-     * @param Session             $session
+     * @param SessionInterface $session
      * @param AuthenticateMessage $message
      */
-    public function processAuthenticateMessage(Session $session, AuthenticateMessage $message): void;
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void;
 }
