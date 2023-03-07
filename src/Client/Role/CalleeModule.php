@@ -6,6 +6,7 @@ use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\RegistrationCollection;
 use PE\Component\WAMP\Client\Session;
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -17,25 +18,26 @@ use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Util\EventsInterface;
 use React\Promise\CancellablePromiseInterface;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
 final class CalleeModule implements ClientModuleInterface
 {
-    public function attach(Client $client): void
+    public function attach(EventsInterface $events): void
     {
-        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function detach(Client $client): void
+    public function detach(EventsInterface $events): void
     {
-        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof RegisteredMessage):
@@ -65,7 +67,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    private function processRegisteredMessage(Session $session, RegisteredMessage $message): void
+    private function processRegisteredMessage(SessionInterface $session, RegisteredMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -77,7 +79,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    private function processUnregisteredMessage(Session $session, UnregisteredMessage $message): void
+    private function processUnregisteredMessage(SessionInterface $session, UnregisteredMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -95,7 +97,7 @@ final class CalleeModule implements ClientModuleInterface
      *
      * @throws \InvalidArgumentException
      */
-    private function processInvocationMessage(Session $session, InvocationMessage $message)
+    private function processInvocationMessage(SessionInterface $session, InvocationMessage $message)
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -165,7 +167,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    private function processInterruptMessage(Session $session, InterruptMessage $message): void
+    private function processInterruptMessage(SessionInterface $session, InterruptMessage $message): void
     {
         if (isset($session->invocationCancellers[$message->getRequestID()])) {
             $callable = $session->invocationCancellers[$message->getRequestID()];
@@ -177,7 +179,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    private function processErrorMessage(Session $session, ErrorMessage $message): void
+    private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
             case MessageCode::_REGISTER:
@@ -189,7 +191,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    private function processErrorMessageFromRegister(Session $session, ErrorMessage $message): void
+    private function processErrorMessageFromRegister(SessionInterface $session, ErrorMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 
@@ -201,7 +203,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    private function processErrorMessageFromUnregister(Session $session, ErrorMessage $message): void
+    private function processErrorMessageFromUnregister(SessionInterface $session, ErrorMessage $message): void
     {
         $registrations = $session->registrations ?: new RegistrationCollection();
 

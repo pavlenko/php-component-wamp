@@ -5,11 +5,12 @@ namespace PE\Component\WAMP\Client\Role\Publisher;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Role\Publisher\Feature\FeatureInterface;
-use PE\Component\WAMP\Client\Session;
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\PublishedMessage;
+use PE\Component\WAMP\Util\EventsInterface;
 use React\Promise\Deferred;
 
 final class PublisherModule implements ClientModuleInterface
@@ -24,19 +25,19 @@ final class PublisherModule implements ClientModuleInterface
         $this->features[get_class($feature)] = $feature;
     }
 
-    public function attach(Client $client): void
+    public function attach(EventsInterface $events): void
     {
-        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function detach(Client $client): void
+    public function detach(EventsInterface $events): void
     {
-        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof PublishedMessage):
@@ -64,7 +65,7 @@ final class PublisherModule implements ClientModuleInterface
         }
     }
 
-    private function processPublishedMessage(Session $session, PublishedMessage $message): void
+    private function processPublishedMessage(SessionInterface $session, PublishedMessage $message): void
     {
         if (isset($session->publishRequests[$id = $message->getRequestID()])) {
             /* @var $deferred Deferred */
@@ -75,7 +76,7 @@ final class PublisherModule implements ClientModuleInterface
         }
     }
 
-    private function processErrorMessage(Session $session, ErrorMessage $message): void
+    private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         if (isset($session->publishRequests[$id = $message->getErrorRequestID()])) {
             /* @var $deferred Deferred */

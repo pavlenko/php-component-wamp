@@ -4,26 +4,27 @@ namespace PE\Component\WAMP\Client\Session;
 
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\SessionBaseTrait;
+use PE\Component\WAMP\Util\EventsInterface;
 
 final class SessionModule implements ClientModuleInterface
 {
-    public function attach(Client $client): void
+    public function attach(EventsInterface $events): void
     {
-        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    public function detach(Client $client): void
+    public function detach(EventsInterface $events): void
     {
-        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    public function onMessageReceived(Message $message, SessionBaseTrait $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof WelcomeMessage):
@@ -38,18 +39,18 @@ final class SessionModule implements ClientModuleInterface
         }
     }
 
-    private function processWelcomeMessage(SessionBaseTrait $session, WelcomeMessage $message): void
+    private function processWelcomeMessage(SessionInterface $session, WelcomeMessage $message): void
     {
         $session->setSessionID($message->getSessionId());
     }
 
-    private function processGoodbyeMessage(SessionBaseTrait $session): void
+    private function processGoodbyeMessage(SessionInterface $session): void
     {
         $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 
-    private function processAbortMessage(SessionBaseTrait $session): void
+    private function processAbortMessage(SessionInterface $session): void
     {
         $session->shutdown();
     }

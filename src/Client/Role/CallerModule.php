@@ -5,28 +5,29 @@ namespace PE\Component\WAMP\Client\Role;
 use PE\Component\WAMP\Client\CallCollection;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Session;
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\ResultMessage;
 use PE\Component\WAMP\MessageCode;
+use PE\Component\WAMP\Util\EventsInterface;
 
 final class CallerModule implements ClientModuleInterface
 {
-    public function attach(Client $client): void
+    public function attach(EventsInterface $events): void
     {
-        $client->on(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $client->on(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function detach(Client $client): void
+    public function detach(EventsInterface $events): void
     {
-        $client->off(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $client->off(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function onMessageReceived(Message $message, Session $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof ResultMessage):
@@ -47,7 +48,7 @@ final class CallerModule implements ClientModuleInterface
         }
     }
 
-    private function processResultMessage(Session $session, ResultMessage $message): void
+    private function processResultMessage(SessionInterface $session, ResultMessage $message): void
     {
         $calls = $session->callRequests ?: new CallCollection();
 
@@ -64,16 +65,14 @@ final class CallerModule implements ClientModuleInterface
         }
     }
 
-    private function processErrorMessage(Session $session, ErrorMessage $message): void
+    private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
-        switch ($message->getErrorMessageCode()) {
-            case MessageCode::_CALL:
-                $this->processErrorMessageFromCall($session, $message);
-                break;
+        if (MessageCode::_CALL === $message->getErrorMessageCode()) {
+            $this->processErrorMessageFromCall($session, $message);
         }
     }
 
-    private function processErrorMessageFromCall(Session $session, ErrorMessage $message): void
+    private function processErrorMessageFromCall(SessionInterface $session, ErrorMessage $message): void
     {
         $calls = $session->callRequests ?: new CallCollection();
 
