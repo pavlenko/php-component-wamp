@@ -23,8 +23,8 @@ final class Session implements SessionInterface
 
     public function send(Message $message): void
     {
-        $this->router->processMessageSend($this->getConnection(), $message);
-        $this->getConnection()->send($message);
+        $this->router->processMessageSend($this->connection, $message);
+        $this->connection->send($message);
     }
 
     public function getAuthMethod(): ?string

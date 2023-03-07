@@ -35,16 +35,6 @@ trait SessionBaseTrait
         unset($this->data[$name]);
     }
 
-    public function getConnection(): ConnectionInterface
-    {
-        return $this->connection;
-    }
-
-    public function setConnection(ConnectionInterface $connection): void
-    {
-        $this->connection = $connection;
-    }
-
     public function getSessionID(): int
     {
         return $this->id;

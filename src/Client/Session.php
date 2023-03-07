@@ -29,7 +29,7 @@ final class Session implements SessionInterface
     public function send(Message $message): void
     {
         $this->client->processMessageSend($message);
-        $this->getConnection()->send($message);
+        $this->connection->send($message);
     }
 
     /**
@@ -37,7 +37,7 @@ final class Session implements SessionInterface
      */
     public function setSessionID(int $id): void
     {
-        parent::setSessionID($id);
+        $this->id = $id;
         $this->client->emit(Client::EVENT_SESSION_ESTABLISHED, $this);
     }
 }
