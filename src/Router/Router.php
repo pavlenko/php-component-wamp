@@ -23,9 +23,9 @@ final class Router
     const EVENT_MESSAGE_SEND     = 'wamp.router.message_send';
 
     private ?TransportInterface $transport = null;
+    private FactoryInterface $factory;
     private LoopInterface $loop;
     private LoggerInterface $logger;
-    private FactoryInterface $factory;
 
     /**
      * @var RouterModuleInterface[]

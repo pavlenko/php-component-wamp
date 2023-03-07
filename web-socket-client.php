@@ -10,6 +10,7 @@ use PE\Component\WAMP\Client\Role\SubscriberModule;
 use PE\Component\WAMP\Client\Role\SubscriberAPI;
 use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Client\Transport\WebSocketTransport;
+use React\EventLoop\Loop;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +21,7 @@ $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 
 $transport = new WebSocketTransport('127.0.0.1', 1337, false, 5);
 
-$client = new Client('realm1', null, $logger);
+$client = new Client('realm1', new Factory(), Loop::get(), $logger);
 $client->setTransport($transport);
 $client->setReconnectAttempts(3);
 

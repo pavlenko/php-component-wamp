@@ -6,11 +6,11 @@ use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Events;
+use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 
 final class Client
@@ -35,22 +35,24 @@ final class Client
 
     private int $reconnectAttempts = self::RECONNECT_ATTEMPTS;
 
-
     private int $_reconnectAttempt = 0;
 
+    private FactoryInterface $factory;
     private LoopInterface $loop;
-
     private LoggerInterface $logger;
+    private ?SessionInterface $session;
 
-    private ?Session $session;
-
+    /**
+     * @var ClientModuleInterface[]
+     */
     private array $modules = [];
 
-    public function __construct(string $realm, LoopInterface $loop = null, LoggerInterface $logger = null)
+    public function __construct(string $realm, FactoryInterface $factory, LoopInterface $loop, LoggerInterface $logger = null)
     {
-        $this->realm  = $realm;
-        $this->loop   = $loop ?: Factory::create();
-        $this->logger = $logger ?: new NullLogger();
+        $this->factory = $factory;
+        $this->realm   = $realm;
+        $this->loop    = $loop;
+        $this->logger  = $logger ?: new NullLogger();
 
         $this->addModule(new SessionModule());
     }
@@ -60,7 +62,7 @@ final class Client
         $this->_reconnectAttempt = 0;
         $this->logger->info('Connection opened');
 
-        $this->session = new Session($connection, $this);
+        $this->session = $this->factory->createClientSession($connection, $this);
 
         $this->emit(self::EVENT_CONNECTION_OPEN, $this->session);
 
