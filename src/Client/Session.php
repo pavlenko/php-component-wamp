@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Client;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
 
-class Session extends \PE\Component\WAMP\Session
+class Session extends \PE\Component\WAMP\Session implements SessionInterface
 {
     /**
      * @var Client

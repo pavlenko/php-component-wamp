@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Router;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
 
-final class Session extends \PE\Component\WAMP\Session
+final class Session extends \PE\Component\WAMP\Session implements SessionInterface
 {
     private Router $router;
 
