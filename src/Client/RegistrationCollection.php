@@ -2,24 +2,18 @@
 
 namespace PE\Component\WAMP\Client;
 
-class RegistrationCollection
+final class RegistrationCollection
 {
     /**
      * @var Registration[]
      */
     private array $registrations = [];
 
-    /**
-     * @param Registration $registration
-     */
     public function add(Registration $registration)
     {
         $this->registrations[spl_object_hash($registration)] = $registration;
     }
 
-    /**
-     * @param Registration $registration
-     */
     public function remove(Registration $registration)
     {
         if ($key = array_search($registration, $this->registrations, true)) {
@@ -27,11 +21,6 @@ class RegistrationCollection
         }
     }
 
-    /**
-     * @param string $procedureURI
-     *
-     * @return Registration|null
-     */
     public function findByProcedureURI(string $procedureURI): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($procedureURI) {
@@ -41,11 +30,6 @@ class RegistrationCollection
         return current($filtered) ?: null;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Registration|null
-     */
     public function findByRegisterRequestID(int $id): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($id) {
@@ -55,11 +39,6 @@ class RegistrationCollection
         return current($filtered) ?: null;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Registration|null
-     */
     public function findByUnregisterRequestID(int $id): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($id) {
@@ -69,11 +48,6 @@ class RegistrationCollection
         return current($filtered) ?: null;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Registration|null
-     */
     public function findByRegistrationID(int $id): ?Registration
     {
         $filtered = array_filter($this->registrations, function (Registration $registration) use ($id) {

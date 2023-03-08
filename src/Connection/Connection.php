@@ -4,6 +4,9 @@ namespace PE\Component\WAMP\Connection;
 
 use PE\Component\WAMP\Serializer\SerializerInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class Connection implements ConnectionInterface
 {
     private SerializerInterface $serializer;

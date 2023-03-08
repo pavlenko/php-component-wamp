@@ -18,7 +18,7 @@ final class WebSocketConnection extends Connection
 
     public function getSession(): ?Session
     {
-        // TODO: Implement getSession() method.
+        return null;
     }
 
     public function send(Message $message): void
