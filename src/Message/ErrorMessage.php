@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri]</code>
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list]</code>
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list, ArgumentsKw|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class ErrorMessage extends Message
 {

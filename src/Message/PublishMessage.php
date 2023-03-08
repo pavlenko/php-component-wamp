@@ -8,6 +8,8 @@ namespace PE\Component\WAMP\Message;
  * <code>[PUBLISH, Request|id, Options|dict, Topic|uri]</code>
  * <code>[PUBLISH, Request|id, Options|dict, Topic|uri, Arguments|list]</code>
  * <code>[PUBLISH, Request|id, Options|dict, Topic|uri, Arguments|list, ArgumentsKw|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class PublishMessage extends Message implements ActionInterface
 {

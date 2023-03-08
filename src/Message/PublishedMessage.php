@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Acknowledge sent by a Broker to a Publisher for acknowledged publications.
  *
  * <code>[PUBLISHED, PUBLISH.Request|id, Publication|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class PublishedMessage extends Message
 {

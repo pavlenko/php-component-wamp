@@ -7,6 +7,8 @@ namespace PE\Component\WAMP\Message;
  * A Caller can cancel and issued call actively by sending a cancel message to the Dealer.
  *
  * <code>[CANCEL, CALL.Request|id, Options|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class CancelMessage extends Message
 {

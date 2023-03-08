@@ -8,6 +8,8 @@ namespace PE\Component\WAMP\Message;
  * <code>[INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict]</code>
  * <code>[INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict, CALL.Arguments|list]</code>
  * <code>[INVOCATION, Request|id, REGISTERED.Registration|id, Details|dict, CALL.Arguments|list, CALL.ArgumentsKw|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class InvocationMessage extends Message
 {

@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Subscribe request sent by a Subscriber to a Broker to subscribe to a topic.
  *
  * <code>[SUBSCRIBE, Request|id, Options|dict, Topic|uri]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class SubscribeMessage extends Message implements ActionInterface
 {

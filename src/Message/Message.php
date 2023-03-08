@@ -2,6 +2,9 @@
 
 namespace PE\Component\WAMP\Message;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class Message implements \JsonSerializable
 {
     public const CODE_UNKNOWN      = 0;

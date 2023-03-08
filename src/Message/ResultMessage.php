@@ -8,6 +8,8 @@ namespace PE\Component\WAMP\Message;
  * <code>[RESULT, CALL.Request|id, Details|dict]</code>
  * <code>[RESULT, CALL.Request|id, Details|dict, YIELD.Arguments|list]</code>
  * <code>[RESULT, CALL.Request|id, Details|dict, YIELD.Arguments|list, YIELD.ArgumentsKw|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class ResultMessage extends Message
 {

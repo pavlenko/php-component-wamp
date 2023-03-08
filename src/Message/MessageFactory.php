@@ -2,6 +2,10 @@
 
 namespace PE\Component\WAMP\Message;
 
+/**
+ * @TODO maybe move logic to root factory
+ * @codeCoverageIgnore
+ */
 final class MessageFactory
 {
     /**

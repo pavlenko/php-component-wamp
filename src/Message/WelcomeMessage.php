@@ -4,6 +4,8 @@ namespace PE\Component\WAMP\Message;
 
 /**
  * <code>[WELCOME, Session|id, Details|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class WelcomeMessage extends Message
 {

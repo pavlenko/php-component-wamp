@@ -7,6 +7,8 @@ namespace PE\Component\WAMP\Message;
  * Upon receiving a cancel for a pending call, a Dealer will issue an interrupt to the Callee.
  *
  * <code>[INTERRUPT, INVOCATION.Request|id, Options|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class InterruptMessage extends Message
 {

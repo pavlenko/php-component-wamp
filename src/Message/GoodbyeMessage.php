@@ -4,6 +4,8 @@ namespace PE\Component\WAMP\Message;
 
 /**
  * <code>[GOODBYE, Details|dict, Reason|uri]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class GoodbyeMessage extends Message
 {

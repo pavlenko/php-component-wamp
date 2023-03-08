@@ -4,6 +4,8 @@ namespace PE\Component\WAMP\Message;
 
 /**
  * <code>[ABORT, Details|dict, Reason|uri]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class AbortMessage extends Message
 {

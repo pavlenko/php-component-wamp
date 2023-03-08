@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Acknowledge sent by a Broker to a Subscriber to acknowledge a subscription.
  *
  * <code>[SUBSCRIBED, SUBSCRIBE.Request|id, Subscription|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class SubscribedMessage extends Message
 {

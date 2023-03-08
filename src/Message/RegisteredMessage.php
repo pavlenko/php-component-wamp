@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Acknowledge sent by a Dealer to a Callee for successful registration.
  *
  * <code>[REGISTERED, REGISTER.Request|id, Registration|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class RegisteredMessage extends Message
 {

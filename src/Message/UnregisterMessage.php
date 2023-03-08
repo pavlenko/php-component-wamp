@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * A Callees request to unregister a previously established registration.
  *
  * <code>[UNREGISTER, Request|id, REGISTERED.Registration|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class UnregisterMessage extends Message
 {

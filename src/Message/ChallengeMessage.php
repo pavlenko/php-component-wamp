@@ -7,6 +7,8 @@ namespace PE\Component\WAMP\Message;
  * During authenticated session establishment, a Router sends a challenge message.
  *
  * <code>[CHALLENGE, AuthMethod|string, Extra|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class ChallengeMessage extends Message
 {

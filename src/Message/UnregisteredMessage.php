@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Acknowledge sent by a Dealer to a Callee for successful unregistration.
  *
  * <code>[UNREGISTERED, UNREGISTER.Request|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class UnregisteredMessage extends Message
 {

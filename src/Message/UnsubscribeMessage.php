@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Unsubscribe request sent by a Subscriber to a Broker to unsubscribe a subscription.
  *
  * <code>[UNSUBSCRIBE, Request|id, SUBSCRIBED.Subscription|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class UnsubscribeMessage extends Message
 {

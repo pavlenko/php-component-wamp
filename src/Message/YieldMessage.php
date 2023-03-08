@@ -8,6 +8,8 @@ namespace PE\Component\WAMP\Message;
  * <code>[YIELD, INVOCATION.Request|id, Options|dict]</code>
  * <code>[YIELD, INVOCATION.Request|id, Options|dict, Arguments|list]</code>
  * <code>[YIELD, INVOCATION.Request|id, Options|dict, Arguments|list, ArgumentsKw|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class YieldMessage extends Message
 {

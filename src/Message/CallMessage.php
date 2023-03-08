@@ -8,6 +8,8 @@ namespace PE\Component\WAMP\Message;
  * <code>[CALL, Request|id, Options|dict, Procedure|uri]</code>
  * <code>[CALL, Request|id, Options|dict, Procedure|uri, Arguments|list]</code>
  * <code>[CALL, Request|id, Options|dict, Procedure|uri, Arguments|list, ArgumentsKw|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class CallMessage extends Message implements ActionInterface
 {

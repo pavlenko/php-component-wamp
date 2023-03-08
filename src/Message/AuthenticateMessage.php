@@ -7,6 +7,8 @@ namespace PE\Component\WAMP\Message;
  * A Client having received a challenge is expected to respond by sending a signature or token.
  *
  * <code>[AUTHENTICATE, Signature|string, Extra|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class AuthenticateMessage extends Message
 {

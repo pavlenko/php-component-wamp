@@ -2,6 +2,9 @@
 
 namespace PE\Component\WAMP\Message;
 
+/**
+ * @codeCoverageIgnore
+ */
 trait Options
 {
     /**

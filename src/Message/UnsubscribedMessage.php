@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Acknowledge sent by a Broker to a Subscriber to acknowledge unsubscription.
  *
  * <code>[UNSUBSCRIBED, UNSUBSCRIBE.Request|id]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class UnsubscribedMessage extends Message
 {

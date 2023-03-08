@@ -6,6 +6,8 @@ namespace PE\Component\WAMP\Message;
  * Sent by a Client to initiate opening of a WAMP session to a Router attaching to a Realm.
  *
  * <code>[HELLO, Realm|uri, Details|dict]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class HelloMessage extends Message
 {

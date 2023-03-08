@@ -5,6 +5,8 @@ namespace PE\Component\WAMP\Message;
 /**
  * <code>[HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer]</code>
  * <code>[HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer, Discard|string]</code>
+ *
+ * @codeCoverageIgnore
  */
 final class HeartbeatMessage extends Message
 {
