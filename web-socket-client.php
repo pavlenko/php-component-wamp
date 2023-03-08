@@ -34,15 +34,14 @@ $client->addModule($authentication);
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 
-//TODO do not do anything until session is authenticated
-$events->attach(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) {
+$events->attach(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) use ($loop) {
     $subscriber = new SubscriberAPI($session);
     $subscriber->subscribe('foo', function () {
-        echo json_encode(func_get_args()) . "\n";
+        //echo json_encode(func_get_args()) . "\n";
     });
 
     $publisher = new PublisherAPI($session);
-    $publisher->publish('foo');
+    $loop->addTimer(mt_rand(5, 10), fn() => $publisher->publish('foo', [mt_rand(5, 10)]));
 });
 
 $client->connect();

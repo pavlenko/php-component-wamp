@@ -39,12 +39,14 @@ final class BrokerModule implements RouterModuleInterface
     {
         $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $events->attach(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(Router::EVENT_CONNECTION_CLOSE, [$this, 'onConnectionClose']);
     }
 
     public function detach(EventsInterface $events): void
     {
         $events->detach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $events->detach(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(Router::EVENT_CONNECTION_CLOSE, [$this, 'onConnectionClose']);
     }
 
     public function onMessageReceived(Message $message, SessionInterface $session): void
@@ -74,12 +76,17 @@ final class BrokerModule implements RouterModuleInterface
         }
     }
 
+    public function onConnectionClose(): void
+    {
+        $this->subscriptions = [];
+    }
+
     private function processPublishMessage(SessionInterface $session, PublishMessage $message): void
     {
         $publicationID = Util::generateID();
 
         foreach ($this->subscriptions as $subscriptionID => $subscription) {
-            if ($subscription->getTopic() === $message->getTopic()) {
+            if ($session !== $subscription->getSession() && $subscription->getTopic() === $message->getTopic()) {
                 foreach ($this->features as $feature) {
                     if (!$feature->processPublishMessage($session, $message, $subscription)) {
                         //TODO what is do here???
@@ -90,7 +97,7 @@ final class BrokerModule implements RouterModuleInterface
                 $subscription->getSession()->send(new EventMessage(
                     $subscriptionID,
                     $publicationID,
-                    [],
+                    [$message->getArguments()[0] ?? null],
                     $message->getArguments(),
                     $message->getArgumentsKw()
                 ));
@@ -108,11 +115,7 @@ final class BrokerModule implements RouterModuleInterface
         $subscriptionID = Util::generateID();
 
         if ($message->getTopic()) {
-            $this->subscriptions[$subscriptionID] = new Subscription(
-                $session,
-                $message->getTopic()
-            );
-
+            $this->subscriptions[$subscriptionID] = new Subscription($session, $message->getTopic());
             $session->send(new SubscribedMessage($message->getRequestID(), $subscriptionID));
         } else {
             $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_INVALID_URI));

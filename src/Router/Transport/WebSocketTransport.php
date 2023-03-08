@@ -31,11 +31,6 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
     private Router $router;
     private ?\SessionHandlerInterface $sessionHandler = null;
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param bool $secure
-     */
     public function __construct(string $host = '127.0.0.1', int $port = 8080, bool $secure = false)
     {
         $this->host   = $host;
@@ -45,25 +40,16 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
         $this->connections = new \SplObjectStorage();
     }
 
-    /**
-     * @param \SessionHandlerInterface|null $sessionHandler
-     */
     public function setSessionHandler(\SessionHandlerInterface $sessionHandler = null): void
     {
         $this->sessionHandler = $sessionHandler;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getSubProtocols(): array
     {
         return ['wamp.2.json'];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function start(Router $router, LoopInterface $loop, LoggerInterface $logger): void
     {
         $uri = ($this->secure ? 'tls' : 'tcp') . '://' . $this->host . ':' . $this->port;
@@ -83,9 +69,6 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
         );
     }
 
-    /**
-     * @inheritDoc
-     */
     public function stop(): void
     {
         if ($this->server) {
@@ -97,54 +80,40 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onOpen(RatchetConnectionInterface $ratchetConnection): void
+    public function onOpen(RatchetConnectionInterface $conn): void
     {
-        $connection = new WebSocketConnection($ratchetConnection);
+        $connection = new WebSocketConnection($conn);
         $connection->setSerializer(new Serializer());
 
-        $this->connections->attach($ratchetConnection, $connection);
+        $this->connections->attach($conn, $connection);
 
         $this->router->processOpen($connection);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onClose(RatchetConnectionInterface $ratchetConnection): void
+    public function onClose(RatchetConnectionInterface $conn): void
     {
-        $connection = $this->connections[$ratchetConnection];
+        $connection = $this->connections[$conn];
 
-        $this->connections->detach($ratchetConnection);
+        $this->connections->detach($conn);
 
-        unset($this->connections[$ratchetConnection]);
+        unset($this->connections[$conn]);
 
         $this->router->processClose($connection);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onError(RatchetConnectionInterface $ratchetConnection, \Exception $exception): void
+    public function onError(RatchetConnectionInterface $conn, \Exception $e): void
     {
-        $connection = $this->connections[$ratchetConnection];
+        $connection = $this->connections[$conn];
 
-        $this->router->processError($connection, $exception);
+        $this->router->processError($connection, $e);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onMessage(RatchetConnectionInterface $ratchetConnection, MessageInterface $message): void
+    public function onMessage(RatchetConnectionInterface $conn, MessageInterface $msg): void
     {
-        $connection = $this->connections[$ratchetConnection];
+        $connection = $this->connections[$conn];
 
         try {
-            $deserialized = $connection->getSerializer()->deserialize($message);
-
-            $this->router->processMessageReceived($connection, $deserialized);
+            $this->router->processMessageReceived($connection, $connection->getSerializer()->deserialize($msg));
         } catch (\Exception $exception) {}
     }
 }
