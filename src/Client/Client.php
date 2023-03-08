@@ -9,6 +9,7 @@ use PE\Component\WAMP\Events;
 use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\Util\EventsInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
@@ -39,6 +40,7 @@ final class Client
 
     private FactoryInterface $factory;
     private LoopInterface $loop;
+    private EventsInterface $events;
     private LoggerInterface $logger;
     private ?SessionInterface $session;
 
@@ -47,11 +49,12 @@ final class Client
      */
     private array $modules = [];
 
-    public function __construct(string $realm, FactoryInterface $factory, LoopInterface $loop, LoggerInterface $logger = null)
+    public function __construct(string $realm, FactoryInterface $factory, LoopInterface $loop, EventsInterface $events = null, LoggerInterface $logger = null)
     {
-        $this->factory = $factory;
         $this->realm   = $realm;
+        $this->factory = $factory;
         $this->loop    = $loop;
+        $this->events  = $events ?: new \PE\Component\WAMP\Util\Events();
         $this->logger  = $logger ?: new NullLogger();
 
         $this->addModule(new SessionModule());
@@ -64,7 +67,7 @@ final class Client
 
         $this->session = $this->factory->createClientSession($connection, $this);
 
-        $this->emit(self::EVENT_CONNECTION_OPEN, $this->session);
+        $this->events->trigger(self::EVENT_CONNECTION_OPEN, $this->session);
 
         $this->session->send(new HelloMessage($this->realm, []));
     }
@@ -74,7 +77,7 @@ final class Client
         if ($this->session) {
             $this->logger->info('Client: close: ' . $reason);
 
-            $this->emit(self::EVENT_CONNECTION_CLOSE, $this->session);
+            $this->events->trigger(self::EVENT_CONNECTION_CLOSE, $this->session);
 
             $this->session->shutdown();
             $this->session = null;
@@ -88,13 +91,13 @@ final class Client
         $this->logger->info("Client: {$message->getName()} received");
         $this->logger->debug(json_encode($message));
 
-        $this->emit(self::EVENT_MESSAGE_RECEIVED, $message, $this->session);
+        $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $this->session);
     }
 
     public function processMessageSend(Message $message): void
     {
         $this->logger->info("Client: {$message->getName()} send");
-        $this->emit(self::EVENT_MESSAGE_SEND, $message, $this->session);
+        $this->events->trigger(self::EVENT_MESSAGE_SEND, $message, $this->session);
         $this->logger->debug(json_encode($message));
     }
 
@@ -103,7 +106,7 @@ final class Client
         $this->logger->error("Client: [{$exception->getCode()}] {$exception->getMessage()}");
         $this->logger->debug("\n{$exception->getTraceAsString()}");
 
-        $this->emit(self::EVENT_CONNECTION_ERROR, $this->session);
+        $this->events->trigger(self::EVENT_CONNECTION_ERROR, $this->session);
     }
 
     public function setTransport(TransportInterface $transport): void
@@ -127,7 +130,7 @@ final class Client
             throw new \RuntimeException('Transport not set via setTransport()');
         }
 
-        $this->logger && $this->logger->info('Client: connecting...');
+        $this->logger->info('Client: connecting...');
 
         $this->transport->start($this, $this->loop, $this->logger);
 
@@ -140,11 +143,11 @@ final class Client
     {
         if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
             // Max retry attempts reached
-            $this->logger && $this->logger->error("Client: unable to connect after {$this->reconnectAttempts} attempts");
+            $this->logger->error("Client: unable to connect after {$this->reconnectAttempts} attempts");
             return;
         }
 
-        $this->logger && $this->logger->warning("Client: reconnect after {$this->reconnectTimeout} seconds");
+        $this->logger->warning("Client: reconnect after {$this->reconnectTimeout} seconds");
 
         $this->_reconnectAttempt++;
 
@@ -161,7 +164,7 @@ final class Client
             throw new \InvalidArgumentException('Cannot add same module twice');
         }
 
-        $module->attach($this);
+        $module->attach($this->events);
         $this->modules[$hash] = $module;
     }
 }

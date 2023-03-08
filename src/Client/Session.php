@@ -38,6 +38,6 @@ final class Session implements SessionInterface
     public function setSessionID(int $id): void
     {
         $this->id = $id;
-        $this->client->emit(Client::EVENT_SESSION_ESTABLISHED, $this);
+        $this->client->emit(Client::EVENT_SESSION_ESTABLISHED, $this);//TODO move outside
     }
 }

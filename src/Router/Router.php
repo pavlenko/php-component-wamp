@@ -7,6 +7,7 @@ use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
+use PE\Component\WAMP\Util\Events;
 use PE\Component\WAMP\Util\EventsInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -40,7 +41,7 @@ final class Router
     {
         $this->factory  = $factory;
         $this->loop     = $loop;
-        $this->events   = $events ?: new \PE\Component\WAMP\Util\Events();
+        $this->events   = $events ?: new Events();
         $this->logger   = $logger ?: new NullLogger();
         $this->sessions = new \SplObjectStorage();
 
