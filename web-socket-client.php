@@ -21,7 +21,7 @@ $logger = new ConsoleLogger(new ConsoleOutput(OutputInterface::VERBOSITY_DEBUG))
 
 $transport = new WebSocketTransport('127.0.0.1', 1337, false, 5);
 
-$client = new Client('realm1', new Factory(), Loop::get(), $logger);
+$client = new Client('realm1', new Factory(), Loop::get(), $events = new \PE\Component\WAMP\Util\Events(), $logger);
 $client->setTransport($transport);
 $client->setReconnectAttempts(3);
 
@@ -32,7 +32,7 @@ $client->addModule($authentication);
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 
-$client->on(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) {
+$events->attach(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) {
     $subscriber = new SubscriberAPI($session);
     $subscriber->subscribe('foo', function () {
         echo json_encode(func_get_args()) . "\n";

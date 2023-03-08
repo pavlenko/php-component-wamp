@@ -14,14 +14,18 @@ use PE\Component\WAMP\Util\EventsInterface;
 
 final class SessionModule implements ClientModuleInterface
 {
+    private ?EventsInterface $events = null;
+
     public function attach(EventsInterface $events): void
     {
-        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $this->events = $events;
+        $this->events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     public function detach(EventsInterface $events): void
     {
-        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $this->events = $events;
+        $this->events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     public function onMessageReceived(Message $message, SessionInterface $session): void
@@ -42,6 +46,9 @@ final class SessionModule implements ClientModuleInterface
     private function processWelcomeMessage(SessionInterface $session, WelcomeMessage $message): void
     {
         $session->setSessionID($message->getSessionId());
+        if ($this->events) {
+            $this->events->trigger(Client::EVENT_SESSION_ESTABLISHED, $session);
+        }
     }
 
     private function processGoodbyeMessage(SessionInterface $session): void

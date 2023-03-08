@@ -23,21 +23,9 @@ final class Session implements SessionInterface
         $this->client = $client;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function send(Message $message): void
     {
         $this->client->processMessageSend($message);
         $this->connection->send($message);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setSessionID(int $id): void
-    {
-        $this->id = $id;
-        $this->client->emit(Client::EVENT_SESSION_ESTABLISHED, $this);//TODO move outside
     }
 }
