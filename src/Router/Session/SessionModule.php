@@ -24,7 +24,7 @@ final class SessionModule implements RouterModuleInterface
         $events->detach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    public function onMessageReceived(Message $message, SessionInterface $session): bool
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof HelloMessage):

@@ -26,7 +26,7 @@ final class AuthenticationModule implements RouterModuleInterface
 
     public function attach(EventsInterface $events): void
     {
-        $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 10);
+        $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], -10);
     }
 
     public function detach(EventsInterface $events): void
@@ -39,18 +39,15 @@ final class AuthenticationModule implements RouterModuleInterface
         switch (true) {
             case ($message instanceof HelloMessage):
                 $this->processHelloMessage($session, $message);
-                break;
+                return false;
             case ($message instanceof AuthenticateMessage):
                 $this->processAuthenticateMessage($session, $message);
                 break;
         }
+        return true;
     }
 
-    /**
-     * @param SessionInterface $session
-     * @param HelloMessage $message
-     */
-    private function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
+    private function processHelloMessage(SessionInterface $session, HelloMessage $message): void
     {
         $methods = (array) $message->getDetail('authmethods', []);
 

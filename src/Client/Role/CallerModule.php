@@ -26,7 +26,7 @@ final class CallerModule implements ClientModuleInterface
         $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function onMessageReceived(Message $message, SessionInterface $session): bool
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof ResultMessage):
@@ -38,7 +38,7 @@ final class CallerModule implements ClientModuleInterface
         }
     }
 
-    public function onMessageSend(Message $message): bool
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('caller', [

@@ -38,14 +38,14 @@ final class AuthenticationModule implements ClientModuleInterface
         $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function onMessageReceived(Message $message, SessionInterface $session): bool
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         if ($message instanceof ChallengeMessage) {
             $this->processChallengeMessage($session, $message);
         }
     }
 
-    public function onMessageSend(Message $message, SessionInterface $session): bool
+    public function onMessageSend(Message $message, SessionInterface $session): void
     {
         if ($message instanceof HelloMessage) {
             foreach ($this->methods as $method) {

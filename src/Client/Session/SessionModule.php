@@ -27,7 +27,7 @@ final class SessionModule implements ClientModuleInterface
         $this->events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    public function onMessageReceived(Message $message, SessionInterface $session): bool
+    public function onMessageReceived(Message $message, SessionInterface $session): void
     {
         switch (true) {
             case ($message instanceof WelcomeMessage):
