@@ -2,7 +2,6 @@
 
 namespace PE\Component\WAMP\Router\Role;
 
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
 use PE\Component\WAMP\Message\ErrorMessage;
@@ -119,7 +118,7 @@ final class DealerModule implements RouterModuleInterface
 
             $session->send(new RegisteredMessage($message->getRequestID(), $registrationID));
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_PROCEDURE_ALREADY_EXISTS));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_PROCEDURE_ALREADY_EXISTS));
         }
     }
 
@@ -137,7 +136,7 @@ final class DealerModule implements RouterModuleInterface
             $session->send(new UnregisteredMessage($message->getRequestID()));
             unset($this->procedures[$procedureURI]);
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_REGISTRATION));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_REGISTRATION));
         }
     }
 
@@ -170,7 +169,7 @@ final class DealerModule implements RouterModuleInterface
 
             $session->send($invocation);
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_PROCEDURE));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_PROCEDURE));
         }
     }
 
@@ -200,7 +199,7 @@ final class DealerModule implements RouterModuleInterface
                 $message->getArgumentsKw()
             ));
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_CALL));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_CALL));
         }
     }
 
@@ -235,13 +234,13 @@ final class DealerModule implements RouterModuleInterface
             if ($message->getOption('mode') === 'killnowait') {
                 $call->getCallerSession()->send(MessageFactory::createErrorMessageFromMessage(
                     $message,
-                    ErrorURI::_CANCELLED
+                    Message::ERROR_CANCELLED
                 ));
 
                 $this->removeCall($call);
             }
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_CALL));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_CALL));
         }
     }
 
@@ -287,7 +286,7 @@ final class DealerModule implements RouterModuleInterface
 
             $this->removeCall($call);
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_CALL));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_CALL));
         }
     }
 
@@ -306,7 +305,7 @@ final class DealerModule implements RouterModuleInterface
 
             $this->removeCall($call);
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_CALL));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_CALL));
         }
     }
 

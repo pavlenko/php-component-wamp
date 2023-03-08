@@ -2,11 +2,11 @@
 
 namespace PE\Component\WAMP\Router\Authentication\Method;
 
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\SessionInterface;
 use PE\Component\WAMP\Util;
@@ -64,7 +64,7 @@ final class WAMPCRAMethod implements MethodInterface
 
             $session->send(new WelcomeMessage($session->getSessionID(), $data));
         } else {
-            $session->send(new AbortMessage([], ErrorURI::_AUTHORIZATION_FAILED));
+            $session->send(new AbortMessage([], Message::ERROR_AUTHORIZATION_FAILED));
         }
     }
 }

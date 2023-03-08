@@ -2,10 +2,10 @@
 
 namespace PE\Component\WAMP\Router\Authentication\Method;
 
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\SessionInterface;
@@ -38,7 +38,7 @@ final class TicketMethod implements MethodInterface
             $session->setSessionID($sessionID);
             $session->send(new WelcomeMessage($sessionID, []));
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NOT_AUTHORIZED));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NOT_AUTHORIZED));
         }
     }
 }

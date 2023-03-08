@@ -7,7 +7,6 @@ use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\RegistrationCollection;
 use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Client\SessionInterface;
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\InterruptMessage;
@@ -174,7 +173,7 @@ final class CalleeModule implements ClientModuleInterface
 
             unset($session->invocationCancellers[$message->getRequestID()]);
 
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_CANCELLED));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_CANCELLED));
         }
     }
 

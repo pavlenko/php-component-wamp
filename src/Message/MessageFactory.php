@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\ErrorURI;
-
 final class MessageFactory
 {
     /**
@@ -128,7 +126,7 @@ final class MessageFactory
     public static function createErrorMessageFromMessage(Message $message, string $errorUri = null): ErrorMessage
     {
         if ($errorUri === null) {
-            $errorUri = ErrorURI::_UNKNOWN;
+            $errorUri = Message::ERROR_UNKNOWN;
         }
 
         if (method_exists($message, 'getRequestId')) {

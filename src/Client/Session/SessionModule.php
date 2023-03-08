@@ -5,7 +5,6 @@ namespace PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\SessionInterface;
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\Message;
@@ -53,7 +52,7 @@ final class SessionModule implements ClientModuleInterface
 
     private function processGoodbyeMessage(SessionInterface $session): void
     {
-        $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
+        $session->send(new GoodbyeMessage([], Message::ERROR_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 

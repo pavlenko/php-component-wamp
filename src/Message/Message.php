@@ -60,6 +60,27 @@ abstract class Message implements \JsonSerializable
         self::CODE_YIELD        => 'YIELD',
     ];
 
+    public const ERROR_UNKNOWN                       = 'wamp.error.unknown';
+    public const ERROR_INVALID_URI                   = 'wamp.error.invalid_uri';
+    public const ERROR_NO_SUCH_PROCEDURE             = 'wamp.error.no_such_procedure';
+    public const ERROR_NO_SUCH_CALL                  = 'wamp.error.no_such_call';
+    public const ERROR_NO_SUCH_REGISTRATION          = 'wamp.error.no_such_registration';
+    public const ERROR_NO_SUCH_SUBSCRIPTION          = 'wamp.error.no_such_subscription';
+    public const ERROR_NO_SUCH_REALM                 = 'wamp.error.no_such_realm';
+    public const ERROR_NO_SUCH_ROLE                  = 'wamp.error.no_such_role';
+    public const ERROR_PROCEDURE_ALREADY_EXISTS      = 'wamp.error.procedure_already_exists';
+    public const ERROR_INVALID_ARGUMENT              = 'wamp.error.invalid_argument';
+    public const ERROR_SYSTEM_SHUTDOWN               = 'wamp.error.system_shutdown';
+    public const ERROR_CLOSE_REALM                   = 'wamp.error.close_realm';
+    public const ERROR_GOODBYE_AND_OUT               = 'wamp.error.goodbye_and_out';
+    public const ERROR_NOT_AUTHORIZED                = 'wamp.error.not_authorized';
+    public const ERROR_AUTHORIZATION_FAILED          = 'wamp.error.authorization_failed';
+    public const ERROR_CANCELLED                     = 'wamp.error.canceled';
+    public const ERROR_OPTION_NOT_ALLOWED            = 'wamp.error.option_not_allowed';
+    public const ERROR_NO_ELIGIBLE_CALLEE            = 'wamp.error.no_eligible_callee';
+    public const ERROR_OPTION_DISALLOWED_DISCLOSE_ME = 'wamp.error.option_disallowed.disclose_me';
+    public const ERROR_NETWORK_FAILURE               = 'wamp.error.network_failure';
+
     /**
      * @return int
      */

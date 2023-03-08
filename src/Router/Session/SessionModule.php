@@ -2,7 +2,6 @@
 
 namespace PE\Component\WAMP\Router\Session;
 
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
@@ -63,7 +62,7 @@ final class SessionModule implements RouterModuleInterface
      */
     private function processGoodbyeMessage(SessionInterface $session/*, GoodbyeMessage $message*/): void
     {
-        $session->send(new GoodbyeMessage([], ErrorURI::_GOODBYE_AND_OUT));
+        $session->send(new GoodbyeMessage([], Message::ERROR_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 }

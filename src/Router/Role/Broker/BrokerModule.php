@@ -2,7 +2,6 @@
 
 namespace PE\Component\WAMP\Router\Role\Broker;
 
-use PE\Component\WAMP\ErrorURI;
 use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
@@ -140,7 +139,7 @@ final class BrokerModule implements RouterModuleInterface
 
             $session->send(new SubscribedMessage($message->getRequestID(), $subscriptionID));
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_INVALID_URI));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_INVALID_URI));
         }
     }
 
@@ -154,7 +153,7 @@ final class BrokerModule implements RouterModuleInterface
             $session->send(new UnsubscribedMessage($message->getRequestID()));
             unset($this->subscriptions[$message->getSubscriptionID()]);
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, ErrorURI::_NO_SUCH_SUBSCRIPTION));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_SUBSCRIPTION));
         }
     }
 }
