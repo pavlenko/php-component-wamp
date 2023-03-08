@@ -4,6 +4,7 @@ namespace PE\Component\WAMP;
 
 final class ErrorURI
 {
+    //TODO move const to Message class & remove this class
     const _UNKNOWN                       = 'wamp.error.unknown';
     const _INVALID_URI                   = 'wamp.error.invalid_uri';
     const _NO_SUCH_PROCEDURE             = 'wamp.error.no_such_procedure';

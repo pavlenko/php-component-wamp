@@ -10,7 +10,6 @@ use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\ResultMessage;
-use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Util\EventsInterface;
 
 final class CallerModule implements ClientModuleInterface
@@ -67,7 +66,7 @@ final class CallerModule implements ClientModuleInterface
 
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
-        if (MessageCode::_CALL === $message->getErrorMessageCode()) {
+        if (Message::CODE_CALL === $message->getErrorMessageCode()) {
             $this->processErrorMessageFromCall($session, $message);
         }
     }

@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Acknowledge sent by a Dealer to a Callee for successful registration.
  *
@@ -33,7 +31,7 @@ final class RegisteredMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_REGISTERED;
+        return self::CODE_REGISTERED;
     }
 
     /**

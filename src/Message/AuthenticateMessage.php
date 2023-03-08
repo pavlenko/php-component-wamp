@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * The AUTHENTICATE message is used with certain Authentication Methods.
  * A Client having received a challenge is expected to respond by sending a signature or token.
@@ -37,7 +35,7 @@ final class AuthenticateMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_AUTHENTICATE;
+        return self::CODE_AUTHENTICATE;
     }
 
     /**

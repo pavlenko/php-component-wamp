@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Result of a call as returned by Dealer to Caller.
  *
@@ -36,7 +34,7 @@ final class ResultMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_RESULT;
+        return self::CODE_RESULT;
     }
 
     /**

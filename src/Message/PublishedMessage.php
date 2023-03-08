@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Acknowledge sent by a Broker to a Publisher for acknowledged publications.
  *
@@ -33,7 +31,7 @@ final class PublishedMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_PUBLISHED;
+        return self::CODE_PUBLISHED;
     }
 
     /**

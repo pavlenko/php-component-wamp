@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * A Callees request to register an endpoint at a Dealer.
  *
@@ -36,7 +34,7 @@ final class RegisterMessage extends Message implements ActionInterface
      */
     public function getCode(): int
     {
-        return MessageCode::_REGISTER;
+        return self::CODE_REGISTER;
     }
 
     /**

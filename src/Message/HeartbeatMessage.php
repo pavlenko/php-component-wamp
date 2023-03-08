@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * <code>[HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer]</code>
  * <code>[HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer, Discard|string]</code>
@@ -40,7 +38,7 @@ final class HeartbeatMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_HEARTBEAT;
+        return self::CODE_HEARTBEAT;
     }
 
     /**

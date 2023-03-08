@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Subscribe request sent by a Subscriber to a Broker to subscribe to a topic.
  *
@@ -36,7 +34,7 @@ final class SubscribeMessage extends Message implements ActionInterface
      */
     public function getCode(): int
     {
-        return MessageCode::_SUBSCRIBE;
+        return self::CODE_SUBSCRIBE;
     }
 
     /**

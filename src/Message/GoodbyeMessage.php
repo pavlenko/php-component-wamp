@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * <code>[GOODBYE, Details|dict, Reason|uri]</code>
  */
@@ -31,7 +29,7 @@ final class GoodbyeMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_GOODBYE;
+        return self::CODE_GOODBYE;
     }
 
     /**

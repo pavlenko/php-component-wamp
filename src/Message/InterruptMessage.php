@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * The INTERRUPT message is used with the Call Canceling advanced feature.
  * Upon receiving a cancel for a pending call, a Dealer will issue an interrupt to the Callee.
@@ -30,7 +28,7 @@ final class InterruptMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_INTERRUPT;
+        return self::CODE_INTERRUPT;
     }
 
     /**

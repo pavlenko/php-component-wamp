@@ -17,7 +17,6 @@ use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\YieldMessage;
-use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Util\EventsInterface;
 use React\Promise\CancellablePromiseInterface;
 use React\Promise\FulfilledPromise;
@@ -182,10 +181,10 @@ final class CalleeModule implements ClientModuleInterface
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
-            case MessageCode::_REGISTER:
+            case Message::CODE_REGISTER:
                 $this->processErrorMessageFromRegister($session, $message);
                 break;
-            case MessageCode::_UNREGISTER:
+            case Message::CODE_UNREGISTER:
                 $this->processErrorMessageFromUnregister($session, $message);
                 break;
         }

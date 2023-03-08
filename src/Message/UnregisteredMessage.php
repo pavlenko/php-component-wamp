@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Acknowledge sent by a Dealer to a Callee for successful unregistration.
  *
@@ -26,7 +24,7 @@ final class UnregisteredMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_UNREGISTERED;
+        return self::CODE_UNREGISTERED;
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Event dispatched by Broker to Subscribers for subscriptions the event was matching.
  *
@@ -52,7 +50,7 @@ final class EventMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_EVENT;
+        return self::CODE_EVENT;
     }
 
     /**

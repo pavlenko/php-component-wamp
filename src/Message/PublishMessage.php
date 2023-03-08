@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Sent by a Publisher to a Broker to publish an event.
  *
@@ -43,7 +41,7 @@ final class PublishMessage extends Message implements ActionInterface
      */
     public function getCode(): int
     {
-        return MessageCode::_PUBLISH;
+        return self::CODE_PUBLISH;
     }
 
     /**

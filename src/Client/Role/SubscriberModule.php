@@ -13,7 +13,6 @@ use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
-use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Util\EventsInterface;
 
 final class SubscriberModule implements ClientModuleInterface
@@ -99,10 +98,10 @@ final class SubscriberModule implements ClientModuleInterface
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
-            case MessageCode::_SUBSCRIBE:
+            case Message::CODE_SUBSCRIBE:
                 $this->processErrorMessageFromSubscribe($session, $message);
                 break;
-            case MessageCode::_UNSUBSCRIBE:
+            case Message::CODE_UNSUBSCRIBE:
                 $this->processErrorMessageFromUnsubscribe($session, $message);
                 break;
         }

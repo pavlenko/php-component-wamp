@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * <code>[ABORT, Details|dict, Reason|uri]</code>
  */
@@ -28,7 +26,7 @@ final class AbortMessage extends Message
 
     public function getCode(): int
     {
-       return MessageCode::_ABORT;
+       return self::CODE_ABORT;
     }
 
     public function getName(): string

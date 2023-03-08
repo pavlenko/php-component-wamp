@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Actual invocation of an endpoint sent by Dealer to a Callee.
  *
@@ -43,7 +41,7 @@ final class InvocationMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_INVOCATION;
+        return self::CODE_INVOCATION;
     }
 
     /**

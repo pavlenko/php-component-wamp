@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * The CHALLENGE message is used with certain Authentication Methods.
  * During authenticated session establishment, a Router sends a challenge message.
@@ -37,7 +35,7 @@ final class ChallengeMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_CHALLENGE;
+        return self::CODE_CHALLENGE;
     }
 
     /**

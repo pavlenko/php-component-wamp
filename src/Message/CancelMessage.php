@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * The CANCEL message is used with the Call Canceling advanced feature.
  * A Caller can cancel and issued call actively by sending a cancel message to the Dealer.
@@ -30,7 +28,7 @@ final class CancelMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_CANCEL;
+        return self::CODE_CANCEL;
     }
 
     /**

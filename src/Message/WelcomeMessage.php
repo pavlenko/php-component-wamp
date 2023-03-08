@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * <code>[WELCOME, Session|id, Details|dict]</code>
  */
@@ -31,7 +29,7 @@ final class WelcomeMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_WELCOME;
+        return self::CODE_WELCOME;
     }
 
     /**

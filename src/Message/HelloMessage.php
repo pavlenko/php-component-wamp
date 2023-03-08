@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Sent by a Client to initiate opening of a WAMP session to a Router attaching to a Realm.
  *
@@ -33,7 +31,7 @@ final class HelloMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_HELLO;
+        return self::CODE_HELLO;
     }
 
     /**

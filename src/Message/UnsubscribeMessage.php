@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Unsubscribe request sent by a Subscriber to a Broker to unsubscribe a subscription.
  *
@@ -33,7 +31,7 @@ final class UnsubscribeMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_UNSUBSCRIBE;
+        return self::CODE_UNSUBSCRIBE;
     }
 
     /**

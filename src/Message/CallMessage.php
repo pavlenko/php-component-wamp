@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Call as originally issued by the Caller to the Dealer.
  *
@@ -48,7 +46,7 @@ final class CallMessage extends Message implements ActionInterface
      */
     public function getCode(): int
     {
-        return MessageCode::_CALL;
+        return self::CODE_CALL;
     }
 
     /**

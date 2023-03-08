@@ -17,7 +17,6 @@ use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Message\YieldMessage;
-use PE\Component\WAMP\MessageCode;
 use PE\Component\WAMP\Router\Call;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
@@ -255,10 +254,10 @@ final class DealerModule implements RouterModuleInterface
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         switch ($message->getErrorMessageCode()) {
-            case MessageCode::_INVOCATION:
+            case Message::CODE_INVOCATION:
                 $this->processErrorMessageFromInvocation($session, $message);
                 break;
-            case MessageCode::_INTERRUPT:
+            case Message::CODE_INTERRUPT:
                 $this->processErrorMessageFromInterrupt($session, $message);
                 break;
         }

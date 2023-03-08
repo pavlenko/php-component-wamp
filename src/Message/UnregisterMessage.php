@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * A Callees request to unregister a previously established registration.
  *
@@ -33,7 +31,7 @@ final class UnregisterMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_UNREGISTER;
+        return self::CODE_UNREGISTER;
     }
 
     /**

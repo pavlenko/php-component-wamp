@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri]</code>
  * <code>[ERROR, REQUEST.Type|int, REQUEST.Request|id, Details|dict, Error|uri, Arguments|list]</code>
@@ -58,7 +56,7 @@ final class ErrorMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_ERROR;
+        return self::CODE_ERROR;
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace PE\Component\WAMP\Message;
 
-use PE\Component\WAMP\MessageCode;
-
 /**
  * Actual yield from an endpoint sent by a Callee to Dealer.
  *
@@ -36,7 +34,7 @@ final class YieldMessage extends Message
      */
     public function getCode(): int
     {
-        return MessageCode::_YIELD;
+        return self::CODE_YIELD;
     }
 
     /**
