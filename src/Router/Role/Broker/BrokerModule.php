@@ -62,9 +62,6 @@ final class BrokerModule implements RouterModuleInterface
         }
     }
 
-    /**
-     * @param Message $message
-     */
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof WelcomeMessage) {
@@ -77,10 +74,6 @@ final class BrokerModule implements RouterModuleInterface
         }
     }
 
-    /**
-     * @param SessionInterface $session
-     * @param PublishMessage $message
-     */
     private function processPublishMessage(SessionInterface $session, PublishMessage $message): void
     {
         $publicationID = Util::generateID();
@@ -110,10 +103,6 @@ final class BrokerModule implements RouterModuleInterface
         }
     }
 
-    /**
-     * @param SessionInterface $session
-     * @param SubscribeMessage $message
-     */
     private function processSubscribeMessage(SessionInterface $session, SubscribeMessage $message): void
     {
         $subscriptionID = Util::generateID();
@@ -130,10 +119,6 @@ final class BrokerModule implements RouterModuleInterface
         }
     }
 
-    /**
-     * @param SessionInterface $session
-     * @param UnsubscribeMessage $message
-     */
     private function processUnsubscribeMessage(SessionInterface $session, UnsubscribeMessage $message): void
     {
         if (isset($this->subscriptions[$message->getSubscriptionID()])) {

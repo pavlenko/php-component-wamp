@@ -3,6 +3,7 @@ namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Router\Authentication\AuthenticationModule;
 use PE\Component\WAMP\Router\Authentication\Method\TicketMethod;
+use PE\Component\WAMP\Router\Role\Broker\BrokerModule;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\Transport\WebSocketTransport;
 use React\EventLoop\Loop;
@@ -23,5 +24,6 @@ $authentication = new AuthenticationModule();
 $authentication->addMethod(new TicketMethod('foo'));
 
 $router->addModule($authentication);
-//TODO do not do anything until session is authenticated
+$router->addModule(new BrokerModule());
+
 $router->start();
