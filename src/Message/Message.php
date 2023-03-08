@@ -106,4 +106,9 @@ abstract class Message implements \JsonSerializable
     {
         return array_merge([$this->getCode()], $this->getParts());
     }
+
+    public function __toString()
+    {
+        return self::NAMES[$this->getCode()] . ' ' . json_encode($this);
+    }
 }

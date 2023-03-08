@@ -23,5 +23,5 @@ $authentication = new AuthenticationModule();
 $authentication->addMethod(new TicketMethod('foo'));
 
 $router->addModule($authentication);
-
+//TODO do not do anything until session is authenticated
 $router->start();

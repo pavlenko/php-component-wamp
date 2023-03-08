@@ -34,6 +34,7 @@ $client->addModule($authentication);
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 
+//TODO do not do anything until session is authenticated
 $events->attach(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) {
     $subscriber = new SubscriberAPI($session);
     $subscriber->subscribe('foo', function () {

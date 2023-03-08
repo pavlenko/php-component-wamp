@@ -86,17 +86,14 @@ final class Client
 
     public function processMessageReceived(Message $message): void
     {
-        $this->logger->info("Client: {$message->getName()} received");
-        $this->logger->debug(json_encode($message));
-
+        $this->logger->info('<-- ' . $message);
         $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $this->session);
     }
 
     public function processMessageSend(Message $message): void
     {
-        $this->logger->info("Client: {$message->getName()} send");
         $this->events->trigger(self::EVENT_MESSAGE_SEND, $message, $this->session);
-        $this->logger->debug(json_encode($message));
+        $this->logger->info('--> ' . $message);
     }
 
     public function processError(\Throwable $exception): void
@@ -133,7 +130,7 @@ final class Client
         $this->transport->start($this, $this->loop, $this->logger);
 
         if ($startLoop) {
-            $this->loop->run();//TODO add some logic for ensure loop running
+            $this->loop->run();
         }
     }
 

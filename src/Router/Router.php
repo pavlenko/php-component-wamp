@@ -74,22 +74,14 @@ final class Router
 
     public function processMessageReceived(ConnectionInterface $connection, Message $message): void
     {
-        $this->logger->info("Router: {$message->getName()} received");
-        $this->logger->debug(json_encode($message));
-
-        $session = $this->sessions[$connection];
-
-        $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $session);
+        $this->logger->info('<-- ' . $message);
+        $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $this->sessions[$connection]);
     }
 
     public function processMessageSend(ConnectionInterface $connection, Message $message): void
     {
-        $this->logger->info("Router: {$message->getName()} send");
-
-        $session = $this->sessions[$connection];
-
-        $this->events->trigger(self::EVENT_MESSAGE_SEND, $message, $session);
-        $this->logger->debug(json_encode($message));
+        $this->events->trigger(self::EVENT_MESSAGE_SEND, $message, $this->sessions[$connection]);
+        $this->logger->info('--> ' . $message);
     }
 
     public function processError(ConnectionInterface $connection, \Throwable $exception): void
