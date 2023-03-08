@@ -2,6 +2,9 @@
 
 namespace PE\Component\WAMP\Client;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class RegistrationCollection
 {
     /**

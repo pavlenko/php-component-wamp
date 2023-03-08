@@ -4,20 +4,23 @@ namespace PE\Component\WAMP\Client;
 
 use React\Promise\Deferred;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class Registration
 {
     private string $procedureURI;
     private \Closure $callback;
-    private int $registrationID;
-    private int $registerRequestID;
-    private int $unregisterRequestID;
-    private Deferred $registerDeferred;
-    private Deferred $unregisterDeferred;
+    private int $registrationID = 0;
+    private int $registerRequestID = 0;
+    private int $unregisterRequestID = 0;
+    private ?Deferred $registerDeferred = null;
+    private ?Deferred $unregisterDeferred = null;
 
     public function __construct(string $procedureURI, \Closure $callback)
     {
-        $this->setProcedureURI($procedureURI);
-        $this->setCallback($callback);
+        $this->procedureURI = $procedureURI;
+        $this->callback     = $callback;
     }
 
     public function getProcedureURI(): string
@@ -25,19 +28,9 @@ final class Registration
         return $this->procedureURI;
     }
 
-    public function setProcedureURI(string $procedureURI): void
-    {
-        $this->procedureURI = $procedureURI;
-    }
-
     public function getCallback(): \Closure
     {
         return $this->callback;
-    }
-
-    public function setCallback(\Closure $callback): void
-    {
-        $this->callback = $callback;
     }
 
     public function getRegistrationID(): int
@@ -70,7 +63,7 @@ final class Registration
         $this->unregisterRequestID = $unregisterRequestID;
     }
 
-    public function getRegisterDeferred(): Deferred
+    public function getRegisterDeferred(): ?Deferred
     {
         return $this->registerDeferred;
     }
@@ -80,7 +73,7 @@ final class Registration
         $this->registerDeferred = $deferred;
     }
 
-    public function getUnregisterDeferred(): Deferred
+    public function getUnregisterDeferred(): ?Deferred
     {
         return $this->unregisterDeferred;
     }

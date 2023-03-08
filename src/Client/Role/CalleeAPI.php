@@ -74,7 +74,6 @@ final class CalleeAPI
         if ($registration = $registrations->findByProcedureURI($procedureURI)) {
             $registration->getRegisterDeferred()->reject();
 
-            $registration->setCallback(null);
             $registration->setUnregisterRequestID($requestID);
             $registration->setUnregisterDeferred($deferred = new Deferred());
 
