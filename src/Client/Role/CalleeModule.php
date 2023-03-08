@@ -18,8 +18,8 @@ use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\Util\EventsInterface;
 use React\Promise\CancellablePromiseInterface;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 
 final class CalleeModule implements ClientModuleInterface
 {
@@ -116,7 +116,7 @@ final class CalleeModule implements ClientModuleInterface
 
                 if (!($result instanceof PromiseInterface)) {
                     // If result is not a promise - wrap it into fulfilled promise
-                    $result = new FulfilledPromise($result);
+                    $result = resolve($result);
                 }
 
                 // Check if promise is cancellable and add canceller to session if true

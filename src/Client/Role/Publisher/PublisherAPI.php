@@ -6,8 +6,8 @@ use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 
 final class PublisherAPI
 {
@@ -33,6 +33,6 @@ final class PublisherAPI
 
         $this->session->send(new PublishMessage($requestID, $options, $topic, $arguments, $argumentsKw));
 
-        return $deferred ? $deferred->promise() : new FulfilledPromise();
+        return $deferred ? $deferred->promise() : resolve();
     }
 }

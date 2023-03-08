@@ -10,7 +10,7 @@ use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
+use function React\Promise\reject;
 
 final class SubscriberAPI
 {
@@ -78,6 +78,6 @@ final class SubscriberAPI
             return $deferred->promise();
         }
 
-        return new RejectedPromise();
+        return reject();
     }
 }
