@@ -5,10 +5,10 @@ namespace PE\Component\WAMP\Client;
 use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
-use PE\Component\WAMP\Events;
 use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\Util\Events;
 use PE\Component\WAMP\Util\EventsInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -16,8 +16,6 @@ use React\EventLoop\LoopInterface;
 
 final class Client
 {
-    use Events;
-
     const RECONNECT_TIMEOUT  = 1.5;
     const RECONNECT_ATTEMPTS = 15;
 
@@ -54,7 +52,7 @@ final class Client
         $this->realm   = $realm;
         $this->factory = $factory;
         $this->loop    = $loop;
-        $this->events  = $events ?: new \PE\Component\WAMP\Util\Events();
+        $this->events  = $events ?: new Events();
         $this->logger  = $logger ?: new NullLogger();
 
         $this->addModule(new SessionModule());
@@ -135,7 +133,7 @@ final class Client
         $this->transport->start($this, $this->loop, $this->logger);
 
         if ($startLoop) {
-            $this->loop->run();
+            $this->loop->run();//TODO add some logic for ensure loop running
         }
     }
 

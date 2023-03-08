@@ -16,43 +16,21 @@ use React\Socket\Server;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Serializer\Serializer;
+use React\Socket\SocketServer;
 
 final class WebSocketTransport implements TransportInterface, MessageComponentInterface, WsServerInterface
 {
-    /**
-     * @var string
-     */
     private string $host;
-
-    /**
-     * @var int
-     */
     private int $port;
-
-    /**
-     * @var bool
-     */
     private bool $secure;
 
     /**
      * @var \SplObjectStorage|ConnectionInterface[]
      */
     private $connections;
-
-    /**
-     * @var IoServer
-     */
-    private IoServer $server;
-
-    /**
-     * @var Router
-     */
+    private ?IoServer $server = null;
     private Router $router;
-
-    /**
-     * @var \SessionHandlerInterface|null
-     */
-    private ?\SessionHandlerInterface $sessionHandler;
+    private ?\SessionHandlerInterface $sessionHandler = null;
 
     /**
      * @param string $host
@@ -101,7 +79,7 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
 
         $this->server = new IoServer(
             new HttpServer($wsServer),
-            new Server($uri, $loop),
+            new SocketServer($uri, [], $loop),
             $loop
         );
     }
