@@ -19,35 +19,22 @@ final class AuthenticationModule implements RouterModuleInterface
      */
     private array $methods = [];
 
-    /**
-     * @param MethodInterface $method
-     */
     public function addMethod(MethodInterface $method): void
     {
         $this->methods[] = $method;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function attach(EventsInterface $events): void
     {
         $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], 10);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function detach(EventsInterface $events): void
     {
         $events->detach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    /**
-     * @param Message $message
-     * @param SessionInterface $session
-     */
-    public function onMessageReceived(Message $message, SessionInterface $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): bool
     {
         switch (true) {
             case ($message instanceof HelloMessage):
@@ -63,7 +50,7 @@ final class AuthenticationModule implements RouterModuleInterface
      * @param SessionInterface $session
      * @param HelloMessage $message
      */
-    private function processHelloMessage(SessionInterface $session, HelloMessage $message): void
+    private function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
         $methods = (array) $message->getDetail('authmethods', []);
 

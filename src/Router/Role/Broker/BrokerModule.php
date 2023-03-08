@@ -30,37 +30,24 @@ final class BrokerModule implements RouterModuleInterface
      */
     private array $subscriptions = [];
 
-    /**
-     * @param BrokerFeatureInterface $feature
-     */
     public function addFeature(BrokerFeatureInterface $feature): void
     {
         $this->features[get_class($feature)] = $feature;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function attach(EventsInterface $events): void
     {
         $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $events->attach(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function detach(EventsInterface $events): void
     {
         $events->detach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
         $events->detach(Router::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    /**
-     * @param Message $message
-     * @param SessionInterface $session
-     */
-    public function onMessageReceived(Message $message, SessionInterface $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): bool
     {
         switch (true) {
             case ($message instanceof PublishMessage):
@@ -78,7 +65,7 @@ final class BrokerModule implements RouterModuleInterface
     /**
      * @param Message $message
      */
-    public function onMessageSend(Message $message): void
+    public function onMessageSend(Message $message): bool
     {
         if ($message instanceof WelcomeMessage) {
             $features = [];

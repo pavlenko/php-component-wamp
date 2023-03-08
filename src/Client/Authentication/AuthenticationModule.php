@@ -25,7 +25,7 @@ final class AuthenticationModule implements ClientModuleInterface
 
     public function attach(EventsInterface $events): void
     {
-        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], -10);
         $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
@@ -38,14 +38,14 @@ final class AuthenticationModule implements ClientModuleInterface
         $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
-    public function onMessageReceived(Message $message, SessionInterface $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): bool
     {
         if ($message instanceof ChallengeMessage) {
             $this->processChallengeMessage($session, $message);
         }
     }
 
-    public function onMessageSend(Message $message, SessionInterface $session): void
+    public function onMessageSend(Message $message, SessionInterface $session): bool
     {
         if ($message instanceof HelloMessage) {
             foreach ($this->methods as $method) {

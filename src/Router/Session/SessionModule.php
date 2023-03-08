@@ -14,41 +14,28 @@ use PE\Component\WAMP\Util\EventsInterface;
 
 final class SessionModule implements RouterModuleInterface
 {
-    /**
-     * @inheritDoc
-     */
     public function attach(EventsInterface $events): void
     {
         $events->attach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function detach(EventsInterface $events): void
     {
         $events->detach(Router::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
-    /**
-     * @param Message $message
-     * @param SessionInterface $session
-     */
-    public function onMessageReceived(Message $message, SessionInterface $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): bool
     {
         switch (true) {
             case ($message instanceof HelloMessage):
-                $this->processHelloMessage($session, $message);
+                $this->processHelloMessage($session/*, $message*/);
                 break;
             case ($message instanceof GoodbyeMessage):
-                $this->processGoodbyeMessage($session, $message);
+                $this->processGoodbyeMessage($session/*, $message*/);
                 break;
         }
     }
 
-    /**
-     * @param SessionInterface $session
-     */
     private function processHelloMessage(SessionInterface $session/*, HelloMessage $message*/): void
     {
         $sessionID = Util::generateID();
@@ -57,9 +44,6 @@ final class SessionModule implements RouterModuleInterface
         $session->send(new WelcomeMessage($sessionID, []));
     }
 
-    /**
-     * @param SessionInterface $session
-     */
     private function processGoodbyeMessage(SessionInterface $session/*, GoodbyeMessage $message*/): void
     {
         $session->send(new GoodbyeMessage([], Message::ERROR_GOODBYE_AND_OUT));

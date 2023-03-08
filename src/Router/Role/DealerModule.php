@@ -67,7 +67,7 @@ final class DealerModule implements RouterModuleInterface
      * @param Message $message
      * @param SessionInterface $session
      */
-    public function onMessageReceived(Message $message, SessionInterface $session): void
+    public function onMessageReceived(Message $message, SessionInterface $session): bool
     {
         switch (true) {
             case ($message instanceof RegisterMessage):
@@ -94,7 +94,7 @@ final class DealerModule implements RouterModuleInterface
     /**
      * @param Message $message
      */
-    public function onMessageSend(Message $message): void
+    public function onMessageSend(Message $message): bool
     {
         if ($message instanceof WelcomeMessage) {
             $message->addFeatures('dealer', [
