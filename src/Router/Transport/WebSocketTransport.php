@@ -12,7 +12,6 @@ use Ratchet\WebSocket\MessageComponentInterface;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\WebSocket\WsServerInterface;
 use React\EventLoop\LoopInterface;
-use React\Socket\Server;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Serializer\Serializer;

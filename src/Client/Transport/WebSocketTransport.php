@@ -39,8 +39,8 @@ final class WebSocketTransport implements TransportInterface
         );
 
         $promise = $connector($url, ['wamp.2.json'], []);
-        $promise->then(
-            function (WebSocket $socket) use ($client) {
+        $promise
+            ->then(function (WebSocket $socket) use ($client) {
                 $connection = new WebSocketConnection($socket);
                 $connection->setSerializer(new Serializer());
 
@@ -57,11 +57,10 @@ final class WebSocketTransport implements TransportInterface
                 $socket->on('error', function ($error) use ($client) {
                     $client->processError($error);
                 });
-            },
-            function (\Exception $exception) use ($client) {
+            })
+            ->otherwise(function(\Throwable $throwable) use ($client) {
                 $client->processClose('unreachable');
-                $client->processError($exception);
-            }
-        );
+                $client->processError($throwable);
+            });
     }
 }

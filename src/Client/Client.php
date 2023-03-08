@@ -40,7 +40,7 @@ final class Client
     private LoopInterface $loop;
     private EventsInterface $events;
     private LoggerInterface $logger;
-    private ?SessionInterface $session;
+    private ?SessionInterface $session = null;
 
     /**
      * @var ClientModuleInterface[]
