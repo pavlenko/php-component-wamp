@@ -7,6 +7,10 @@ use React\Promise\Deferred;
 
 /**
  * @property array<int, Deferred> $publishRequests
+ * @property RegistrationCollection $registrations
+ * @property array<int, callable> $invocationCancellers
+ * @property CallCollection $callRequests
+ * @property SubscriptionCollection $subscriptions
  */
 interface SessionInterface extends SessionBaseInterface
 {

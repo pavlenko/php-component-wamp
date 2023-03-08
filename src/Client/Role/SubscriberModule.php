@@ -4,7 +4,6 @@ namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Client\SubscriptionCollection;
 use PE\Component\WAMP\Message\ErrorMessage;

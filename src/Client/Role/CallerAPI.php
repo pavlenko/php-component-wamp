@@ -4,24 +4,18 @@ namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Call;
 use PE\Component\WAMP\Client\CallCollection;
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
-use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 
 final class CallerAPI
 {
-    /**
-     * @var SessionBaseTrait
-     */
-    private SessionBaseTrait $session;
+    private SessionInterface $session;
 
-    /**
-     * @param SessionBaseTrait $session
-     */
-    public function __construct(SessionBaseTrait $session)
+    public function __construct(SessionInterface $session)
     {
         $this->session = $session;
     }

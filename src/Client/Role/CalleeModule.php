@@ -89,12 +89,6 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-    /**
-     * @param Session           $session
-     * @param InvocationMessage $message
-     *
-     * @throws \InvalidArgumentException
-     */
     private function processInvocationMessage(SessionInterface $session, InvocationMessage $message)
     {
         $registrations = $session->registrations ?: new RegistrationCollection();

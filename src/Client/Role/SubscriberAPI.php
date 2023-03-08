@@ -2,11 +2,11 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Client\Subscription;
 use PE\Component\WAMP\Client\SubscriptionCollection;
 use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
-use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
@@ -14,27 +14,14 @@ use function React\Promise\reject;
 
 final class SubscriberAPI
 {
-    /**
-     * @var SessionBaseTrait
-     */
-    private SessionBaseTrait $session;
+    private SessionInterface $session;
 
-    /**
-     * @param SessionBaseTrait $session
-     */
-    public function __construct(SessionBaseTrait $session)
+    public function __construct(SessionInterface $session)
     {
         $this->session = $session;
     }
 
-    /**
-     * @param string $topic
-     * @param callable   $callback
-     * @param array|null $options
-     *
-     * @return PromiseInterface
-     */
-    public function subscribe(string $topic, callable $callback, array $options = null): PromiseInterface
+    public function subscribe(string $topic, \Closure $callback, array $options = null): PromiseInterface
     {
         $requestID = Util::generateID();
         $options   = $options ?: [];
@@ -54,15 +41,7 @@ final class SubscriberAPI
         return $deferred->promise();
     }
 
-    /**
-     * @param string $topic
-     * @param callable $callback
-     *
-     * @return PromiseInterface
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function unsubscribe(string $topic, callable $callback): PromiseInterface
+    public function unsubscribe(string $topic, \Closure $callback): PromiseInterface
     {
         $requestID     = Util::generateID();
         $subscriptions = $this->session->subscriptions ?: new SubscriptionCollection();
