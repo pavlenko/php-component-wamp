@@ -11,7 +11,6 @@ use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\PublishedMessage;
 use PE\Component\WAMP\Util\EventsInterface;
-use React\Promise\Deferred;
 
 final class PublisherModule implements ClientModuleInterface
 {
@@ -68,7 +67,6 @@ final class PublisherModule implements ClientModuleInterface
     private function processPublishedMessage(SessionInterface $session, PublishedMessage $message): void
     {
         if (isset($session->publishRequests[$id = $message->getRequestID()])) {
-            /* @var $deferred Deferred */
             $deferred = $session->publishRequests[$id];
             $deferred->resolve();
 
@@ -79,7 +77,6 @@ final class PublisherModule implements ClientModuleInterface
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         if (isset($session->publishRequests[$id = $message->getErrorRequestID()])) {
-            /* @var $deferred Deferred */
             $deferred = $session->publishRequests[$id];
             $deferred->resolve();
 

@@ -2,8 +2,8 @@
 
 namespace PE\Component\WAMP\Client\Role\Publisher;
 
+use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\PublishMessage;
-use PE\Component\WAMP\SessionBaseTrait;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
@@ -11,9 +11,9 @@ use function React\Promise\resolve;
 
 final class PublisherAPI
 {
-    private SessionBaseTrait $session;
+    private SessionInterface $session;
 
-    public function __construct(SessionBaseTrait $session)
+    public function __construct(SessionInterface $session)
     {
         $this->session = $session;
     }
