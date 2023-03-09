@@ -25,22 +25,18 @@ final class WAMPCRAMethod implements MethodInterface
         $this->users    = $users;//TODO collection of user objects
     }
 
-    public function getName(): string
-    {
-        return 'wampcra';
-    }
-
     public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
-        $authID = $message->getDetail('authid');
+        $methods = (array) $message->getDetail('authmethods');
+        $authID  = $message->getDetail('authid');
 
-        if (!empty($authID) && array_key_exists($authID, $this->users)) {
+        if (in_array('wampcra', $methods) && !empty($authID) && array_key_exists($authID, $this->users)) {
             $sessionID = Util::generateID();
 
             $session->challenge = json_encode([
                 'authid'       => $authID,
                 'authrole'     => $this->users[$authID]['role'],
-                'authmethod'   => $this->getName(),
+                'authmethod'   => 'wampcra',
                 'authprovider' => $this->provider,
                 'nonce'        => md5((string) mt_rand()),
                 'timestamp'    => date(DATE_ATOM),
@@ -48,14 +44,19 @@ final class WAMPCRAMethod implements MethodInterface
             ]);
 
             $session->setSessionID($sessionID);
-            $session->send(new ChallengeMessage($this->getName(), ['challenge' => $session->challenge]));
+            $session->send(new ChallengeMessage('wampcra', ['challenge' => $session->challenge]));
+            $session->authMethod = 'wampcra';
             return true;
         }
         return false;
     }
 
-    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): bool
     {
+        if ('wampcra' !== $session->authMethod) {
+            return false;
+        }
+
         $challenge = $session->challenge;
         $signature = $message->getSignature();
 
@@ -68,5 +69,6 @@ final class WAMPCRAMethod implements MethodInterface
         } else {
             $session->send(new AbortMessage([], Message::ERROR_AUTHORIZATION_FAILED));
         }
+        return true;
     }
 }

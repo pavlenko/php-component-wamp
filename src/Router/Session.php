@@ -13,7 +13,6 @@ final class Session implements SessionInterface
     }
 
     private Router $router;
-    private ?string $authMethod;
 
     public function __construct(ConnectionInterface $connection, Router $router)
     {
@@ -27,15 +26,5 @@ final class Session implements SessionInterface
     {
         $this->router->processMessageSend($this->connection, $message);
         $this->connection->send($message);
-    }
-
-    public function getAuthMethod(): ?string
-    {
-        return $this->authMethod;
-    }
-
-    public function setAuthMethod(string $authMethod): void
-    {
-        $this->authMethod = $authMethod;
     }
 }

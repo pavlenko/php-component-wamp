@@ -18,11 +18,6 @@ final class CookieMethod implements MethodInterface
         $this->tokenKeys = $tokenKeys;
     }
 
-    public function getName(): string
-    {
-        return 'cookie';//<-- this is non-standard name but required by api
-    }
-
     public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
         if ($session->session && $session->session instanceof SymfonySessionInterface) {
@@ -42,8 +37,8 @@ final class CookieMethod implements MethodInterface
         return false;
     }
 
-    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): bool
     {
-        // Do nothing
+        return false;
     }
 }

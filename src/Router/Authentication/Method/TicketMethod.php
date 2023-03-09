@@ -13,27 +13,34 @@ use PE\Component\WAMP\Util;
 
 final class TicketMethod implements MethodInterface
 {
-    private string $ticket;
+    /**
+     * @var string[]
+     */
+    private array $tickets;
 
-    public function __construct(string $ticket)
+    public function __construct(array $tickets)
     {
-        $this->ticket = $ticket;
-    }
-
-    public function getName(): string
-    {
-        return 'ticket';
+        $this->tickets = $tickets;
     }
 
     public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
-        $session->send(new ChallengeMessage($this->getName(), []));
+        $methods = (array) $message->getDetail('authmethods');
+        if (!in_array('ticket', $methods) || empty($this->tickets)) {
+            return false;
+        }
+
+        $session->send(new ChallengeMessage('ticket', []));
+        $session->authMethod = 'ticket';
         return true;
     }
 
-    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): bool
     {
-        if ($message->getSignature() === $this->ticket) {
+        if ('ticket' !== $session->authMethod) {
+            return false;
+        }
+        if (in_array($message->getSignature(), $this->tickets)) {
             $sessionID = Util::generateID();
 
             $session->setSessionID($sessionID);
@@ -41,6 +48,7 @@ final class TicketMethod implements MethodInterface
         } else {
             $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NOT_AUTHORIZED));
         }
+        return true;
     }
 }
 

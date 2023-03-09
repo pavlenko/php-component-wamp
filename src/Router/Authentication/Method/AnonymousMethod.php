@@ -10,13 +10,13 @@ use PE\Component\WAMP\Util;
 
 final class AnonymousMethod implements MethodInterface
 {
-    public function getName(): string
-    {
-        return 'anonymous';
-    }
-
     public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
+        $methods = (array) $message->getDetail('authmethods');
+        if (!in_array('anonymous', $methods)) {
+            return false;
+        }
+
         $sessionID = Util::generateID();
 
         $session->setSessionID($sessionID);
@@ -24,8 +24,8 @@ final class AnonymousMethod implements MethodInterface
         return true;
     }
 
-    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): bool
     {
-        // DO NOTHING
+        return 'anonymous' === $session->authMethod;
     }
 }

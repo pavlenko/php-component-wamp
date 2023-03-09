@@ -7,21 +7,11 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface as SymfonySessionI
 
 /**
  * @property SymfonySessionInterface|null $session
+ * @property string|null $challenge
  * @property string|null $token
+ * @property string|null $authMethod
  */
 interface SessionInterface extends SessionBaseInterface
 {
-    /**
-     * Get successfully used authentication method
-     *
-     * @return string|null
-     */
-    public function getAuthMethod(): ?string;
-
-    /**
-     * Set successfully used authentication method
-     *
-     * @param string $authMethod
-     */
-    public function setAuthMethod(string $authMethod): void;
+    // Nothing to implement, just typed interface
 }

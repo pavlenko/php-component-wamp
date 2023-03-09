@@ -9,11 +9,6 @@ use PE\Component\WAMP\Router\SessionInterface;
 interface MethodInterface
 {
     /**
-     * @return string
-     */
-    public function getName(): string;
-
-    /**
      * Handle HELLO message from client
      *
      * @param SessionInterface $session
@@ -28,6 +23,8 @@ interface MethodInterface
      *
      * @param SessionInterface $session
      * @param AuthenticateMessage $message
+     *
+     * @return bool Return false for bypass to other methods
      */
-    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void;
+    public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): bool;
 }
