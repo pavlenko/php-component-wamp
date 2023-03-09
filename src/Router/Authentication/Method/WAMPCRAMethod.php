@@ -30,7 +30,7 @@ final class WAMPCRAMethod implements MethodInterface
         return 'wampcra';
     }
 
-    public function processHelloMessage(SessionInterface $session, HelloMessage $message): void
+    public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
         $authID = $message->getDetail('authid');
 
@@ -38,7 +38,7 @@ final class WAMPCRAMethod implements MethodInterface
             $sessionID = Util::generateID();
 
             $session->challenge = json_encode([
-                'authid'       => 'accepted auth id',
+                'authid'       => $authID,
                 'authrole'     => $this->users[$authID]['role'],
                 'authmethod'   => $this->getName(),
                 'authprovider' => $this->provider,
@@ -49,7 +49,9 @@ final class WAMPCRAMethod implements MethodInterface
 
             $session->setSessionID($sessionID);
             $session->send(new ChallengeMessage($this->getName(), ['challenge' => $session->challenge]));
-        }//TODO else
+            return true;
+        }
+        return false;
     }
 
     public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void

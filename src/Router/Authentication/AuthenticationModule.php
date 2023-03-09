@@ -52,8 +52,7 @@ final class AuthenticationModule implements RouterModuleInterface
         $methods = (array) $message->getDetail('authmethods', []);
 
         foreach ($this->methods as $method) {
-            if (in_array($method->getName(), $methods, true)) {
-                $method->processHelloMessage($session, $message);
+            if (in_array($method->getName(), $methods, true) && $method->processHelloMessage($session, $message)) {
                 $session->setAuthMethod($method->getName());
                 return;
             }

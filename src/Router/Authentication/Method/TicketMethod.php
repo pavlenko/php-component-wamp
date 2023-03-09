@@ -25,9 +25,10 @@ final class TicketMethod implements MethodInterface
         return 'ticket';
     }
 
-    public function processHelloMessage(SessionInterface $session, HelloMessage $message): void
+    public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
         $session->send(new ChallengeMessage($this->getName(), []));
+        return true;
     }
 
     public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void

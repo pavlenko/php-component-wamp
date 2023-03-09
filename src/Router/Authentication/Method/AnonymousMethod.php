@@ -15,12 +15,13 @@ final class AnonymousMethod implements MethodInterface
         return 'anonymous';
     }
 
-    public function processHelloMessage(SessionInterface $session, HelloMessage $message): void
+    public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool
     {
         $sessionID = Util::generateID();
 
         $session->setSessionID($sessionID);
         $session->send(new WelcomeMessage($sessionID, []));
+        return true;
     }
 
     public function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void

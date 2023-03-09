@@ -14,12 +14,18 @@ interface MethodInterface
     public function getName(): string;
 
     /**
+     * Handle HELLO message from client
+     *
      * @param SessionInterface $session
      * @param HelloMessage $message
+     *
+     * @return bool Return false for bypass to other methods
      */
-    public function processHelloMessage(SessionInterface $session, HelloMessage $message): void;
+    public function processHelloMessage(SessionInterface $session, HelloMessage $message): bool;
 
     /**
+     * Handle AUTHENTICATE message
+     *
      * @param SessionInterface $session
      * @param AuthenticateMessage $message
      */
