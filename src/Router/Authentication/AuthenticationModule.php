@@ -52,6 +52,7 @@ final class AuthenticationModule implements RouterModuleInterface
         $methods = (array) $message->getDetail('authmethods', []);
 
         foreach ($this->methods as $method) {
+            //TODO add supports() to methods instead of check by name here
             if (in_array($method->getName(), $methods, true) && $method->processHelloMessage($session, $message)) {
                 $session->setAuthMethod($method->getName());
                 return;
@@ -70,6 +71,7 @@ final class AuthenticationModule implements RouterModuleInterface
     private function processAuthenticateMessage(SessionInterface $session, AuthenticateMessage $message): void
     {
         foreach ($this->methods as $method) {
+            //TODO same as above but check selected method, maybe move check to method classes
             if ($method->getName() === $session->getAuthMethod()) {
                 $method->processAuthenticateMessage($session, $message);
                 return;
