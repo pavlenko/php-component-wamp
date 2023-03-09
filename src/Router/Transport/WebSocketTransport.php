@@ -75,7 +75,7 @@ final class WebSocketTransport implements TransportInterface, MessageComponentIn
             $this->server->socket->close();
         }
 
-        foreach ($this->connections as $k) {//TODO stop connection?
+        foreach ($this->connections as $k) {
             $this->connections[$k]->shutdown();
         }
     }

@@ -9,9 +9,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 final class WebSocketConnection extends Connection
 {
-    /**
-     * @var ConnectionInterface
-     */
     private ConnectionInterface $connection;
 
     public function __construct(ConnectionInterface $connection)
@@ -19,25 +16,16 @@ final class WebSocketConnection extends Connection
         $this->connection = $connection;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function send(Message $message): void
     {
         $this->connection->send($this->getSerializer()->serialize($message));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function close(): void
     {
         $this->connection->close();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function ping(): void
     {
         // TODO: Implement ping() method.
