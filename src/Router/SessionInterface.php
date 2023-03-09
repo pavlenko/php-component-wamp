@@ -3,7 +3,12 @@
 namespace PE\Component\WAMP\Router;
 
 use PE\Component\WAMP\SessionBaseInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface as SymfonySessionInterface;
 
+/**
+ * @property SymfonySessionInterface|null $session
+ * @property string|null $token
+ */
 interface SessionInterface extends SessionBaseInterface
 {
     /**

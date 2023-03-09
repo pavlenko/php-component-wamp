@@ -18,7 +18,9 @@ final class Session implements SessionInterface
     public function __construct(ConnectionInterface $connection, Router $router)
     {
         $this->constructor($connection);
-        $this->router = $router;
+
+        $this->router  = $router;
+        $this->session = $connection->getSession();
     }
 
     public function send(Message $message): void
