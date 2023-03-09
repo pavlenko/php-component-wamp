@@ -52,10 +52,7 @@ final class AuthenticationModule implements ClientModuleInterface
                 $method->processHelloMessage($session, $message);
             }
 
-            $methods = array_map(static function (MethodInterface $method) {
-                return $method->getName();
-            }, $this->methods);
-
+            $methods = array_map(fn(MethodInterface $method) => $method->getName(), $this->methods);
             $message->setDetail('authmethods', $methods);
         }
     }

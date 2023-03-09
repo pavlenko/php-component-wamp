@@ -2,10 +2,9 @@
 - Common
   - Remove create object instances everywhere when possible
 - Authentication
-  - Transport-level Authentication
+  - Transport-level Authentication (router only)
     - Cookie-based Authentication
     - TLS Certificate Authentication
-  - Challenge Response Authentication
 
 ## Message flow
 HELLO
