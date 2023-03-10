@@ -27,10 +27,7 @@ $client = new Client('realm1', new Factory(), $loop = Loop::get(), $events = new
 $client->setTransport($transport);
 $client->setReconnectAttempts(3);
 
-$authentication = new AuthenticationModule();
-$authentication->addMethod(new TicketMethod('foo'));
-
-$client->addModule($authentication);
+$client->addModule(new AuthenticationModule(new TicketMethod('foo')));
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 

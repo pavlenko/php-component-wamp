@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Authentication;
 
+use PE\Component\WAMP\Client\Authentication\Method\AnonymousMethod;
 use PE\Component\WAMP\Client\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
@@ -18,9 +19,12 @@ final class AuthenticationModule implements ClientModuleInterface
      */
     private array $methods = [];
 
-    public function addMethod(MethodInterface $method): void
+    /**
+     * @param MethodInterface ...$methods
+     */
+    public function __construct(MethodInterface ...$methods)
     {
-        $this->methods[] = $method;
+        $this->methods = !empty($methods) ? $methods : [new AnonymousMethod()];
     }
 
     public function attach(EventsInterface $events): void
