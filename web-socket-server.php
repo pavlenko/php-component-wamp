@@ -21,7 +21,7 @@ $router = new Router(new Factory(), Loop::get(), null, $logger);
 $router->setTransport($transport);
 
 $authentication = new AuthenticationModule();
-$authentication->addMethod(new TicketMethod('foo'));
+$authentication->addMethod(new TicketMethod(['foo']));
 
 $router->addModule($authentication);
 $router->addModule(new BrokerModule());

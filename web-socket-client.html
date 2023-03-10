@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WAMP client test</title>
+</head>
+<body>
+<div id="messages"></div>
+<script src="wampy.min.js"></script>
+<script>
+    async function init() {
+        console.log(Wampy)
+        const wampy = new Wampy('127.0.0.1:1337', {
+            realm: 'realm1',
+            authid: 'joe',
+            authmethods: ['ticket'],
+            onChallenge: (method, info) => {
+                console.log('Requested challenge with ', method, info);
+                return 'foo';
+            }
+        });
+
+        try {
+            await wampy.connect();
+        } catch (e) {
+            console.log('connection failed', e);
+        }
+
+        try {
+            await wampy.subscribe('foo', (eventData) => {
+                console.log('Received event:', eventData);
+            });
+        } catch (e) {
+            console.log('subscription failed', e);
+        }
+
+        // try {
+        //     const res = await wampy.call('get.server.time');
+        //     console.log('RPC called. Server time:', res.argsDict.serverTime);
+        // } catch (e) {
+        //     console.log('RPC call failed', e);
+        // }
+
+        // Somewhere else for example
+        await wampy.publish('foo');
+
+        // or just ignore promise if you don't need it
+        //wampy.publish('client.message', 'Hi guys!');
+    }
+    init();
+</script>
+</body>
+</html>
