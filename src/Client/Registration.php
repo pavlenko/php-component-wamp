@@ -12,15 +12,17 @@ final class Registration
     private string $procedureURI;
     private \Closure $callback;
     private int $registrationID = 0;
-    private int $registerRequestID = 0;
+    private int $registerRequestID;
     private int $unregisterRequestID = 0;
-    private ?Deferred $registerDeferred = null;
+    private Deferred $registerDeferred;
     private ?Deferred $unregisterDeferred = null;
 
-    public function __construct(string $procedureURI, \Closure $callback)
+    public function __construct(string $procedureURI, \Closure $callback, $requestID, Deferred $registerDeferred)
     {
-        $this->procedureURI = $procedureURI;
-        $this->callback     = $callback;
+        $this->procedureURI      = $procedureURI;
+        $this->callback          = $callback;
+        $this->registerRequestID = $requestID;
+        $this->registerDeferred  = $registerDeferred;
     }
 
     public function getProcedureURI(): string
@@ -48,11 +50,6 @@ final class Registration
         return $this->registerRequestID;
     }
 
-    public function setRegisterRequestID(int $registerRequestID): void
-    {
-        $this->registerRequestID = $registerRequestID;
-    }
-
     public function getUnregisterRequestID(): int
     {
         return $this->unregisterRequestID;
@@ -63,14 +60,9 @@ final class Registration
         $this->unregisterRequestID = $unregisterRequestID;
     }
 
-    public function getRegisterDeferred(): ?Deferred
+    public function getRegisterDeferred(): Deferred
     {
         return $this->registerDeferred;
-    }
-
-    public function setRegisterDeferred(Deferred $deferred): void
-    {
-        $this->registerDeferred = $deferred;
     }
 
     public function getUnregisterDeferred(): ?Deferred

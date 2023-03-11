@@ -6,10 +6,13 @@ use PE\Component\WAMP\Client\Registration;
 use PE\Component\WAMP\Client\Role\CalleeAPI;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\RegisterMessage;
+use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Tests\Client\Session\SessionStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 
 final class CalleeAPITest extends TestCase
 {
@@ -26,7 +29,7 @@ final class CalleeAPITest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $session = $this->createSessionMock();
-        $session->registrations = [new Registration('uri', fn() => null)];
+        $session->registrations = [new Registration('uri', fn() => null, 0, new Deferred())];
 
         $api = new CalleeAPI($session);
         $api->register('uri', fn() => null);
@@ -38,6 +41,29 @@ final class CalleeAPITest extends TestCase
         $session->expects(self::once())->method('send')->with(self::isInstanceOf(RegisterMessage::class));
 
         $res = (new CalleeAPI($session))->register('uri', fn() => null);
+
+        self::assertInstanceOf(PromiseInterface::class, $res);
+    }
+
+    public function testUnregister_fail()
+    {
+        $session = $this->createSessionMock();
+
+        $res = (new CalleeAPI($session))->unregister('uri');
+
+        self::assertInstanceOf(RejectedPromise::class, $res);
+    }
+
+    public function testUnregister_pass()
+    {
+        $session = $this->createSessionMock();
+        $session->expects(self::once())->method('send')->with(self::isInstanceOf(UnregisterMessage::class));
+
+        $registration = new Registration('uri', fn() => null, 0, new Deferred());
+
+        $session->registrations = [$registration];
+
+        $res = (new CalleeAPI($session))->unregister('uri');
 
         self::assertInstanceOf(PromiseInterface::class, $res);
     }

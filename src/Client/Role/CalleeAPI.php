@@ -35,11 +35,10 @@ final class CalleeAPI
         $requestID = Util::generateID();
         $deferred  = new Deferred();
 
-        $registration = new Registration($procedureURI, $callback);
-        $registration->setRegisterRequestID($requestID);
-        $registration->setRegisterDeferred($deferred);
-
-        $this->session->registrations = array_merge($registrations, [$procedureURI => $registration]);
+        $this->session->registrations = array_merge(
+            $registrations,
+            [$procedureURI => new Registration($procedureURI, $callback, $requestID, $deferred)]
+        );
 
         // If supported pattern_based_registration feature you may send $option['match'] = 'prefix'|'wildcard'
         // If supported shared_registration feature you may send $options['invoke'] =  'single'|'roundrobin'|'random'|'first'|'last'
@@ -50,8 +49,8 @@ final class CalleeAPI
 
     public function unregister(string $procedureURI): PromiseInterface
     {
-        $this->session->registrations = $this->session->registrations ?: [];
-        foreach ($this->session->registrations as $registration) {
+        $registrations = $this->session->registrations ?: [];
+        foreach ($registrations as $registration) {
             if ($registration->getProcedureURI() === $procedureURI) {
                 $registration->getRegisterDeferred()->reject();
 
