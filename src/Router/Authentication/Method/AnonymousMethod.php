@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Router\Authentication\Method;
 use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Router\SessionInterface;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Util;
 
 final class AnonymousMethod implements MethodInterface

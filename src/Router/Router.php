@@ -5,6 +5,7 @@ namespace PE\Component\WAMP\Router;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\Router\Session\Session;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
 use PE\Component\WAMP\Util\Events;

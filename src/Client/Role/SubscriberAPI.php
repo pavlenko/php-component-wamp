@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
-use PE\Component\WAMP\Client\SessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Client\Subscription;
 use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;

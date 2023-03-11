@@ -3,10 +3,10 @@
 namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Client\Client;
-use PE\Component\WAMP\Client\SessionInterface as ClientSessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface as ClientSessionInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
-use PE\Component\WAMP\Router\SessionInterface as RouterSessionInterface;
+use PE\Component\WAMP\Router\Session\SessionInterface as RouterSessionInterface;
 
 interface FactoryInterface
 {

@@ -1,7 +1,10 @@
 <?php
 
-namespace PE\Component\WAMP\Client;
+namespace PE\Component\WAMP\Client\Session;
 
+use PE\Component\WAMP\Client\Call;
+use PE\Component\WAMP\Client\Registration;
+use PE\Component\WAMP\Client\Subscription;
 use PE\Component\WAMP\SessionBaseInterface;
 use React\Promise\Deferred;
 

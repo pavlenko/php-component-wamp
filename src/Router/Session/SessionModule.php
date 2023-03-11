@@ -8,7 +8,7 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\Router\SessionInterface;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Util;
 use PE\Component\WAMP\Util\EventsInterface;
 

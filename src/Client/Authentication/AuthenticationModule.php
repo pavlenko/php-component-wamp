@@ -6,7 +6,7 @@ use PE\Component\WAMP\Client\Authentication\Method\AnonymousMethod;
 use PE\Component\WAMP\Client\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\SessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;

@@ -3,7 +3,7 @@
 namespace PE\Component\WAMP\Router\Role\Broker;
 
 use PE\Component\WAMP\Message\PublishMessage;
-use PE\Component\WAMP\Router\SessionInterface;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Router\Subscription;
 
 final class FeatureBlackWhiteList implements BrokerFeatureInterface

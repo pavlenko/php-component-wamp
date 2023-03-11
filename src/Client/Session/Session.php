@@ -1,7 +1,8 @@
 <?php
 
-namespace PE\Component\WAMP\Router;
+namespace PE\Component\WAMP\Client\Session;
 
+use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\SessionBaseTrait;
@@ -12,19 +13,20 @@ final class Session implements SessionInterface
         __construct as public constructor;
     }
 
-    private Router $router;
+    /**
+     * @var Client
+     */
+    private Client $client;
 
-    public function __construct(ConnectionInterface $connection, Router $router)
+    public function __construct(ConnectionInterface $connection, Client $client)
     {
         $this->constructor($connection);
-
-        $this->router  = $router;
-        $this->session = $connection->getSession();
+        $this->client = $client;
     }
 
     public function send(Message $message): void
     {
-        $this->router->processMessageSend($this->connection, $message);
+        $this->client->processMessageSend($message);
         $this->connection->send($message);
     }
 }

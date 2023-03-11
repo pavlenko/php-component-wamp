@@ -3,12 +3,12 @@
 namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Client\Client;
-use PE\Component\WAMP\Client\Session as ClientSession;
-use PE\Component\WAMP\Client\SessionInterface as ClientSessionInterface;
+use PE\Component\WAMP\Client\Session\Session as ClientSession;
+use PE\Component\WAMP\Client\Session\SessionInterface as ClientSessionInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Router\Router;
-use PE\Component\WAMP\Router\Session as RouterSession;
-use PE\Component\WAMP\Router\SessionInterface as RouterSessionInterface;
+use PE\Component\WAMP\Router\Session\Session as RouterSession;
+use PE\Component\WAMP\Router\Session\SessionInterface as RouterSessionInterface;
 
 final class Factory implements FactoryInterface
 {

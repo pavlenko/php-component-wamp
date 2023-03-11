@@ -6,6 +6,7 @@ use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
 use PE\Component\WAMP\Message\InterruptMessage;
 use PE\Component\WAMP\Message\InvocationMessage;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 
 final class Call
 {
@@ -21,11 +22,12 @@ final class Call
 
     private InterruptMessage $interruptMessage;
 
-    public function getCalleeSession(): Session
+    public function getCalleeSession(): SessionInterface
     {
         return $this->calleeSession;
     }
 
+    //TODO check where method should be called
     public function setCalleeSession(SessionInterface $session): void
     {
         $this->calleeSession = $session;

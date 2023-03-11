@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Router;
+namespace PE\Component\WAMP\Router\Session;
 
 use PE\Component\WAMP\SessionBaseInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface as SymfonySessionInterface;

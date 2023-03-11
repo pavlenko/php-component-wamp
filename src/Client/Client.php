@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Client;
 
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Client\Transport\TransportInterface;
 use PE\Component\WAMP\Connection\ConnectionInterface;
@@ -138,11 +139,11 @@ final class Client
     {
         if ($this->reconnectAttempts <= $this->_reconnectAttempt) {
             // Max retry attempts reached
-            $this->logger->error("Client: unable to connect after {$this->reconnectAttempts} attempts");
+            $this->logger->error("Client: unable to connect after $this->reconnectAttempts attempts");
             return;
         }
 
-        $this->logger->warning("Client: reconnect after {$this->reconnectTimeout} seconds");
+        $this->logger->warning("Client: reconnect after $this->reconnectTimeout seconds");
 
         $this->_reconnectAttempt++;
 

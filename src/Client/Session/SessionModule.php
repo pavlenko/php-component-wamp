@@ -4,7 +4,7 @@ namespace PE\Component\WAMP\Client\Session;
 
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\SessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\Message;

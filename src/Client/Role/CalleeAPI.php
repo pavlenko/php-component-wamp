@@ -3,7 +3,7 @@
 namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Registration;
-use PE\Component\WAMP\Client\SessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\RegisterMessage;
 use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Util;

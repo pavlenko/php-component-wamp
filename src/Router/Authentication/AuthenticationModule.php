@@ -9,7 +9,7 @@ use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Router\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
-use PE\Component\WAMP\Router\SessionInterface;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Util\EventsInterface;
 
 final class AuthenticationModule implements RouterModuleInterface

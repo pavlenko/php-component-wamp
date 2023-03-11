@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Client\Role;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Role\Publisher\Feature\FeatureInterface;
-use PE\Component\WAMP\Client\SessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;

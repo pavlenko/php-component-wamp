@@ -2,6 +2,8 @@
 
 namespace PE\Component\WAMP\Router;
 
+use PE\Component\WAMP\Router\Session\SessionInterface;
+
 /**
  * @codeCoverageIgnore
  */

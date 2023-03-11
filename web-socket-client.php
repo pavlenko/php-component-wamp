@@ -9,7 +9,7 @@ use PE\Component\WAMP\Client\Role\PublisherModule;
 use PE\Component\WAMP\Client\Role\PublisherAPI;
 use PE\Component\WAMP\Client\Role\SubscriberModule;
 use PE\Component\WAMP\Client\Role\SubscriberAPI;
-use PE\Component\WAMP\Client\Session;
+use PE\Component\WAMP\Client\Session\Session;
 use PE\Component\WAMP\Client\Transport\WebSocketTransport;
 use PE\Component\WAMP\Util\Events;
 use React\EventLoop\Loop;

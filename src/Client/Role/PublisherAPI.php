@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
-use PE\Component\WAMP\Client\SessionInterface;
+use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\Util;
 use React\Promise\Deferred;
