@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role\Publisher;
+namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
@@ -19,6 +19,7 @@ final class PublisherModule implements ClientModuleInterface
      */
     private array $features = [];
 
+    //TODO change to constructor
     public function addFeature(FeatureInterface $feature): void
     {
         $this->features[get_class($feature)] = $feature;
@@ -78,7 +79,7 @@ final class PublisherModule implements ClientModuleInterface
     {
         if (isset($session->publishRequests[$id = $message->getErrorRequestID()])) {
             $deferred = $session->publishRequests[$id];
-            $deferred->resolve();
+            $deferred->reject();
 
             unset($session->publishRequests[$id]);
         }
