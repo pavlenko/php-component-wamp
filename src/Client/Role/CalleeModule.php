@@ -70,8 +70,7 @@ final class CalleeModule implements ClientModuleInterface
             if ($registration->getRegisterRequestID() === $message->getRegistrationID()) {
                 $registration->setRegistrationID($message->getRegistrationID());
 
-                $deferred = $registration->getRegisterDeferred();
-                $deferred->resolve();
+                $registration->getRegisterDeferred()->resolve();
             }
         }
     }
@@ -81,9 +80,7 @@ final class CalleeModule implements ClientModuleInterface
         $session->registrations = $session->registrations ?: [];
         foreach ($session->registrations as $key => $registration) {
             if ($registration->getUnregisterRequestID() === $message->getRequestID()) {
-                $deferred = $registration->getUnregisterDeferred();
-                $deferred->resolve();
-
+                $registration->getUnregisterDeferred()->resolve();
                 unset($session->registrations[$key]);
             }
         }
@@ -186,9 +183,7 @@ final class CalleeModule implements ClientModuleInterface
         $session->registrations = $session->registrations ?: [];
         foreach ($session->registrations as $key => $registration) {
             if ($registration->getRegisterRequestID() === $message->getErrorRequestID()) {
-                $deferred = $registration->getRegisterDeferred();
-                $deferred->reject();
-
+                $registration->getRegisterDeferred()->reject();
                 unset($session->registrations[$key]);
             }
         }
@@ -199,9 +194,7 @@ final class CalleeModule implements ClientModuleInterface
         $session->registrations = $session->registrations ?: [];
         foreach ($session->registrations as $key => $registration) {
             if ($registration->getUnregisterRequestID() === $message->getErrorRequestID()) {
-                $deferred = $registration->getUnregisterDeferred();
-                $deferred->reject();
-
+                $registration->getUnregisterDeferred()->reject();
                 unset($session->registrations[$key]);
             }
         }
