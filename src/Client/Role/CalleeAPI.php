@@ -22,8 +22,8 @@ final class CalleeAPI
 
     public function register(string $procedureURI, \Closure $callback, array $options = []): PromiseInterface
     {
-        $this->session->registrations = $this->session->registrations ?: [];
-        foreach ($this->session->registrations as $registration) {
+        $registrations = $this->session->registrations ?: [];
+        foreach ($registrations as $registration) {
             if ($registration->getProcedureURI() === $procedureURI) {
                 throw new \InvalidArgumentException(sprintf(
                     'Procedure with uri "%s" already registered',
@@ -39,7 +39,7 @@ final class CalleeAPI
         $registration->setRegisterRequestID($requestID);
         $registration->setRegisterDeferred($deferred);
 
-        $this->session->registrations[$procedureURI] = $registration;
+        $this->session->registrations = array_merge($registrations, [$procedureURI => $registration]);
 
         // If supported pattern_based_registration feature you may send $option['match'] = 'prefix'|'wildcard'
         // If supported shared_registration feature you may send $options['invoke'] =  'single'|'roundrobin'|'random'|'first'|'last'
