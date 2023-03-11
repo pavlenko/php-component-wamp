@@ -101,6 +101,8 @@ final class BrokerModule implements RouterModuleInterface
                     }
                 }
 
+                // If publisher_identification feature supported and $message->getOption('disclose_me') === true
+                //   you can send $details['publisher'] = <publisher_session_id>
                 $subscription->getSession()->send(new EventMessage(
                     $subscriptionID,
                     $publicationID,
