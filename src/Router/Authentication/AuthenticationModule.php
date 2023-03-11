@@ -5,7 +5,6 @@ namespace PE\Component\WAMP\Router\Authentication;
 use PE\Component\WAMP\Message\AuthenticateMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
-use PE\Component\WAMP\Message\MessageFactory;
 use PE\Component\WAMP\Router\Authentication\Method\AnonymousMethod;
 use PE\Component\WAMP\Router\Authentication\Method\MethodInterface;
 use PE\Component\WAMP\Router\Router;
@@ -54,10 +53,6 @@ final class AuthenticationModule implements RouterModuleInterface
             if ($method->processHelloMessage($session, $message)) {
                 return;
             }
-        }
-
-        if (count($this->methods)) {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NOT_AUTHORIZED));
         }
     }
 
