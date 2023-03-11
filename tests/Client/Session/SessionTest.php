@@ -8,7 +8,7 @@ use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\Message\Message;
 use PHPUnit\Framework\TestCase;
 
-class SessionTest extends TestCase
+final class SessionTest extends TestCase
 {
     public function testSend()
     {

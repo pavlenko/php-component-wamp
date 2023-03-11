@@ -11,7 +11,7 @@ use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Util\EventsInterface;
 use PHPUnit\Framework\TestCase;
 
-class SessionModuleTest extends TestCase
+final class SessionModuleTest extends TestCase
 {
     public function testAttach()
     {

@@ -8,7 +8,7 @@ use PE\Component\WAMP\Router\RouterInterface;
 use PE\Component\WAMP\Router\Session\Session;
 use PHPUnit\Framework\TestCase;
 
-class SessionTest extends TestCase
+final class SessionTest extends TestCase
 {
     public function testSend()
     {

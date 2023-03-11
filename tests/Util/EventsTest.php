@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Tests\Util;
 use PE\Component\WAMP\Util\Events;
 use PHPUnit\Framework\TestCase;
 
-class EventsTest extends TestCase
+final class EventsTest extends TestCase
 {
     public function testTrigger(): void
     {
