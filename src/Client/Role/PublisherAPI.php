@@ -23,8 +23,7 @@ final class PublisherAPI
         $deferred  = new Deferred();
 
         if (isset($options['acknowledge']) && true === $options['acknowledge']) {
-            $this->session->publishRequests = $this->session->publishRequests ?: [];
-            $this->session->publishRequests[$requestID] = $deferred;
+            $this->session->publishRequests = array_merge($this->session->publishRequests ?: [], [$requestID => $deferred]);
         }
 
         $this->session->send(new PublishMessage($requestID, $options, $topic, $arguments, $argumentsKw));
