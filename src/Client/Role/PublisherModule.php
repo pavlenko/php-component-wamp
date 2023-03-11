@@ -52,8 +52,9 @@ final class PublisherModule implements ClientModuleInterface
     {
         if ($message instanceof HelloMessage) {
             $features = [
-                'payload_passthru_mode'    => false,//TODO
-                'publisher_identification' => false,//TODO
+                'payload_passthru_mode'         => false,//TODO
+                'publisher_identification'      => false,//TODO
+                'subscriber_blackwhite_listing' => false,//TODO code exists but need optimise
             ];
             foreach ($this->features as $feature) {
                 $features[$feature->getName()] = true;
