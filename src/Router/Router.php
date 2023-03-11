@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
 
-final class Router
+final class Router implements RouterInterface
 {
     const EVENT_CONNECTION_OPEN  = 'wamp.router.connection_open';
     const EVENT_CONNECTION_CLOSE = 'wamp.router.connection_close';
