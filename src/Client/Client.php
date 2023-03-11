@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
 
-final class Client
+final class Client implements ClientInterface
 {
     const RECONNECT_TIMEOUT  = 1.5;
     const RECONNECT_ATTEMPTS = 15;
