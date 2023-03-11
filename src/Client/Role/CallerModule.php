@@ -2,7 +2,6 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
-use PE\Component\WAMP\Client\CallCollection;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\SessionInterface;
@@ -49,17 +48,19 @@ final class CallerModule implements ClientModuleInterface
 
     private function processResultMessage(SessionInterface $session, ResultMessage $message): void
     {
-        $calls = $session->callRequests ?: new CallCollection();
+        $session->callRequests = $session->callRequests ?: [];
+        foreach ($session->callRequests as $key => $call) {
+            if ($call->getRequestID() === $message->getRequestID()) {
+                $deferred = $call->getDeferred();
+                $details  = $message->getDetails();
 
-        if ($call = $calls->findByRequestID($message->getRequestID())) {
-            $deferred = $call->getDeferred();
-            $details  = $message->getDetails();
-
-            if (empty($details['progress'])) {
-                $deferred->resolve();
-                $calls->remove($call);
-            } else {
-                $deferred->notify();
+                if (empty($details['progress'])) {
+                    $deferred->resolve();
+                    unset($session->callRequests[$key]);
+                } else {
+                    $deferred->notify();
+                }
+                break;
             }
         }
     }
@@ -67,19 +68,16 @@ final class CallerModule implements ClientModuleInterface
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         if (Message::CODE_CALL === $message->getErrorMessageCode()) {
-            $this->processErrorMessageFromCall($session, $message);
-        }
-    }
+            $session->callRequests = $session->callRequests ?: [];
+            foreach ($session->callRequests as $key => $call) {
+                if ($call->getRequestID() === $message->getErrorRequestID()) {
+                    $deferred = $call->getDeferred();
+                    $deferred->reject();
 
-    private function processErrorMessageFromCall(SessionInterface $session, ErrorMessage $message): void
-    {
-        $calls = $session->callRequests ?: new CallCollection();
-
-        if ($call = $calls->findByRequestID($message->getErrorRequestID())) {
-            $deferred = $call->getDeferred();
-            $deferred->reject();
-
-            $calls->remove($call);
+                    unset($session->callRequests[$key]);
+                    break;
+                }
+            }
         }
     }
 }

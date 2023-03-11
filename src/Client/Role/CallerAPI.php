@@ -3,7 +3,6 @@
 namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Call;
-use PE\Component\WAMP\Client\CallCollection;
 use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
@@ -29,11 +28,8 @@ final class CallerAPI
             $this->session->send(new CancelMessage($requestID, []));
         });
 
-        if (!($this->session->callRequests instanceof CallCollection)) {
-            $this->session->callRequests = new CallCollection();
-        }
-
-        $this->session->callRequests->add(new Call($requestID, $deferred));
+        $this->session->callRequests = $this->session->callRequests ?: [];
+        $this->session->callRequests[] = new Call($requestID, $deferred);
 
         $this->session->send(new CallMessage($requestID, $options ?: [], $procedureURI, $arguments, $argumentsKw));
 

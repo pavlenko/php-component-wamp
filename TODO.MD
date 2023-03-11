@@ -3,9 +3,8 @@
   - Remove create object instances everywhere when possible
 - Authentication
   - Transport-level Authentication (router only)
-    - Cookie-based Authentication
     - TLS Certificate Authentication
-
+- Standardize structure: modules, dtos, etc
 ## Message flow
 HELLO
 ```text
