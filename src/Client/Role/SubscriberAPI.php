@@ -27,14 +27,14 @@ final class SubscriberAPI
 
         $subscription = new Subscription($topic, $callback);
         $subscription->setSubscribeRequestID($requestID);
-        $subscription->setSubscribeDeferred($deferred = new Deferred());
+        $subscription->setSubscribeDeferred(new Deferred());
 
         $this->session->subscriptions = $this->session->subscriptions ?: [];
         $this->session->subscriptions[] = $subscription;
 
         $this->session->send(new SubscribeMessage($requestID, $options, $topic));
 
-        return $deferred->promise();
+        return $subscription->getSubscribeDeferred()->promise();
     }
 
     public function unsubscribe(string $topic, \Closure $callback): PromiseInterface
@@ -45,11 +45,11 @@ final class SubscriberAPI
                 $requestID = Util::generateID();
                 $subscription->getSubscribeDeferred()->reject();
                 $subscription->setUnsubscribeRequestID($requestID);
-                $subscription->setUnsubscribeDeferred($deferred = new Deferred());
+                $subscription->setUnsubscribeDeferred(new Deferred());
 
                 $this->session->send(new UnsubscribeMessage($requestID, $subscription->getSubscriptionID()));
 
-                return $deferred->promise();
+                return $subscription->getUnsubscribeDeferred()->promise();
             }
         }
 
