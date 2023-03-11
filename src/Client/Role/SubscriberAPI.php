@@ -4,7 +4,6 @@ namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Client\Subscription;
-use PE\Component\WAMP\Client\SubscriptionCollection;
 use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Util;
@@ -30,11 +29,8 @@ final class SubscriberAPI
         $subscription->setSubscribeRequestID($requestID);
         $subscription->setSubscribeDeferred($deferred = new Deferred());
 
-        if (!($this->session->subscriptions instanceof SubscriptionCollection)) {
-            $this->session->subscriptions = new SubscriptionCollection();
-        }
-
-        $this->session->subscriptions->add($subscription);
+        $this->session->subscriptions = $this->session->subscriptions ?: [];
+        $this->session->subscriptions[] = $subscription;
 
         $this->session->send(new SubscribeMessage($requestID, $options, $topic));
 
@@ -43,18 +39,18 @@ final class SubscriberAPI
 
     public function unsubscribe(string $topic, \Closure $callback): PromiseInterface
     {
-        $requestID     = Util::generateID();
-        $subscriptions = $this->session->subscriptions ?: new SubscriptionCollection();
+        $this->session->subscriptions = $this->session->subscriptions ?: [];
+        foreach ($this->session->subscriptions as $subscription) {
+            if ($subscription->getTopic() === $topic && $subscription->getCallback() === $callback) {
+                $requestID = Util::generateID();
+                $subscription->getSubscribeDeferred()->reject();
+                $subscription->setUnsubscribeRequestID($requestID);
+                $subscription->setUnsubscribeDeferred($deferred = new Deferred());
 
-        if ($subscription = $subscriptions->findByTopicAndCallable($topic, $callback)) {
-            $subscription->getSubscribeDeferred()->reject();
+                $this->session->send(new UnsubscribeMessage($requestID, $subscription->getSubscriptionID()));
 
-            $subscription->setUnsubscribeRequestID($requestID);
-            $subscription->setUnsubscribeDeferred($deferred = new Deferred());
-
-            $this->session->send(new UnsubscribeMessage($requestID, $subscription->getSubscriptionID()));
-
-            return $deferred->promise();
+                return $deferred->promise();
+            }
         }
 
         return reject();

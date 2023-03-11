@@ -10,7 +10,7 @@ use React\Promise\Deferred;
  * @property array<int, Registration> $registrations
  * @property array<int, callable> $invocationCancellers
  * @property array<int, Call> $callRequests
- * @property SubscriptionCollection $subscriptions
+ * @property array<int, Subscription> $subscriptions
  */
 interface SessionInterface extends SessionBaseInterface
 {

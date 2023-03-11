@@ -5,7 +5,6 @@ namespace PE\Component\WAMP\Client\Role;
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\SessionInterface;
-use PE\Component\WAMP\Client\SubscriptionCollection;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -57,40 +56,39 @@ final class SubscriberModule implements ClientModuleInterface
 
     private function processSubscribedMessage(SessionInterface $session, SubscribedMessage $message): void
     {
-        $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
-
-        if ($subscription = $subscriptions->findBySubscribeRequestID($message->getRequestID())) {
-            $subscription->setSubscriptionID($message->getSubscriptionID());
-
-            $deferred = $subscription->getSubscribeDeferred();
-            $deferred->resolve();
+        $session->subscriptions = $session->subscriptions ?: [];
+        foreach ($session->subscriptions as $subscription) {
+            if ($subscription->getSubscribeRequestID() === $message->getRequestID()) {
+                $subscription->setSubscriptionID($message->getSubscriptionID());
+                $subscription->getSubscribeDeferred()->resolve();
+            }
         }
     }
 
     private function processUnsubscribedMessage(SessionInterface $session, UnsubscribedMessage $message): void
     {
-        $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
-
-        if ($subscription = $subscriptions->findByUnsubscribeRequestID($message->getRequestID())) {
-            $deferred = $subscription->getUnsubscribeDeferred();
-            $deferred->resolve();
-
-            $subscriptions->remove($subscription);
+        $session->subscriptions = $session->subscriptions ?: [];
+        foreach ($session->subscriptions as $key => $subscription) {
+            if ($subscription->getUnsubscribeRequestID() === $message->getRequestID()) {
+                $subscription->getUnsubscribeDeferred()->resolve();
+                unset($session->subscriptions[$key]);
+            }
         }
     }
 
     private function processEventMessage(SessionInterface $session, EventMessage $message): void
     {
-        $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
-
-        if ($subscription = $subscriptions->findBySubscriptionID($message->getSubscriptionID())) {
-            call_user_func(
-                $subscription->getCallback(),
-                $message->getArguments(),
-                $message->getArgumentsKw(),
-                $message->getDetails(),
-                $message->getPublicationID()
-            );
+        $session->subscriptions = $session->subscriptions ?: [];
+        foreach ($session->subscriptions as $subscription) {
+            if ($subscription->getSubscriptionID() === $message->getSubscriptionID()) {
+                call_user_func(
+                    $subscription->getCallback(),
+                    $message->getArguments(),
+                    $message->getArgumentsKw(),
+                    $message->getDetails(),
+                    $message->getPublicationID()
+                );
+            }
         }
     }
 
@@ -108,25 +106,23 @@ final class SubscriberModule implements ClientModuleInterface
 
     private function processErrorMessageFromSubscribe(SessionInterface $session, ErrorMessage $message): void
     {
-        $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
-
-        if ($subscription = $subscriptions->findBySubscribeRequestID($message->getErrorRequestID())) {
-            $deferred = $subscription->getSubscribeDeferred();
-            $deferred->reject();
-
-            $subscriptions->remove($subscription);
+        $session->subscriptions = $session->subscriptions ?: [];
+        foreach ($session->subscriptions as $key => $subscription) {
+            if ($subscription->getSubscribeRequestID() === $message->getErrorRequestID()) {
+                $subscription->getSubscribeDeferred()->reject();
+                unset($session->subscriptions[$key]);
+            }
         }
     }
 
     private function processErrorMessageFromUnsubscribe(SessionInterface $session, ErrorMessage $message): void
     {
-        $subscriptions = $session->subscriptions ?: new SubscriptionCollection();
-
-        if ($subscription = $subscriptions->findByUnsubscribeRequestID($message->getErrorRequestID())) {
-            $deferred = $subscription->getUnsubscribeDeferred();
-            $deferred->reject();
-
-            $subscriptions->remove($subscription);
+        $session->subscriptions = $session->subscriptions ?: [];
+        foreach ($session->subscriptions as  $key =>$subscription) {
+            if ($subscription->getUnsubscribeRequestID() === $message->getErrorRequestID()) {
+                $subscription->getUnsubscribeDeferred()->reject();
+                unset($session->subscriptions[$key]);
+            }
         }
     }
 }
