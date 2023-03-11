@@ -4,8 +4,6 @@ namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\RegistrationCollection;
-use PE\Component\WAMP\Client\Session;
 use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -67,94 +65,94 @@ final class CalleeModule implements ClientModuleInterface
 
     private function processRegisteredMessage(SessionInterface $session, RegisteredMessage $message): void
     {
-        $registrations = $session->registrations ?: new RegistrationCollection();
+        $session->registrations = $session->registrations ?: [];
+        foreach ($session->registrations as $registration) {
+            if ($registration->getRegisterRequestID() === $message->getRegistrationID()) {
+                $registration->setRegistrationID($message->getRegistrationID());
 
-        if ($registration = $registrations->findByRegisterRequestID($message->getRequestID())) {
-            $registration->setRegistrationID($message->getRegistrationID());
-
-            $deferred = $registration->getRegisterDeferred();
-            $deferred->resolve();
+                $deferred = $registration->getRegisterDeferred();
+                $deferred->resolve();
+            }
         }
     }
 
     private function processUnregisteredMessage(SessionInterface $session, UnregisteredMessage $message): void
     {
-        $registrations = $session->registrations ?: new RegistrationCollection();
+        $session->registrations = $session->registrations ?: [];
+        foreach ($session->registrations as $key => $registration) {
+            if ($registration->getUnregisterRequestID() === $message->getRequestID()) {
+                $deferred = $registration->getUnregisterDeferred();
+                $deferred->resolve();
 
-        if ($registration = $registrations->findByUnregisterRequestID($message->getRequestID())) {
-            $deferred = $registration->getUnregisterDeferred();
-            $deferred->resolve();
-
-            $registrations->remove($registration);
+                unset($session->registrations[$key]);
+            }
         }
     }
 
     private function processInvocationMessage(SessionInterface $session, InvocationMessage $message)
     {
-        $registrations = $session->registrations ?: new RegistrationCollection();
-
-        if ($registration = $registrations->findByRegistrationID($message->getRegistrationID())) {
-            if ($registration->getCallback() === null) {
-                // Callback can be empty if unregister request occurred, but not completed
-                $session->send(MessageFactory::createErrorMessageFromMessage($message));
-                return;
-            }
-
-            try {
-                $result = call_user_func(
-                    $registration->getCallback(),
-                    $message->getArguments(),
-                    $message->getArgumentsKw(),
-                    $message->getDetails()
-                );
-
-                if (!($result instanceof PromiseInterface)) {
-                    // If result is not a promise - wrap it into fulfilled promise
-                    $result = resolve($result);
+        $session->registrations = $session->registrations ?: [];
+        foreach ($session->registrations as $registration) {
+            if ($registration->getRegistrationID() === $message->getRegistrationID()) {
+                if ($registration->getCallback() === null) {
+                    // Callback can be empty if unregister request occurred, but not completed
+                    $session->send(MessageFactory::createErrorMessageFromMessage($message));
+                    return;
                 }
 
-                // Check if promise is cancellable and add canceller to session if true
-                if ($result instanceof CancellablePromiseInterface) {
-                    if (!is_array($session->invocationCancellers)) {
-                        $session->invocationCancellers = [];
+                try {
+                    $result = call_user_func(
+                        $registration->getCallback(),
+                        $message->getArguments(),
+                        $message->getArgumentsKw(),
+                        $message->getDetails()
+                    );
+
+                    if (!($result instanceof PromiseInterface)) {
+                        // If result is not a promise - wrap it into fulfilled promise
+                        $result = resolve($result);
                     }
 
-                    $session->invocationCancellers[$message->getRequestID()] = [$result, 'cancel'];
+                    // Check if promise is cancellable and add canceller to session if true
+                    if ($result instanceof CancellablePromiseInterface) {
+                        $session->invocationCancellers = $session->invocationCancellers ?: [];
+                        $session->invocationCancellers[$message->getRequestID()] = [$result, 'cancel'];
 
-                    $result = $result->then(function ($result) use ($session, $message) {
-                        unset($session->invocationCancellers[$message->getRequestID()]);
-                        return $result;
-                    });
-                }
+                        $result = $result->then(function ($result) use ($session, $message) {
+                            unset($session->invocationCancellers[$message->getRequestID()]);
+                            return $result;
+                        });
+                    }
 
-                // Send messages depends on invocation state
-                $result->then(
-                    function ($result) use ($session, $message) {
-                        // Send invocation success
-                        $session->send(new YieldMessage($message->getRequestID(), [], [$result]));
-                    },
-                    function ($error) use ($session, $message) {
-                        // Send invocation error
-                        $errorMessage = MessageFactory::createErrorMessageFromMessage($message);
+                    // Send messages depends on invocation state
+                    $result->then(
+                        function ($result) use ($session, $message) {
+                            // Send invocation success
+                            $session->send(new YieldMessage($message->getRequestID(), [], [$result]));
+                        },
+                        function ($error) use ($session, $message) {
+                            // Send invocation error
+                            $errorMessage = MessageFactory::createErrorMessageFromMessage($message);
 
-                        if ($error instanceof \Exception) {
-                            $errorMessage->setArguments([$error->getMessage()]);
-                            $errorMessage->setArgumentsKw([$error]);
+                            if ($error instanceof \Exception) {
+                                $errorMessage->setArguments([$error->getMessage()]);
+                                $errorMessage->setArgumentsKw([$error]);
+                            }
+
+                            $session->send($errorMessage);
+                        },
+                        function ($result) use ($session, $message) {
+                            // Send invocation progress
+                            $session->send(new YieldMessage($message->getRequestID(), ['progress' => true], [$result]));
                         }
+                    );
+                } catch (\Exception $exception) {
+                    $error = MessageFactory::createErrorMessageFromMessage($message);
+                    $error->setArguments([$exception->getMessage()]);
+                    $error->setArgumentsKw([$exception]);
 
-                        $session->send($errorMessage);
-                    },
-                    function ($result) use ($session, $message) {
-                        // Send invocation progress
-                        $session->send(new YieldMessage($message->getRequestID(), ['progress' => true], [$result]));
-                    }
-                );
-            } catch (\Exception $exception) {
-                $error = MessageFactory::createErrorMessageFromMessage($message);
-                $error->setArguments([$exception->getMessage()]);
-                $error->setArgumentsKw([$exception]);
-
-                $session->send($error);
+                    $session->send($error);
+                }
             }
         }
     }
@@ -185,25 +183,27 @@ final class CalleeModule implements ClientModuleInterface
 
     private function processErrorMessageFromRegister(SessionInterface $session, ErrorMessage $message): void
     {
-        $registrations = $session->registrations ?: new RegistrationCollection();
+        $session->registrations = $session->registrations ?: [];
+        foreach ($session->registrations as $key => $registration) {
+            if ($registration->getRegisterRequestID() === $message->getErrorRequestID()) {
+                $deferred = $registration->getRegisterDeferred();
+                $deferred->reject();
 
-        if ($registration = $registrations->findByRegisterRequestID($message->getErrorRequestID())) {
-            $deferred = $registration->getRegisterDeferred();
-            $deferred->reject();
-
-            $registrations->remove($registration);
+                unset($session->registrations[$key]);
+            }
         }
     }
 
     private function processErrorMessageFromUnregister(SessionInterface $session, ErrorMessage $message): void
     {
-        $registrations = $session->registrations ?: new RegistrationCollection();
+        $session->registrations = $session->registrations ?: [];
+        foreach ($session->registrations as $key => $registration) {
+            if ($registration->getUnregisterRequestID() === $message->getErrorRequestID()) {
+                $deferred = $registration->getUnregisterDeferred();
+                $deferred->reject();
 
-        if ($registration = $registrations->findByUnregisterRequestID($message->getErrorRequestID())) {
-            $deferred = $registration->getUnregisterDeferred();
-            $deferred->reject();
-
-            $registrations->remove($registration);
+                unset($session->registrations[$key]);
+            }
         }
     }
 }

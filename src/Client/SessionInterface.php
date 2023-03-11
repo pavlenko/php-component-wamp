@@ -7,7 +7,7 @@ use React\Promise\Deferred;
 
 /**
  * @property array<int, Deferred> $publishRequests
- * @property RegistrationCollection $registrations
+ * @property array<int, Registration> $registrations
  * @property array<int, callable> $invocationCancellers
  * @property array<int, Call> $callRequests
  * @property SubscriptionCollection $subscriptions

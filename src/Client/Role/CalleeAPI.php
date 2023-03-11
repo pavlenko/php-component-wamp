@@ -3,7 +3,6 @@
 namespace PE\Component\WAMP\Client\Role;
 
 use PE\Component\WAMP\Client\Registration;
-use PE\Component\WAMP\Client\RegistrationCollection;
 use PE\Component\WAMP\Client\SessionInterface;
 use PE\Component\WAMP\Message\RegisterMessage;
 use PE\Component\WAMP\Message\UnregisterMessage;
@@ -23,12 +22,14 @@ final class CalleeAPI
 
     public function register(string $procedureURI, \Closure $callback, array $options = []): PromiseInterface
     {
-        if (!($this->session->registrations instanceof RegistrationCollection)) {
-            $this->session->registrations = new RegistrationCollection();
-        }
-
-        if ($this->session->registrations->findByProcedureURI($procedureURI)) {
-            throw new \InvalidArgumentException(sprintf('Procedure with uri "%s" already registered', $procedureURI));
+        $this->session->registrations = $this->session->registrations ?: [];
+        foreach ($this->session->registrations as $registration) {
+            if ($registration->getProcedureURI() === $procedureURI) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Procedure with uri "%s" already registered',
+                    $procedureURI
+                ));
+            }
         }
 
         $requestId = Util::generateID();
@@ -46,18 +47,19 @@ final class CalleeAPI
 
     public function unregister(string $procedureURI): PromiseInterface
     {
-        $requestID     = Util::generateID();
-        $registrations = $this->session->registrations ?: new RegistrationCollection();
+        $this->session->registrations = $this->session->registrations ?: [];
+        foreach ($this->session->registrations as $registration) {
+            if ($registration->getProcedureURI() === $procedureURI) {
+                $registration->getRegisterDeferred()->reject();
 
-        if ($registration = $registrations->findByProcedureURI($procedureURI)) {
-            $registration->getRegisterDeferred()->reject();
+                $requestID = Util::generateID();
+                $registration->setUnregisterRequestID($requestID);
+                $registration->setUnregisterDeferred($deferred = new Deferred());
 
-            $registration->setUnregisterRequestID($requestID);
-            $registration->setUnregisterDeferred($deferred = new Deferred());
+                $this->session->send(new UnregisterMessage($requestID, $registration->getRegistrationID()));
 
-            $this->session->send(new UnregisterMessage($requestID, $registration->getRegistrationID()));
-
-            return $deferred->promise();
+                return $deferred->promise();
+            }
         }
 
         return reject();
