@@ -54,7 +54,7 @@ final class CalleeModule implements ClientModuleInterface
         }
     }
 
-     public function onMessageSend(Message $message): void
+    public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('callee', [
