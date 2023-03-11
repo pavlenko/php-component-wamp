@@ -20,18 +20,15 @@ final class SubscriberAPI
         $this->session = $session;
     }
 
-    public function subscribe(string $topic, \Closure $callback, array $options = null): PromiseInterface
+    public function subscribe(string $topic, \Closure $callback, array $options = []): PromiseInterface
     {
         $requestID = Util::generateID();
-        $options   = $options ?: [];
 
         $subscription = new Subscription($topic, $callback);
         $subscription->setSubscribeRequestID($requestID);
         $subscription->setSubscribeDeferred(new Deferred());
 
-        $this->session->subscriptions = $this->session->subscriptions ?: [];
-        $this->session->subscriptions[] = $subscription;
-
+        $this->session->subscriptions = array_merge($this->session->subscriptions ?: [], [$subscription]);
         $this->session->send(new SubscribeMessage($requestID, $options, $topic));
 
         return $subscription->getSubscribeDeferred()->promise();
@@ -39,8 +36,8 @@ final class SubscriberAPI
 
     public function unsubscribe(string $topic, \Closure $callback): PromiseInterface
     {
-        $this->session->subscriptions = $this->session->subscriptions ?: [];
-        foreach ($this->session->subscriptions as $subscription) {
+        $subscriptions = $this->session->subscriptions ?: [];
+        foreach ($subscriptions as $subscription) {
             if ($subscription->getTopic() === $topic && $subscription->getCallback() === $callback) {
                 $requestID = Util::generateID();
                 $subscription->getSubscribeDeferred()->reject();
