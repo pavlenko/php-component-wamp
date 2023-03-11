@@ -3,7 +3,7 @@ namespace PE\Component\WAMP;
 
 use PE\Component\WAMP\Router\Authentication\AuthenticationModule;
 use PE\Component\WAMP\Router\Authentication\Method\TicketMethod;
-use PE\Component\WAMP\Router\Role\Broker\BrokerModule;
+use PE\Component\WAMP\Router\Role\BrokerModule;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\Transport\WebSocketTransport;
 use React\EventLoop\Loop;

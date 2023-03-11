@@ -1,12 +1,8 @@
 <?php
 
-namespace PE\Component\WAMP\Router\Role\Broker;
-
-use PE\Component\WAMP\Router\SessionInterface;
+namespace PE\Component\WAMP\Router;
 
 /**
- * Subscription DTO
- *
  * @codeCoverageIgnore
  */
 final class Subscription

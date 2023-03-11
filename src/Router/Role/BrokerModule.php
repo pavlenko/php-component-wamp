@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Router\Role\Broker;
+namespace PE\Component\WAMP\Router\Role;
 
 use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\Message;
@@ -12,6 +12,8 @@ use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
+use PE\Component\WAMP\Router\Role\Broker\BrokerFeatureInterface;
+use PE\Component\WAMP\Router\Subscription;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\SessionInterface;
