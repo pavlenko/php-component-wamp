@@ -17,6 +17,7 @@ use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\Router\Call;
+use PE\Component\WAMP\Router\Procedure;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session\SessionInterface;
@@ -26,7 +27,7 @@ use PE\Component\WAMP\Util\EventsInterface;
 final class DealerModule implements RouterModuleInterface
 {
     /**
-     * @var array
+     * @var Procedure[]
      */
     private array $procedures = [];
 
@@ -120,13 +121,16 @@ final class DealerModule implements RouterModuleInterface
     {
         $registrationID = Util::generateID();
 
-        if (!isset($this->procedures[$message->getProcedureURI()])) {
-            $this->procedures[$message->getProcedureURI()] = $registrationID;
-
-            $session->send(new RegisteredMessage($message->getRequestID(), $registrationID));
-        } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_PROCEDURE_ALREADY_EXISTS));
+        foreach ($this->procedures as $procedure) {
+            if ($message->getProcedureURI() === $procedure->getProcedureURI()) {
+                $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_PROCEDURE_ALREADY_EXISTS));
+                return;
+            }
         }
+
+        $this->procedures[] = new Procedure($session, $message->getProcedureURI(), $registrationID);
+
+        $session->send(new RegisteredMessage($message->getRequestID(), $registrationID));
     }
 
     /**
@@ -137,14 +141,15 @@ final class DealerModule implements RouterModuleInterface
      */
     private function processUnregisterMessage(SessionInterface $session, UnregisterMessage $message): void
     {
-        if (in_array($message->getRegistrationID(), $this->procedures, false)) {
-            $procedureURI = array_search($message->getRegistrationID(), $this->procedures);
-
-            $session->send(new UnregisteredMessage($message->getRequestID()));
-            unset($this->procedures[$procedureURI]);
-        } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_REGISTRATION));
+        foreach ($this->procedures as $key => $procedure) {
+            if ($message->getRegistrationID() === $procedure->getRegistrationID()) {
+                $session->send(new UnregisteredMessage($message->getRequestID()));
+                unset($this->procedures[$key]);
+                return;
+            }
         }
+
+        $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_REGISTRATION));
     }
 
     /**
@@ -155,32 +160,36 @@ final class DealerModule implements RouterModuleInterface
      */
     private function processCallMessage(SessionInterface $session, CallMessage $message): void
     {
-        if (isset($this->procedures[$message->getProcedureURI()])) {
-            $invocationID   = Util::generateID();
-            $registrationID = $this->procedures[$message->getProcedureURI()];
+        foreach ($this->procedures as $procedure) {
+            if ($message->getProcedureURI() === $procedure->getProcedureURI()) {
+                $invocationID = Util::generateID();
+                $procedure    = $this->procedures[$message->getProcedureURI()];
 
-            // If supported call_trustlevels feature you may pass trustlevel option with integer value
-            $invocation = new InvocationMessage(
-                $invocationID,
-                $registrationID,
-                [
-                    'receive_progress' => (bool) $message->getOption('receive_progress'),
-                ],
-                $message->getArguments(),
-                $message->getArgumentsKw()
-            );
+                // If supported call_trustlevels feature you may pass trustlevel option with integer value
+                $invocation = new InvocationMessage(
+                    $invocationID,
+                    $procedure->getRegistrationID(),
+                    [
+                        'receive_progress' => (bool) $message->getOption('receive_progress'),
+                    ],
+                    $message->getArguments(),
+                    $message->getArgumentsKw()
+                );
 
-            $call = new Call();
-            $call->setCallerSession($session);
-            $call->setInvocationMessage($invocation);
+                $call = new Call();
+                $call->setCalleeSession($procedure->getSession());
+                $call->setCallerSession($session);
+                $call->setInvocationMessage($invocation);
 
-            $this->calls[$message->getRequestID()] = $call;
-            $this->invocations[$invocationID]      = $call;
+                $this->calls[$message->getRequestID()] = $call;
+                $this->invocations[$invocationID]      = $call;
 
-            $session->send($invocation);
-        } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_PROCEDURE));
+                $session->send($invocation);
+                return;
+            }
         }
+
+        $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_PROCEDURE));
     }
 
     /**

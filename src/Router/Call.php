@@ -27,7 +27,6 @@ final class Call
         return $this->calleeSession;
     }
 
-    //TODO check where method should be called
     public function setCalleeSession(SessionInterface $session): void
     {
         $this->calleeSession = $session;
