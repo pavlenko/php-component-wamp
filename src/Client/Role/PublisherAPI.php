@@ -23,10 +23,7 @@ final class PublisherAPI
         $deferred  = new Deferred();
 
         if (isset($options['acknowledge']) && true === $options['acknowledge']) {
-            if (!is_array($this->session->publishRequests)) {
-                $this->session->publishRequests = [];
-            }
-
+            $this->session->publishRequests = $this->session->publishRequests ?: [];
             $this->session->publishRequests[$requestID] = $deferred;
         }
 

@@ -32,15 +32,16 @@ final class CalleeAPI
             }
         }
 
-        $requestId = Util::generateID();
+        $requestID = Util::generateID();
+        $deferred  = new Deferred();
 
         $registration = new Registration($procedureURI, $callback);
-        $registration->setRegisterRequestID($requestId);
-        $registration->setRegisterDeferred($deferred = new Deferred());
+        $registration->setRegisterRequestID($requestID);
+        $registration->setRegisterDeferred($deferred);
 
         $this->session->registrations[$procedureURI] = $registration;
 
-        $this->session->send(new RegisterMessage($requestId, $options, $procedureURI));
+        $this->session->send(new RegisterMessage($requestID, $options, $procedureURI));
 
         return $deferred->promise();
     }
@@ -53,8 +54,10 @@ final class CalleeAPI
                 $registration->getRegisterDeferred()->reject();
 
                 $requestID = Util::generateID();
+                $deferred  = new Deferred();
+
                 $registration->setUnregisterRequestID($requestID);
-                $registration->setUnregisterDeferred($deferred = new Deferred());
+                $registration->setUnregisterDeferred($deferred);
 
                 $this->session->send(new UnregisterMessage($requestID, $registration->getRegistrationID()));
 
