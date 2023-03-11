@@ -17,12 +17,11 @@ final class PublisherModule implements ClientModuleInterface
     /**
      * @var FeatureInterface[]
      */
-    private array $features = [];
+    private array $features;
 
-    //TODO change to constructor
-    public function addFeature(FeatureInterface $feature): void
+    public function __construct(FeatureInterface ...$features)
     {
-        $this->features[get_class($feature)] = $feature;
+        $this->features = $features;
     }
 
     public function attach(EventsInterface $events): void
@@ -67,21 +66,19 @@ final class PublisherModule implements ClientModuleInterface
 
     private function processPublishedMessage(SessionInterface $session, PublishedMessage $message): void
     {
-        if (isset($session->publishRequests[$id = $message->getRequestID()])) {
-            $deferred = $session->publishRequests[$id];
-            $deferred->resolve();
-
-            unset($session->publishRequests[$id]);
+        $requestID = $message->getRequestID();
+        if (isset($session->publishRequests[$requestID])) {
+            $session->publishRequests[$requestID]->resolve();
+            unset($session->publishRequests[$requestID]);
         }
     }
 
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
-        if (isset($session->publishRequests[$id = $message->getErrorRequestID()])) {
-            $deferred = $session->publishRequests[$id];
-            $deferred->reject();
-
-            unset($session->publishRequests[$id]);
+        $requestID = $message->getErrorRequestID();
+        if (isset($session->publishRequests[$requestID])) {
+            $session->publishRequests[$requestID]->reject();
+            unset($session->publishRequests[$requestID]);
         }
     }
 }
