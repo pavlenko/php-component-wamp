@@ -7,8 +7,8 @@ use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
 use PE\Component\WAMP\Util;
+use React\Promise\CancellablePromiseInterface;
 use React\Promise\Deferred;
-use React\Promise\PromiseInterface;
 
 final class CallerAPI
 {
@@ -19,7 +19,7 @@ final class CallerAPI
         $this->session = $session;
     }
 
-    public function call(string $procedureURI, array $arguments = [], array $argumentsKw = [], array $options = []): PromiseInterface
+    public function call(string $procedureURI, array $arguments = [], array $argumentsKw = [], array $options = []): CancellablePromiseInterface
     {
         // For use progressive results set $options['receive_progress'] = true
         // For use timeouts set $options['timeout'] = N (positive integer)
@@ -27,12 +27,12 @@ final class CallerAPI
 
         $deferred = new Deferred(function () use ($requestID) {
             // This is only one possible point to cancel a call
+            // @codeCoverageIgnoreStart
             $this->session->send(new CancelMessage($requestID, []));
+            // @codeCoverageIgnoreEnd
         });
 
-        $this->session->callRequests = $this->session->callRequests ?: [];
-        $this->session->callRequests[] = new Call($requestID, $deferred);
-
+        $this->session->callRequests = array_merge($this->session->callRequests ?: [], [new Call($requestID, $deferred)]);
         $this->session->send(new CallMessage($requestID, $options, $procedureURI, $arguments, $argumentsKw));
 
         return $deferred->promise();
