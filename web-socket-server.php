@@ -20,10 +20,7 @@ $transport = new WebSocketTransport('127.0.0.1', 1337);
 $router = new Router(new Factory(), Loop::get(), null, $logger);
 $router->setTransport($transport);
 
-$authentication = new AuthenticationModule();
-$authentication->addMethod(new TicketMethod(['foo']));
-
-$router->addModule($authentication);
+$router->addModule(new AuthenticationModule(new TicketMethod(['foo'])));
 $router->addModule(new BrokerModule());
 
 $router->start();
