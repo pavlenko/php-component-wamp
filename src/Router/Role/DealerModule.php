@@ -98,7 +98,14 @@ final class DealerModule implements RouterModuleInterface
     {
         if ($message instanceof WelcomeMessage) {
             $message->addFeatures('dealer', [
-                //TODO
+                'payload_passthru_mode'      => false,//TODO
+                'caller_identification'      => false,//TODO
+                'progressive_call_results'   => false,//TODO
+                'call_cancelling'            => false,//TODO
+                'call_timeout'               => false,//TODO
+                'call_trustlevels'           => false,//TODO
+                'pattern_based_registration' => false,//TODO
+                'shared_registration'        => false,//TODO
             ]);
         }
     }
@@ -152,10 +159,13 @@ final class DealerModule implements RouterModuleInterface
             $invocationID   = Util::generateID();
             $registrationID = $this->procedures[$message->getProcedureURI()];
 
+            // If supported call_trustlevels feature you may pass trustlevel option with integer value
             $invocation = new InvocationMessage(
                 $invocationID,
                 $registrationID,
-                [],
+                [
+                    'receive_progress' => (bool) $message->getOption('receive_progress'),
+                ],
                 $message->getArguments(),
                 $message->getArgumentsKw()
             );

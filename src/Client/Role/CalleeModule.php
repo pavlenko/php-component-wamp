@@ -58,7 +58,14 @@ final class CalleeModule implements ClientModuleInterface
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('callee', [
-                //TODO
+                'payload_passthru_mode'      => false,//TODO
+                'caller_identification'      => false,//TODO
+                'progressive_call_results'   => false,//TODO
+                'call_cancelling'            => false,//TODO use with progressive_calls feature
+                'call_timeout'               => false,//TODO
+                'call_trustlevels'           => false,//TODO
+                'pattern_based_registration' => false,//TODO
+                'shared_registration'        => false,//TODO
             ]);
         }
     }

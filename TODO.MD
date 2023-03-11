@@ -6,29 +6,6 @@
     - TLS Certificate Authentication
 - Standardize structure: modules, dtos, etc
 
-# role check exists features
-- publisher:
-  - subscriber blackwhite listing
-  - publisher exclusion
-  - publisher identification
-  - payload passthru mode
-- subscriber:
-  - pattern-based subscription
-  - publication trust levels
-  - publisher identification
-  - payload passthru mode
-- caller:
-  - caller identification
-  - progressive call results
-  - call canceling
-  - call timeout
-payload passthru mode
-- callee:
-  - caller identification
-  - call trust levels
-  - pattern-based registration
-  - shared registration
-  - payload passthru mode
 ## Message flow
 HELLO
 ```text

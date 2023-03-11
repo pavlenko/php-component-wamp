@@ -41,6 +41,8 @@ final class CalleeAPI
 
         $this->session->registrations[$procedureURI] = $registration;
 
+        // If supported pattern_based_registration feature you may send $option['match'] = 'prefix'|'wildcard'
+        // If supported shared_registration feature you may send $options['invoke'] =  'single'|'roundrobin'|'random'|'first'|'last'
         $this->session->send(new RegisterMessage($requestID, $options, $procedureURI));
 
         return $deferred->promise();

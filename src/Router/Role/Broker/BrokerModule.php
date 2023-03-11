@@ -67,7 +67,12 @@ final class BrokerModule implements RouterModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof WelcomeMessage) {
-            $features = [];
+            $features = [
+                'payload_passthru_mode'      => false,//TODO
+                'publisher_identification'   => false,//TODO
+                'publication_trustlevels'    => false,//TODO
+                'pattern_based_subscription' => false,//TODO
+            ];
             foreach ($this->features as $feature) {
                 $features[$feature->getName()] = true;
             }

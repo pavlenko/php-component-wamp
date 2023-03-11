@@ -49,7 +49,10 @@ final class SubscriberModule implements ClientModuleInterface
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('subscriber', [
-                //TODO
+                'payload_passthru_mode'      => false,//TODO
+                'publisher_identification'   => false,//TODO
+                'publication_trustlevels'    => false,//TODO
+                'pattern_based_subscription' => false,//TODO
             ]);
         }
     }

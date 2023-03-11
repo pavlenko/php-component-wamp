@@ -21,6 +21,8 @@ final class CallerAPI
 
     public function call(string $procedureURI, array $arguments = [], array $argumentsKw = [], array $options = []): PromiseInterface
     {
+        // For use progressive results set $options['receive_progress'] = true
+        // For use timeouts set $options['timeout'] = N (positive integer)
         $requestID = Util::generateID();
 
         $deferred = new Deferred(function () use ($requestID) {
@@ -31,7 +33,7 @@ final class CallerAPI
         $this->session->callRequests = $this->session->callRequests ?: [];
         $this->session->callRequests[] = new Call($requestID, $deferred);
 
-        $this->session->send(new CallMessage($requestID, $options ?: [], $procedureURI, $arguments, $argumentsKw));
+        $this->session->send(new CallMessage($requestID, $options, $procedureURI, $arguments, $argumentsKw));
 
         return $deferred->promise();
     }

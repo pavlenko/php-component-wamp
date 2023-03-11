@@ -51,7 +51,10 @@ final class PublisherModule implements ClientModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
-            $features = [];
+            $features = [
+                'payload_passthru_mode'    => false,//TODO
+                'publisher_identification' => false,//TODO
+            ];
             foreach ($this->features as $feature) {
                 $features[$feature->getName()] = true;
             }

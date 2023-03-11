@@ -41,7 +41,10 @@ final class CallerModule implements ClientModuleInterface
     {
         if ($message instanceof HelloMessage) {
             $message->addFeatures('caller', [
-                //TODO
+                'payload_passthru_mode'    => false,//TODO
+                'caller_identification'    => false,//TODO
+                'call_cancelling'          => false,//TODO
+                'progressive_call_results' => false,//TODO
             ]);
         }
     }
@@ -51,16 +54,12 @@ final class CallerModule implements ClientModuleInterface
         $session->callRequests = $session->callRequests ?: [];
         foreach ($session->callRequests as $key => $call) {
             if ($call->getRequestID() === $message->getRequestID()) {
-                $deferred = $call->getDeferred();
-                $details  = $message->getDetails();
-
-                if (empty($details['progress'])) {
-                    $deferred->resolve();
+                if (empty($message->getDetail('progress'))) {
+                    $call->getDeferred()->resolve();
                     unset($session->callRequests[$key]);
                 } else {
-                    $deferred->notify();
+                    $call->getDeferred()->notify();
                 }
-                break;
             }
         }
     }
@@ -71,11 +70,8 @@ final class CallerModule implements ClientModuleInterface
             $session->callRequests = $session->callRequests ?: [];
             foreach ($session->callRequests as $key => $call) {
                 if ($call->getRequestID() === $message->getErrorRequestID()) {
-                    $deferred = $call->getDeferred();
-                    $deferred->reject();
-
+                    $call->getDeferred()->reject();
                     unset($session->callRequests[$key]);
-                    break;
                 }
             }
         }
