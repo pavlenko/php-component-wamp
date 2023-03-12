@@ -10,13 +10,14 @@ use PE\Component\WAMP\Router\Session\SessionInterface;
 final class Subscription
 {
     private SessionInterface $session;
-
     private string $topic;
+    private int $subscriptionID = 0;
 
-    public function __construct(SessionInterface $session, string $topic)
+    public function __construct(SessionInterface $session, string $topic, int $subscriptionID)
     {
-        $this->session = $session;
-        $this->topic   = $topic;
+        $this->session        = $session;
+        $this->topic          = $topic;
+        $this->subscriptionID = $subscriptionID;
     }
 
     public function getSession(): SessionInterface
@@ -27,5 +28,10 @@ final class Subscription
     public function getTopic(): string
     {
         return $this->topic;
+    }
+
+    public function getSubscriptionID(): int
+    {
+        return $this->subscriptionID;
     }
 }

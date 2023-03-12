@@ -92,19 +92,19 @@ final class BrokerModule implements RouterModuleInterface
     {
         $publicationID = Util::generateID();
 
-        foreach ($this->subscriptions as $subscriptionID => $subscription) {
+        foreach ($this->subscriptions as $subscription) {
             if ($session !== $subscription->getSession() && $subscription->getTopic() === $message->getTopic()) {
-                foreach ($this->features as $feature) {
-                    if (!$feature->processPublishMessage($session, $message, $subscription)) {
-                        //TODO what is do here???
-                        break;
-                    }
-                }
+//                foreach ($this->features as $feature) {
+//                    if (!$feature->processPublishMessage($session, $message, $subscription)) {
+//                        //TODO what is do here???
+//                        break;
+//                    }
+//                }
 
                 // If publisher_identification feature supported and $message->getOption('disclose_me') === true
                 //   you can send $details['publisher'] = <publisher_session_id>
                 $subscription->getSession()->send(new EventMessage(
-                    $subscriptionID,
+                    $subscription->getSubscriptionID(),
                     $publicationID,
                     [$message->getArguments()[0] ?? null],
                     $message->getArguments(),
@@ -124,7 +124,7 @@ final class BrokerModule implements RouterModuleInterface
         $subscriptionID = Util::generateID();
 
         if ($message->getTopic()) {
-            $this->subscriptions[$subscriptionID] = new Subscription($session, $message->getTopic());
+            $this->subscriptions[] = new Subscription($session, $message->getTopic(), $subscriptionID);
             $session->send(new SubscribedMessage($message->getRequestID(), $subscriptionID));
         } else {
             $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_INVALID_URI));
@@ -133,11 +133,13 @@ final class BrokerModule implements RouterModuleInterface
 
     private function processUnsubscribeMessage(SessionInterface $session, UnsubscribeMessage $message): void
     {
-        if (isset($this->subscriptions[$message->getSubscriptionID()])) {
-            $session->send(new UnsubscribedMessage($message->getRequestID()));
-            unset($this->subscriptions[$message->getSubscriptionID()]);
-        } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_SUBSCRIPTION));
+        foreach ($this->subscriptions as $key => $subscription) {
+            if ($message->getSubscriptionID() === $subscription->getSubscriptionID()) {
+                $session->send(new UnsubscribedMessage($message->getRequestID()));
+                unset($this->subscriptions[$key]);
+                return;
+            }
         }
+        $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NO_SUCH_SUBSCRIPTION));
     }
 }
