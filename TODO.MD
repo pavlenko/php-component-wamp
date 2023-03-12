@@ -285,6 +285,8 @@ Pattern-based subscriptions
 | registration_revocation    | alpha  |     |     |     |     |  X  |  X  |
 | procedure_reflection       | sketch |     |     |     |     |  X  |     |
 
+&nbsp;
+
 **PubSub Features**
 
 | Feature                       | Status |  P  |  B  |  S  | Cr  | D   | Ce  |
@@ -298,6 +300,8 @@ Pattern-based subscriptions
 | sharded_subscription          | alpha  |     |  X  |  X  |     |     |     |
 | event_history                 | alpha  |     |  X  |  X  |     |     |     |
 | topic_reflection              | sketch |     |  X  |     |     |     |     |
+
+&nbsp;
 
 **Other Advanced Features**
 
