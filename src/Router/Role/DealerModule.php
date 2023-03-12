@@ -177,7 +177,6 @@ final class DealerModule implements RouterModuleInterface
         foreach ($this->procedures as $procedure) {
             if ($message->getProcedureURI() === $procedure->getProcedureURI()) {
                 $invocationID = Util::generateID();
-                $procedure    = $this->procedures[$message->getProcedureURI()];
 
                 // If supported call_trustlevels feature you may pass trustlevel option with integer value
                 $invocation = new InvocationMessage(
