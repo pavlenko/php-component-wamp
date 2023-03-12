@@ -83,6 +83,9 @@ final class BrokerModule implements RouterModuleInterface
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function onConnectionClose(): void
     {
         $this->subscriptions = [];

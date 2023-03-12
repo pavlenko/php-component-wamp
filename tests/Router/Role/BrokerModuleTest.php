@@ -3,7 +3,10 @@
 namespace PE\Component\WAMP\Tests\Router\Role;
 
 use PE\Component\WAMP\Message\ErrorMessage;
+use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\Message;
+use PE\Component\WAMP\Message\PublishedMessage;
+use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
@@ -48,7 +51,18 @@ final class BrokerModuleTest extends TestCase
 
     public function testOnMessageReceivedPUBLISH()
     {
-        $this->markTestIncomplete();
+        $session1 = $this->createMock(SessionInterface::class);
+        $session1->expects(self::exactly(2))->method('send')->withConsecutive(
+            [self::isInstanceOf(SubscribedMessage::class)],
+            [self::isInstanceOf(EventMessage::class)],
+        );
+
+        $session2 = $this->createMock(SessionInterface::class);
+        $session2->expects(self::once())->method('send')->with(self::isInstanceOf(PublishedMessage::class));
+
+        $module = new BrokerModule();
+        $module->onMessageReceived(new SubscribeMessage(1, [], 'topic'), $session1);
+        $module->onMessageReceived(new PublishMessage(1, ['acknowledge' => true], 'topic'), $session2);
     }
 
     public function testOnMessageReceivedSUBSCRIBE_pass()
@@ -97,7 +111,11 @@ final class BrokerModuleTest extends TestCase
 
     public function testOnMessageReceivedUNSUBSCRIBE_fail()
     {
-        $this->markTestIncomplete();
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('send')->with(self::isInstanceOf(ErrorMessage::class));
+
+        $module = new BrokerModule();
+        $module->onMessageReceived(new UnsubscribeMessage(1, 0), $session);
     }
 
     public function testOnMessageSendWELCOME()
