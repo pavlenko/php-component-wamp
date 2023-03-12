@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Tests\Client\Role;
 
-use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\DTO\Subscription;
 use PE\Component\WAMP\Client\Role\SubscriberFeatureInterface;
 use PE\Component\WAMP\Client\Role\SubscriberModule;
@@ -14,29 +14,22 @@ use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\Tests\Client\Session\SessionStub;
+use PE\Component\WAMP\Tests\Client\TestCaseBase;
 use PE\Component\WAMP\Util\EventsInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use React\Promise\Deferred;
 
-final class SubscriberModuleTest extends TestCase
+final class SubscriberModuleTest extends TestCaseBase
 {
-    /**
-     * @return SessionInterface|MockObject
-     */
-    private function createSessionMock()
-    {
-        return $this->getMockForAbstractClass(SessionStub::class, [], '', false, true, true, ['send']);
-    }
-
     public function testAttach()
     {
         $module = new SubscriberModule();
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::exactly(2))->method('attach')->withConsecutive(
-            [Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']],
-            [Client::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
+            [ClientInterface::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']],
+            [ClientInterface::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
         );
 
         $module->attach($events);
@@ -48,8 +41,8 @@ final class SubscriberModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::exactly(2))->method('detach')->withConsecutive(
-            [Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']],
-            [Client::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
+            [ClientInterface::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']],
+            [ClientInterface::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
         );
 
         $module->detach($events);

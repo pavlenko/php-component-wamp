@@ -20,13 +20,6 @@ final class Client implements ClientInterface
     const RECONNECT_TIMEOUT  = 1.5;
     const RECONNECT_ATTEMPTS = 15;
 
-    const EVENT_CONNECTION_OPEN     = 'wamp.client.connection_open';
-    const EVENT_CONNECTION_CLOSE    = 'wamp.client.connection_close';
-    const EVENT_CONNECTION_ERROR    = 'wamp.client.connection_error';
-    const EVENT_SESSION_ESTABLISHED = 'wamp.client.session_established';
-    const EVENT_MESSAGE_RECEIVED    = 'wamp.client.message_received';
-    const EVENT_MESSAGE_SEND        = 'wamp.client.message_send';
-
     private string $realm;
 
     private ?TransportInterface $transport = null;

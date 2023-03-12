@@ -3,8 +3,8 @@
 namespace PE\Component\WAMP\Client\Session;
 
 use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\Message;
@@ -18,13 +18,13 @@ final class SessionModule implements ClientModuleInterface
     public function attach(EventsInterface $events): void
     {
         $this->events = $events;
-        $this->events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $this->events->attach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     public function detach(EventsInterface $events): void
     {
         $this->events = $events;
-        $this->events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $this->events->detach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
     }
 
     public function onMessageReceived(Message $message, SessionInterface $session): void

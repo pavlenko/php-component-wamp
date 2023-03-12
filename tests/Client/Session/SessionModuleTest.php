@@ -3,6 +3,7 @@
 namespace PE\Component\WAMP\Tests\Client\Session;
 
 use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Client\Session\SessionModule;
 use PE\Component\WAMP\Message\AbortMessage;
@@ -31,7 +32,7 @@ final class SessionModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::once())->method('detach')->with(
-            Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']
+            ClientInterface::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']
         );
 
         $module->detach($events);
@@ -46,7 +47,7 @@ final class SessionModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::once())->method('trigger')->with(
-            Client::EVENT_SESSION_ESTABLISHED,
+            ClientInterface::EVENT_SESSION_ESTABLISHED,
             $session
         );
 

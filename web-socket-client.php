@@ -5,6 +5,7 @@ namespace PE\Component\WAMP;
 use PE\Component\WAMP\Client\Authentication\AuthenticationModule;
 use PE\Component\WAMP\Client\Authentication\Method\TicketMethod;
 use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\Role\PublisherModule;
 use PE\Component\WAMP\Client\Role\PublisherAPI;
 use PE\Component\WAMP\Client\Role\SubscriberModule;
@@ -31,7 +32,7 @@ $client->addModule(new AuthenticationModule(new TicketMethod('foo')));
 $client->addModule(new SubscriberModule());
 $client->addModule(new PublisherModule());
 
-$events->attach(Client::EVENT_SESSION_ESTABLISHED, function (Session $session) use ($loop) {
+$events->attach(ClientInterface::EVENT_SESSION_ESTABLISHED, function (Session $session) use ($loop) {
     $subscriber = new SubscriberAPI($session);
     $subscriber->subscribe('foo', function () {
         //echo json_encode(func_get_args()) . "\n";

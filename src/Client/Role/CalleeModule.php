@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
-use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ErrorMessage;
@@ -33,14 +33,14 @@ final class CalleeModule implements ClientModuleInterface
 
     public function attach(EventsInterface $events): void
     {
-        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(ClientInterface::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     public function detach(EventsInterface $events): void
     {
-        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(ClientInterface::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     public function onMessageReceived(Message $message, SessionInterface $session): void

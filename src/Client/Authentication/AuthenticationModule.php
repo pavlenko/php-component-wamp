@@ -4,7 +4,7 @@ namespace PE\Component\WAMP\Client\Authentication;
 
 use PE\Component\WAMP\Client\Authentication\Method\AnonymousMethod;
 use PE\Component\WAMP\Client\Authentication\Method\MethodInterface;
-use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ChallengeMessage;
@@ -29,8 +29,8 @@ final class AuthenticationModule implements ClientModuleInterface
 
     public function attach(EventsInterface $events): void
     {
-        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], -10);
-        $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived'], -10);
+        $events->attach(ClientInterface::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     /**
@@ -38,8 +38,8 @@ final class AuthenticationModule implements ClientModuleInterface
      */
     public function detach(EventsInterface $events): void
     {
-        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(ClientInterface::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     public function onMessageReceived(Message $message, SessionInterface $session): void

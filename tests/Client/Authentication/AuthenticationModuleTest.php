@@ -4,7 +4,7 @@ namespace PE\Component\WAMP\Tests\Client\Authentication;
 
 use PE\Component\WAMP\Client\Authentication\AuthenticationModule;
 use PE\Component\WAMP\Client\Authentication\Method\MethodInterface;
-use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -19,8 +19,8 @@ final class AuthenticationModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::exactly(2))->method('attach')->withConsecutive(
-            [Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived'], -10],
-            [Client::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
+            [ClientInterface::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived'], -10],
+            [ClientInterface::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
         );
 
         $module->attach($events);
@@ -32,8 +32,8 @@ final class AuthenticationModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::exactly(2))->method('detach')->withConsecutive(
-            [Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']],
-            [Client::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
+            [ClientInterface::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']],
+            [ClientInterface::EVENT_MESSAGE_SEND, [$module, 'onMessageSend']],
         );
 
         $module->detach($events);

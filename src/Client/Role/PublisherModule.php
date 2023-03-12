@@ -2,9 +2,8 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
-use PE\Component\WAMP\Client\Client;
+use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\ClientModuleInterface;
-use PE\Component\WAMP\Client\Role\Publisher\Feature\FeatureInterface;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ErrorMessage;
 use PE\Component\WAMP\Message\HelloMessage;
@@ -15,25 +14,25 @@ use PE\Component\WAMP\Util\EventsInterface;
 final class PublisherModule implements ClientModuleInterface
 {
     /**
-     * @var FeatureInterface[]
+     * @var PublisherFeatureInterface[]
      */
     private array $features;
 
-    public function __construct(FeatureInterface ...$features)
+    public function __construct(PublisherFeatureInterface ...$features)
     {
         $this->features = $features;
     }
 
     public function attach(EventsInterface $events): void
     {
-        $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $events->attach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->attach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->attach(ClientInterface::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     public function detach(EventsInterface $events): void
     {
-        $events->detach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
-        $events->detach(Client::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
+        $events->detach(ClientInterface::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
+        $events->detach(ClientInterface::EVENT_MESSAGE_SEND, [$this, 'onMessageSend']);
     }
 
     public function onMessageReceived(Message $message, SessionInterface $session): void
@@ -62,27 +61,31 @@ final class PublisherModule implements ClientModuleInterface
                 $message->setFeature('publisher', $feature->getName());
             }
         } else {
-            foreach ($this->features as $feature) {
-                $feature->onMessageSend($message);
-            }
+//            foreach ($this->features as $feature) {
+//                $feature->onMessageSend($message);
+//            }
         }
     }
 
     private function processPublishedMessage(SessionInterface $session, PublishedMessage $message): void
     {
+        $requests  = $session->publishRequests ?: [];
         $requestID = $message->getRequestID();
-        if (isset($session->publishRequests[$requestID])) {
-            $session->publishRequests[$requestID]->resolve();
-            unset($session->publishRequests[$requestID]);
+        if (isset($requests[$requestID])) {
+            $requests[$requestID]->resolve();
+            unset($requests[$requestID]);
         }
+        $session->publishRequests = $requests;
     }
 
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
+        $requests  = $session->publishRequests ?: [];
         $requestID = $message->getErrorRequestID();
-        if (isset($session->publishRequests[$requestID])) {
-            $session->publishRequests[$requestID]->reject();
-            unset($session->publishRequests[$requestID]);
+        if (isset($requests[$requestID])) {
+            $requests[$requestID]->reject();
+            unset($requests[$requestID]);
         }
+        $session->publishRequests = $requests;
     }
 }
