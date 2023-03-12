@@ -10,9 +10,11 @@ use PE\Component\WAMP\Message\InvocationMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\RegisterMessage;
+use PE\Component\WAMP\Message\ResultMessage;
 use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
+use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\Router\Role\DealerFeatureInterface;
 use PE\Component\WAMP\Router\Role\DealerModule;
 use PE\Component\WAMP\Router\Router;
@@ -123,6 +125,47 @@ final class DealerModuleTest extends TestCase
 
         $module = new DealerModule();
         $module->onMessageReceived(new CallMessage(1, [], 'uri'), $session);
+    }
+
+    public function testOnMessageReceivedYIELD_pass_progress()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::exactly(3))->method('send')->withConsecutive(
+            [self::isInstanceOf(RegisteredMessage::class)],
+            [self::isInstanceOf(InvocationMessage::class)],
+            [self::isInstanceOf(ResultMessage::class)],
+        );
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new RegisterMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CallMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new YieldMessage(1, ['progress' => true]), $session);
+    }
+
+    public function testOnMessageReceivedYIELD_pass_complete()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::exactly(3))->method('send')->withConsecutive(
+            [self::isInstanceOf(RegisteredMessage::class)],
+            [self::isInstanceOf(InvocationMessage::class)],
+            [self::isInstanceOf(ResultMessage::class)],
+        );
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new RegisterMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CallMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new YieldMessage(1, []), $session);
+    }
+
+    public function testOnMessageReceivedYIELD_fail()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('send')->willReturnCallback(function(ErrorMessage $m) {
+            self::assertSame(Message::ERROR_NO_SUCH_CALL, $m->getErrorURI());
+        });
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new YieldMessage(1, []), $session);
     }
 
     public function testOnMessageReceivedERROR_invocation()

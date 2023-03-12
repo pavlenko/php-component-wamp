@@ -24,6 +24,7 @@ use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Util;
 use PE\Component\WAMP\Util\EventsInterface;
 
+//TODO if possible do not use multiple Call[] lists
 final class DealerModule implements RouterModuleInterface
 {
     /**
@@ -195,8 +196,8 @@ final class DealerModule implements RouterModuleInterface
                 $call->setCallerSession($session);
                 $call->setInvocationMessage($invocation);
 
-                $this->calls[$message->getRequestID()] = $call;
-                $this->invocations[$invocationID]      = $call;
+                $this->calls[$message->getRequestID()]       = $call;
+                $this->invocations[$message->getRequestID()] = $call;
 
                 $session->send($invocation);
                 return;

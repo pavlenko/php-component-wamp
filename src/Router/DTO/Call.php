@@ -20,7 +20,7 @@ final class Call
 
     private CancelMessage $cancelMessage;
 
-    private InterruptMessage $interruptMessage;
+    private ?InterruptMessage $interruptMessage = null;
 
     public function getCalleeSession(): SessionInterface
     {
@@ -72,7 +72,7 @@ final class Call
         $this->cancelMessage = $message;
     }
 
-    public function getInterruptMessage(): InterruptMessage
+    public function getInterruptMessage(): ?InterruptMessage
     {
         return $this->interruptMessage;
     }
