@@ -250,46 +250,63 @@ WAMP-level Authentication
 `------'           `------'
 ```
 
+## Advanced
+Pattern-based subscriptions
+```text
+                                          Subscription
+                          +------+         +--------+           +----------+
+                          |      |--Event->| Exact  |--------+->|Subscriber|
+                          |      |         +--------+        |  +----------+
+                          |      |                           | 
++---------+               |      |         +--------+        |  +----------+
+|Publisher|--Publication->|Broker|--Event->|Wildcard|----+-> `->|Subscriber|
++---------+               |      |         +--------+    |      +----------+
+                          |      |                       |
+                          |      |         +--------+    |      +----------+                          
+                          |      |--Event->| Prefix |--> `----->|Subscriber|
+                          +------+         +--------+           +----------+
+```
+
 ## Features
 **RPC Features**
 
-|Feature                   |Status|P  |B  |S  |Cr |D  |Ce |
-|--------------------------|------|---|---|---|---|---|---|
-|progressive_call_results  |beta  |   |   |   | X | X | X |
-|progressive_calls         |sketch|   |   |   | X | X | X |
-|call_timeout              |alpha |   |   |   | X | X | X |
-|call_canceling            |alpha |   |   |   | X | X | X |
-|caller_identification     |alpha |   |   |   | X | X | X |
-|call_trustlevels          |alpha |   |   |   |   | X | X |
-|registration_meta_api     |beta  |   |   |   |   | X |   |
-|pattern_based_registration|beta  |   |   |   |   | X | X |
-|shared_registration       |beta  |   |   |   |   | X | X |
-|sharded_registration      |alpha |   |   |   |   | X | X |
-|registration_revocation   |alpha |   |   |   |   | X | X |
-|procedure_reflection      |sketch|   |   |   |   | X |   /
+| Feature                    | Status | P   | B   | S   | Cr  |  D  | Ce  |
+|----------------------------|--------|-----|-----|-----|:---:|:---:|:---:|
+| progressive_call_results   | beta   |     |     |     |  X  |  X  |  X  |
+| progressive_calls          | sketch |     |     |     |  X  |  X  |  X  |
+| call_timeout               | alpha  |     |     |     |  X  |  X  |  X  |
+| call_canceling             | alpha  |     |     |     |  X  |  X  |  X  |
+| caller_identification      | alpha  |     |     |     |  X  |  X  |  X  |
+| call_trustlevels           | alpha  |     |     |     |     |  X  |  X  |
+| registration_meta_api      | beta   |     |     |     |     |  X  |     |
+| pattern_based_registration | beta   |     |     |     |     |  X  |  X  |
+| shared_registration        | beta   |     |     |     |     |  X  |  X  |
+| sharded_registration       | alpha  |     |     |     |     |  X  |  X  |
+| registration_revocation    | alpha  |     |     |     |     |  X  |  X  |
+| procedure_reflection       | sketch |     |     |     |     |  X  |     |
 
 **PubSub Features**
 
-|Feature                      |Status|P  |B  |S  |Cr |D  |Ce |
-|-----------------------------|------|---|---|---|---|---|---|
-|subscriber_blackwhite_listing|stable| X | X |   |   |   |   |
-|publisher_exclusion          |stable| X | X |   |   |   |   |
-|publisher_identification     |alpha | X | X | X |   |   |   |
-|publication_trustlevels      |alpha |   | X | X |   |   |   |
-|subscription_meta_api        |beta  |   | X |   |   |   |   |
-|pattern_based_subscription   |beta  |   | X | X |   |   |   |
-|sharded_subscription         |alpha |   | X | X |   |   |   |
-|event_history                |alpha |   | X | X |   |   |   |
-|topic_reflection             |sketch|   | X |   |   |   |   |
+| Feature                       | Status |  P  |  B  |  S  | Cr  | D   | Ce  |
+|-------------------------------|--------|:---:|:---:|:---:|-----|-----|-----|
+| subscriber_blackwhite_listing | stable |  X  |  X  |     |     |     |     |
+| publisher_exclusion           | stable |  X  |  X  |     |     |     |     |
+| publisher_identification      | alpha  |  X  |  X  |  X  |     |     |     |
+| publication_trustlevels       | alpha  |     |  X  |  X  |     |     |     |
+| subscription_meta_api         | beta   |     |  X  |     |     |     |     |
+| pattern_based_subscription    | beta   |     |  X  |  X  |     |     |     |
+| sharded_subscription          | alpha  |     |  X  |  X  |     |     |     |
+| event_history                 | alpha  |     |  X  |  X  |     |     |     |
+| topic_reflection              | sketch |     |  X  |     |     |     |     |
 
 **Other Advanced Features**
 
-|Feature                          |Status|
-|---------------------------------|------|
-|challenge-response authentication|beta  |
-|cookie authentication            |beta  |
-|ticket authentication            |beta  |
-|rawsocket transport              |stable|
-|batched WS transport             |sketch|
-|longpoll transport               |beta  |
-|session meta api                 |beta  |
+| Feature                           | Status |
+|-----------------------------------|--------|
+| challenge-response authentication | beta   |
+| cookie authentication             | beta   |
+| ticket authentication             | beta   |
+| rawsocket transport               | stable |
+| batched WS transport              | sketch |
+| longpoll transport                | beta   |
+| session meta api                  | beta   |
