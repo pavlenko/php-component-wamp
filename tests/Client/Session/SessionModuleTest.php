@@ -19,8 +19,7 @@ final class SessionModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::once())->method('attach')->with(
-            Client::EVENT_MESSAGE_RECEIVED,
-            [$module, 'onMessageReceived']
+            Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']
         );
 
         $module->attach($events);
@@ -32,8 +31,7 @@ final class SessionModuleTest extends TestCase
 
         $events = $this->createMock(EventsInterface::class);
         $events->expects(self::once())->method('detach')->with(
-            Client::EVENT_MESSAGE_RECEIVED,
-            [$module, 'onMessageReceived']
+            Client::EVENT_MESSAGE_RECEIVED, [$module, 'onMessageReceived']
         );
 
         $module->detach($events);

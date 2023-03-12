@@ -54,6 +54,11 @@ trait Details
         return $this;
     }
 
+    public function getFeatures(string $name): array
+    {
+        return (array) ($this->details['roles'][$name]['features'] ?? []);
+    }
+
     public function setFeatures(string $name, array $features): self
     {
         $this->details['roles'][$name] = ['features' => $features];
