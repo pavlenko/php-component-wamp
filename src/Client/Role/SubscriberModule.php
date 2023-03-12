@@ -84,19 +84,20 @@ final class SubscriberModule implements ClientModuleInterface
 
     private function processUnsubscribedMessage(SessionInterface $session, UnsubscribedMessage $message): void
     {
-        $session->subscriptions = $session->subscriptions ?: [];
-        foreach ($session->subscriptions as $key => $subscription) {
+        $subscriptions = $session->subscriptions ?: [];
+        foreach ($subscriptions as $key => $subscription) {
             if ($subscription->getUnsubscribeRequestID() === $message->getRequestID()) {
                 $subscription->getUnsubscribeDeferred()->resolve();
-                unset($session->subscriptions[$key]);
+                unset($subscriptions[$key]);
             }
         }
+        $session->subscriptions = $subscriptions;
     }
 
     private function processEventMessage(SessionInterface $session, EventMessage $message): void
     {
-        $session->subscriptions = $session->subscriptions ?: [];
-        foreach ($session->subscriptions as $subscription) {
+        $subscriptions = $session->subscriptions ?: [];
+        foreach ($subscriptions as $subscription) {
             if ($subscription->getSubscriptionID() === $message->getSubscriptionID()) {
                 call_user_func(
                     $subscription->getCallback(),
@@ -123,23 +124,25 @@ final class SubscriberModule implements ClientModuleInterface
 
     private function processErrorMessageFromSubscribe(SessionInterface $session, ErrorMessage $message): void
     {
-        $session->subscriptions = $session->subscriptions ?: [];
-        foreach ($session->subscriptions as $key => $subscription) {
+        $subscriptions = $session->subscriptions ?: [];
+        foreach ($subscriptions as $key => $subscription) {
             if ($subscription->getSubscribeRequestID() === $message->getErrorRequestID()) {
                 $subscription->getSubscribeDeferred()->reject();
-                unset($session->subscriptions[$key]);
+                unset($subscriptions[$key]);
             }
         }
+        $session->subscriptions = $subscriptions;
     }
 
     private function processErrorMessageFromUnsubscribe(SessionInterface $session, ErrorMessage $message): void
     {
-        $session->subscriptions = $session->subscriptions ?: [];
-        foreach ($session->subscriptions as  $key =>$subscription) {
+        $subscriptions = $session->subscriptions ?: [];
+        foreach ($subscriptions as  $key =>$subscription) {
             if ($subscription->getUnsubscribeRequestID() === $message->getErrorRequestID()) {
                 $subscription->getUnsubscribeDeferred()->reject();
-                unset($session->subscriptions[$key]);
+                unset($subscriptions[$key]);
             }
         }
+        $session->subscriptions = $subscriptions;
     }
 }
