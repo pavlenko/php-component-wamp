@@ -3,8 +3,11 @@
 namespace PE\Component\WAMP\Tests\Router\Role;
 
 use PE\Component\WAMP\Message\ErrorMessage;
+use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\SubscribedMessage;
 use PE\Component\WAMP\Message\SubscribeMessage;
+use PE\Component\WAMP\Message\UnsubscribedMessage;
+use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Role\BrokerFeatureInterface;
 use PE\Component\WAMP\Router\Role\BrokerModule;
@@ -70,7 +73,26 @@ final class BrokerModuleTest extends TestCase
 
     public function testOnMessageReceivedUNSUBSCRIBE_pass()
     {
-        $this->markTestIncomplete();
+        $subscriptionID = 0;
+
+        $index   = 0;
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::exactly(2))->method('send')->willReturnCallback(
+            function (Message $message) use (&$index, &$subscriptionID) {
+                if (0 === $index) {
+                    self::assertInstanceOf(SubscribedMessage::class, $message);
+                    /* @var $message SubscribedMessage */
+                    $subscriptionID = $message->getSubscriptionID();
+                } else {
+                    self::assertInstanceOf(UnsubscribedMessage::class, $message);
+                }
+                $index++;
+            }
+        );
+
+        $module = new BrokerModule();
+        $module->onMessageReceived(new SubscribeMessage(1, [], 'topic'), $session);
+        $module->onMessageReceived(new UnsubscribeMessage(1, $subscriptionID), $session);
     }
 
     public function testOnMessageReceivedUNSUBSCRIBE_fail()
