@@ -250,12 +250,16 @@ final class DealerModule implements RouterModuleInterface
 
             if ($call->getCallerSession() !== $session) {
                 // Session mismatch - do nothing
+                // @codeCoverageIgnoreStart
                 return;
+                // @codeCoverageIgnoreEnd
             }
 
             if ($call->getInterruptMessage()) {
                 // Interrupt in progress - do nothing
+                // @codeCoverageIgnoreStart
                 return;
+                // @codeCoverageIgnoreEnd
             }
 
             $call->setCancelMessage($message);

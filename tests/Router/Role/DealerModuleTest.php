@@ -168,6 +168,33 @@ final class DealerModuleTest extends TestCase
         $module->onMessageReceived(new YieldMessage(1, []), $session);
     }
 
+    public function testOnMessageReceivedCANCEL_pass()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::exactly(4))->method('send')->withConsecutive(
+            [self::isInstanceOf(RegisteredMessage::class)],
+            [self::isInstanceOf(InvocationMessage::class)],
+            [self::isInstanceOf(InterruptMessage::class)],
+            [self::callback(fn(ErrorMessage $m) => Message::ERROR_CANCELLED === $m->getErrorURI())],
+        );
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new RegisterMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CallMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CancelMessage(1, ['mode' => 'killnowait']), $session);
+    }
+
+    public function testOnMessageReceivedCANCEL_fail()
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('send')->willReturnCallback(function(ErrorMessage $m) {
+            self::assertSame(Message::ERROR_NO_SUCH_CALL, $m->getErrorURI());
+        });
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new CancelMessage(1, []), $session);
+    }
+
     public function testOnMessageReceivedERROR_invocation()
     {
         $this->markTestIncomplete();
