@@ -65,29 +65,31 @@ final class CallerModule implements ClientModuleInterface
 
     private function processResultMessage(SessionInterface $session, ResultMessage $message): void
     {
-        $session->callRequests = $session->callRequests ?: [];
-        foreach ($session->callRequests as $key => $call) {
+        $requests = $session->callRequests ?: [];
+        foreach ($requests as $key => $call) {
             if ($call->getRequestID() === $message->getRequestID()) {
                 if (empty($message->getDetail('progress'))) {
                     $call->getDeferred()->resolve();
-                    unset($session->callRequests[$key]);
+                    unset($requests[$key]);
                 } else {
                     $call->getDeferred()->notify();
                 }
             }
         }
+        $session->callRequests = $requests;
     }
 
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
     {
         if (Message::CODE_CALL === $message->getErrorMessageCode()) {
-            $session->callRequests = $session->callRequests ?: [];
-            foreach ($session->callRequests as $key => $call) {
+            $requests = $session->callRequests ?: [];
+            foreach ($requests as $key => $call) {
                 if ($call->getRequestID() === $message->getErrorRequestID()) {
                     $call->getDeferred()->reject();
-                    unset($session->callRequests[$key]);
+                    unset($requests[$key]);
                 }
             }
+            $session->callRequests = $requests;
         }
     }
 }
