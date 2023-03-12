@@ -2,6 +2,7 @@
 
 namespace PE\Component\WAMP\Router\Role;
 
+use Broker\BrokerFeatureInterface;
 use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
@@ -12,7 +13,6 @@ use PE\Component\WAMP\Message\SubscribeMessage;
 use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
-use PE\Component\WAMP\Router\Role\Broker\BrokerFeatureInterface;
 use PE\Component\WAMP\Router\DTO\Subscription;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;

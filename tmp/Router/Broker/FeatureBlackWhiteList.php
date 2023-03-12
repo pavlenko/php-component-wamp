@@ -1,10 +1,10 @@
 <?php
 
-namespace PE\Component\WAMP\Router\Role\Broker;
+namespace Broker;
 
 use PE\Component\WAMP\Message\PublishMessage;
-use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Router\DTO\Subscription;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 
 final class FeatureBlackWhiteList implements BrokerFeatureInterface
 {

@@ -86,11 +86,10 @@ final class CalleeModule implements ClientModuleInterface
 
     private function processRegisteredMessage(SessionInterface $session, RegisteredMessage $message): void
     {
-        $session->registrations = $session->registrations ?: [];
-        foreach ($session->registrations as $registration) {
+        $registrations = $session->registrations ?: [];
+        foreach ($registrations as $registration) {
             if ($registration->getRegisterRequestID() === $message->getRegistrationID()) {
                 $registration->setRegistrationID($message->getRegistrationID());
-
                 $registration->getRegisterDeferred()->resolve();
             }
         }
@@ -98,13 +97,14 @@ final class CalleeModule implements ClientModuleInterface
 
     private function processUnregisteredMessage(SessionInterface $session, UnregisteredMessage $message): void
     {
-        $session->registrations = $session->registrations ?: [];
-        foreach ($session->registrations as $key => $registration) {
+        $registrations = $session->registrations ?: [];
+        foreach ($registrations as $key => $registration) {
             if ($registration->getUnregisterRequestID() === $message->getRequestID()) {
                 $registration->getUnregisterDeferred()->resolve();
-                unset($session->registrations[$key]);
+                unset($registrations[$key]);
             }
         }
+        $session->registrations = $registrations;
     }
 
     private function processInvocationMessage(SessionInterface $session, InvocationMessage $message)
@@ -112,12 +112,6 @@ final class CalleeModule implements ClientModuleInterface
         $session->registrations = $session->registrations ?: [];
         foreach ($session->registrations as $registration) {
             if ($registration->getRegistrationID() === $message->getRegistrationID()) {
-                if ($registration->getCallback() === null) {
-                    // Callback can be empty if unregister request occurred, but not completed
-                    $session->send(MessageFactory::createErrorMessageFromMessage($message));
-                    return;
-                }
-
                 try {
                     $result = call_user_func(
                         $registration->getCallback(),
@@ -133,13 +127,20 @@ final class CalleeModule implements ClientModuleInterface
 
                     // Check if promise is cancellable and add canceller to session if true
                     if ($result instanceof CancellablePromiseInterface) {
-                        $session->invocationCancellers = $session->invocationCancellers ?: [];
-                        $session->invocationCancellers[$message->getRequestID()] = [$result, 'cancel'];
+                        $session->invocationCancellers = array_merge(
+                            $session->invocationCancellers ?: [],
+                            [$message->getRequestID() => [$result, 'cancel']]
+                        );
 
+                        // @codeCoverageIgnoreStart
                         $result = $result->then(function ($result) use ($session, $message) {
-                            unset($session->invocationCancellers[$message->getRequestID()]);
+                            // Process via local var for prevent indirect modification error
+                            $cancellers = $session->invocationCancellers ?: [];
+                            unset($cancellers[$message->getRequestID()]);
+                            $session->invocationCancellers = $cancellers;
                             return $result;
                         });
+                        // @codeCoverageIgnoreEnd
                     }
 
                     // Send messages depends on invocation state
@@ -177,14 +178,16 @@ final class CalleeModule implements ClientModuleInterface
 
     private function processInterruptMessage(SessionInterface $session, InterruptMessage $message): void
     {
-        if (isset($session->invocationCancellers[$message->getRequestID()])) {
-            $callable = $session->invocationCancellers[$message->getRequestID()];
+        $cancellers = $session->invocationCancellers ?: [];
+        if (isset($cancellers[$message->getRequestID()])) {
+            $callable = $cancellers[$message->getRequestID()];
             $callable();
 
-            unset($session->invocationCancellers[$message->getRequestID()]);
+            unset($cancellers[$message->getRequestID()]);
 
             $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_CANCELLED));
         }
+        $session->invocationCancellers = $cancellers;
     }
 
     private function processErrorMessage(SessionInterface $session, ErrorMessage $message): void
@@ -201,23 +204,25 @@ final class CalleeModule implements ClientModuleInterface
 
     private function processErrorMessageFromRegister(SessionInterface $session, ErrorMessage $message): void
     {
-        $session->registrations = $session->registrations ?: [];
-        foreach ($session->registrations as $key => $registration) {
+        $registrations = $session->registrations ?: [];
+        foreach ($registrations as $key => $registration) {
             if ($registration->getRegisterRequestID() === $message->getErrorRequestID()) {
                 $registration->getRegisterDeferred()->reject();
-                unset($session->registrations[$key]);
+                unset($registrations[$key]);
             }
         }
+        $session->registrations = $registrations;
     }
 
     private function processErrorMessageFromUnregister(SessionInterface $session, ErrorMessage $message): void
     {
-        $session->registrations = $session->registrations ?: [];
-        foreach ($session->registrations as $key => $registration) {
+        $registrations = $session->registrations ?: [];
+        foreach ($registrations as $key => $registration) {
             if ($registration->getUnregisterRequestID() === $message->getErrorRequestID()) {
                 $registration->getUnregisterDeferred()->reject();
-                unset($session->registrations[$key]);
+                unset($registrations[$key]);
             }
         }
+        $session->registrations = $registrations;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Client\Role\Publisher\Feature;
+namespace Publisher\Feature;
 
 use PE\Component\WAMP\Message\Message;
 

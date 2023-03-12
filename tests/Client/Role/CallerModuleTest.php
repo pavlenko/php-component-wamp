@@ -7,7 +7,6 @@ use PE\Component\WAMP\Client\DTO\Call;
 use PE\Component\WAMP\Client\Role\CallerFeatureInterface;
 use PE\Component\WAMP\Client\Role\CallerModule;
 use PE\Component\WAMP\Message\ErrorMessage;
-use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\ResultMessage;
