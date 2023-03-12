@@ -2,7 +2,6 @@
 
 namespace PE\Component\WAMP\Router\Role;
 
-use Broker\BrokerFeatureInterface;
 use PE\Component\WAMP\Message\EventMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\MessageFactory;
