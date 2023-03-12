@@ -195,14 +195,54 @@ final class DealerModuleTest extends TestCase
         $module->onMessageReceived(new CancelMessage(1, []), $session);
     }
 
-    public function testOnMessageReceivedERROR_invocation()
+    public function testOnMessageReceivedERROR_invocation_pass()
     {
-        $this->markTestIncomplete();
+        $message = new ErrorMessage(Message::CODE_INVOCATION, 1, [], 'uri');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::exactly(3))->method('send')->withConsecutive(
+            [self::isInstanceOf(RegisteredMessage::class)],
+            [self::isInstanceOf(InvocationMessage::class)],
+            [self::isInstanceOf(ErrorMessage::class)],
+        );
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new RegisterMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CallMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived($message, $session);
+    }
+
+    public function testOnMessageReceivedERROR_invocation_fail()
+    {
+        $message = new ErrorMessage(Message::CODE_INVOCATION, 1, [], 'uri');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('send')->willReturnCallback(function(ErrorMessage $m) {
+            self::assertSame(Message::ERROR_NO_SUCH_CALL, $m->getErrorURI());
+        });
+
+        $module = new DealerModule();
+        $module->onMessageReceived($message, $session);
     }
 
     public function testOnMessageReceivedERROR_interrupt_pass()
     {
-        $this->markTestIncomplete();
+        $requestID = 0;
+
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::exactly(4))->method('send')->withConsecutive(
+            [self::isInstanceOf(RegisteredMessage::class)],
+            [self::callback(function (InvocationMessage $m) use (&$requestID) {
+                $requestID = $m->getRequestID();
+                return true;
+            })],
+            [self::isInstanceOf(InterruptMessage::class)],
+            [self::isInstanceOf(ErrorMessage::class)],
+        );
+
+        $module = new DealerModule();
+        $module->onMessageReceived(new RegisterMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CallMessage(1, [], 'uri'), $session);
+        $module->onMessageReceived(new CancelMessage(1, []), $session);
+        $module->onMessageReceived(new ErrorMessage(Message::CODE_INTERRUPT, $requestID, [], 'uri'), $session);
     }
 
     public function testOnMessageReceivedERROR_interrupt_fail()

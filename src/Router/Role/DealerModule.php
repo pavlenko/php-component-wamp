@@ -311,7 +311,9 @@ final class DealerModule implements RouterModuleInterface
 
             if ($call->getCalleeSession() !== $session) {
                 // Session mismatch - do nothing
+                // @codeCoverageIgnoreStart
                 return;
+                // @codeCoverageIgnoreEnd
             }
 
             $error = MessageFactory::createErrorMessageFromMessage($call->getCallMessage(), $message->getErrorURI());
