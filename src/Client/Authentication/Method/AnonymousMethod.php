@@ -6,6 +6,9 @@ use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\ChallengeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class AnonymousMethod implements MethodInterface
 {
     public function getName(): string
