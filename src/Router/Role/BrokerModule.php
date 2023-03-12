@@ -25,16 +25,16 @@ final class BrokerModule implements RouterModuleInterface
     /**
      * @var BrokerFeatureInterface[]
      */
-    private array $features = [];
+    private array $features;
 
     /**
      * @var Subscription[]
      */
     private array $subscriptions = [];
 
-    public function addFeature(BrokerFeatureInterface $feature): void
+    public function __construct(BrokerFeatureInterface ...$features)
     {
-        $this->features[get_class($feature)] = $feature;
+        $this->features = $features;
     }
 
     public function attach(EventsInterface $events): void
@@ -69,17 +69,18 @@ final class BrokerModule implements RouterModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof WelcomeMessage) {
-            $features = [
-                'payload_passthru_mode'      => false,//TODO
-                'publisher_identification'   => false,//TODO
-                'publication_trustlevels'    => false,//TODO
-                'pattern_based_subscription' => false,//TODO
-            ];
+            // Possible features, by default disabled
+            $message->setFeatures('broker', [
+                'payload_passthru_mode'         => false,
+                'publisher_exclusion'           => false,
+                'publisher_identification'      => false,
+                'publication_trustlevels'       => false,
+                'pattern_based_subscription'    => false,
+                'subscriber_blackwhite_listing' => false,
+            ]);
             foreach ($this->features as $feature) {
-                $features[$feature->getName()] = true;
+                $message->setFeature('broker', $feature->getName());
             }
-
-            $message->addFeatures('broker', $features);
         }
     }
 

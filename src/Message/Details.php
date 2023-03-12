@@ -54,32 +54,12 @@ trait Details
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @param array  $features
-     *
-     * @return $this
-     * @deprecated
-     */
-    public function addFeatures(string $name, array $features): self
+    public function setFeatures(string $name, array $features): self
     {
-        if (!isset($this->details['roles'])) {
-            $this->details['roles'] = [];
-        }
-
         $this->details['roles'][$name] = ['features' => $features];
         return $this;
     }
 
-    /**
-     * Add feature to role
-     *
-     * @param string $role
-     * @param string $feature
-     * @param bool $enabled
-     *
-     * @return $this
-     */
     public function setFeature(string $role, string $feature, bool $enabled = true): self
     {
         $this->details['roles'][$role]['features'][$feature] = $enabled;

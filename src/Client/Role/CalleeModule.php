@@ -21,6 +21,16 @@ use function React\Promise\resolve;
 
 final class CalleeModule implements ClientModuleInterface
 {
+    /**
+     * @var CalleeFeatureInterface[]
+     */
+    private array $features;
+
+    public function __construct(CalleeFeatureInterface ...$features)
+    {
+        $this->features = $features;
+    }
+
     public function attach(EventsInterface $events): void
     {
         $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
@@ -57,16 +67,20 @@ final class CalleeModule implements ClientModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
-            $message->addFeatures('callee', [
-                'payload_passthru_mode'      => false,//TODO
-                'caller_identification'      => false,//TODO
-                'progressive_call_results'   => false,//TODO
-                'call_cancelling'            => false,//TODO use with progressive_calls feature
-                'call_timeout'               => false,//TODO
-                'call_trustlevels'           => false,//TODO
-                'pattern_based_registration' => false,//TODO
-                'shared_registration'        => false,//TODO
+            // Possible features, by default disabled
+            $message->setFeatures('callee', [
+                'payload_passthru_mode'      => false,
+                'caller_identification'      => false,
+                'progressive_call_results'   => false,
+                'call_cancelling'            => false,
+                'call_timeout'               => false,
+                'call_trustlevels'           => false,
+                'pattern_based_registration' => false,
+                'shared_registration'        => false,
             ]);
+            foreach ($this->features as $feature) {
+                $message->setFeature('callee', $feature->getName());
+            }
         }
     }
 

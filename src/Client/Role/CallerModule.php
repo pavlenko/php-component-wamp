@@ -13,6 +13,16 @@ use PE\Component\WAMP\Util\EventsInterface;
 
 final class CallerModule implements ClientModuleInterface
 {
+    /**
+     * @var CallerFeatureInterface[]
+     */
+    private array $features;
+
+    public function __construct(CallerFeatureInterface ...$features)
+    {
+        $this->features = $features;
+    }
+
     public function attach(EventsInterface $events): void
     {
         $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
@@ -40,12 +50,16 @@ final class CallerModule implements ClientModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
-            $message->addFeatures('caller', [
-                'payload_passthru_mode'    => false,//TODO
-                'caller_identification'    => false,//TODO
-                'call_cancelling'          => false,//TODO
-                'progressive_call_results' => false,//TODO
+            // Possible features, by default disabled
+            $message->setFeatures('caller', [
+                'payload_passthru_mode'    => false,
+                'caller_identification'    => false,
+                'call_cancelling'          => false,
+                'progressive_call_results' => false,
             ]);
+            foreach ($this->features as $feature) {
+                $message->setFeature('caller', $feature->getName());
+            }
         }
     }
 

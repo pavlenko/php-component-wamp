@@ -6,6 +6,9 @@ use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Router\Subscription;
 
+/**
+ * @deprecated
+ */
 interface BrokerFeatureInterface
 {
     /**

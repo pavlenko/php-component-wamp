@@ -108,16 +108,16 @@ final class DealerModule implements RouterModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof WelcomeMessage) {
-            //TODO replace with comment about possible features
-            $message->addFeatures('dealer', [
-                'payload_passthru_mode'      => false,//TODO
-                'caller_identification'      => false,//TODO
-                'progressive_call_results'   => false,//TODO
-                'call_cancelling'            => false,//TODO
-                'call_timeout'               => false,//TODO
-                'call_trustlevels'           => false,//TODO
-                'pattern_based_registration' => false,//TODO
-                'shared_registration'        => false,//TODO
+            // Possible features, by default disabled
+            $message->setFeatures('dealer', [
+                'payload_passthru_mode'      => false,
+                'caller_identification'      => false,
+                'progressive_call_results'   => false,
+                'call_cancelling'            => false,
+                'call_timeout'               => false,
+                'call_trustlevels'           => false,
+                'pattern_based_registration' => false,
+                'shared_registration'        => false,
             ]);
             foreach ($this->features as $feature) {
                 $message->setFeature('dealer', $feature->getName());

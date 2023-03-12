@@ -15,6 +15,16 @@ use PE\Component\WAMP\Util\EventsInterface;
 
 final class SubscriberModule implements ClientModuleInterface
 {
+    /**
+     * @var SubscriberFeatureInterface[]
+     */
+    private array $features;
+
+    public function __construct(SubscriberFeatureInterface ...$features)
+    {
+        $this->features = $features;
+    }
+
     public function attach(EventsInterface $events): void
     {
         $events->attach(Client::EVENT_MESSAGE_RECEIVED, [$this, 'onMessageReceived']);
@@ -48,12 +58,16 @@ final class SubscriberModule implements ClientModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof HelloMessage) {
-            $message->addFeatures('subscriber', [
-                'payload_passthru_mode'      => false,//TODO
-                'publisher_identification'   => false,//TODO
-                'publication_trustlevels'    => false,//TODO
-                'pattern_based_subscription' => false,//TODO
+            // Possible features, by default disabled
+            $message->setFeatures('subscriber', [
+                'payload_passthru_mode'      => false,
+                'publisher_identification'   => false,
+                'publication_trustlevels'    => false,
+                'pattern_based_subscription' => false,
             ]);
+            foreach ($this->features as $feature) {
+                $message->setFeature('subscriber', $feature->getName());
+            }
         }
     }
 
