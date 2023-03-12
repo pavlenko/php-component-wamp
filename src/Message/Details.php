@@ -59,6 +59,7 @@ trait Details
      * @param array  $features
      *
      * @return $this
+     * @deprecated
      */
     public function addFeatures(string $name, array $features): self
     {
@@ -67,6 +68,21 @@ trait Details
         }
 
         $this->details['roles'][$name] = ['features' => $features];
+        return $this;
+    }
+
+    /**
+     * Add feature to role
+     *
+     * @param string $role
+     * @param string $feature
+     * @param bool $enabled
+     *
+     * @return $this
+     */
+    public function setFeature(string $role, string $feature, bool $enabled = true): self
+    {
+        $this->details['roles'][$role]['features'][$feature] = $enabled;
         return $this;
     }
 }

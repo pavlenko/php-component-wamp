@@ -27,6 +27,11 @@ use PE\Component\WAMP\Util\EventsInterface;
 final class DealerModule implements RouterModuleInterface
 {
     /**
+     * @var DealerFeatureInterface[]
+     */
+    private array $features;
+
+    /**
      * @var Procedure[]
      */
     private array $procedures = [];
@@ -51,6 +56,11 @@ final class DealerModule implements RouterModuleInterface
      * @var Call[]
      */
     private array $interrupts = [];
+
+    public function __construct(DealerFeatureInterface ...$features)
+    {
+        $this->features = $features;
+    }
 
     public function attach(EventsInterface $events): void
     {
@@ -98,6 +108,7 @@ final class DealerModule implements RouterModuleInterface
     public function onMessageSend(Message $message): void
     {
         if ($message instanceof WelcomeMessage) {
+            //TODO replace with comment about possible features
             $message->addFeatures('dealer', [
                 'payload_passthru_mode'      => false,//TODO
                 'caller_identification'      => false,//TODO
@@ -108,6 +119,9 @@ final class DealerModule implements RouterModuleInterface
                 'pattern_based_registration' => false,//TODO
                 'shared_registration'        => false,//TODO
             ]);
+            foreach ($this->features as $feature) {
+                $message->setFeature('dealer', $feature->getName());
+            }
         }
     }
 
