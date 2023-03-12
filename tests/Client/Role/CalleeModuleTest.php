@@ -13,10 +13,12 @@ use PE\Component\WAMP\Message\InvocationMessage;
 use PE\Component\WAMP\Message\Message;
 use PE\Component\WAMP\Message\RegisteredMessage;
 use PE\Component\WAMP\Message\UnregisteredMessage;
+use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\Tests\Client\TestCaseBase;
 use PE\Component\WAMP\Util\EventsInterface;
 use React\Promise\Deferred;
 use React\Promise\Promise;
+use function PHPUnit\Framework\isInstanceOf;
 
 final class CalleeModuleTest extends TestCaseBase
 {
@@ -110,8 +112,7 @@ final class CalleeModuleTest extends TestCaseBase
         $module->onMessageReceived($message, $session);
     }
 
-    //TODO split by success, error, progress
-    public function testOnMessageReceivedINVOCATION()
+    public function testOnMessageReceivedINVOCATION_void()
     {
         $message = new InvocationMessage(1, 1, []);
         $session = $this->createSessionMock();
@@ -130,6 +131,44 @@ final class CalleeModuleTest extends TestCaseBase
         $module->onMessageReceived($message, $session);
 
         self::assertTrue($executed);
+    }
+
+    public function testOnMessageReceivedINVOCATION_resolve()
+    {
+        $message = new InvocationMessage(1, 1, []);
+        $session = $this->createSessionMock();
+        $session->expects(self::once())->method('send')->willReturnCallback(function (YieldMessage $message) {
+            self::assertSame(['resolve'], $message->getArguments());
+        });
+
+        $promise = new Promise(fn(callable $resolve) => $resolve('resolve'));
+
+        $registration = new Registration('uri', fn() => $promise, 1, new Deferred());
+        $registration->setRegistrationID(1);
+
+        $session->registrations = [$registration];
+
+        $module = new CalleeModule();
+        $module->onMessageReceived($message, $session);
+    }
+
+    public function testOnMessageReceivedINVOCATION_reject()
+    {
+        $message = new InvocationMessage(1, 1, []);
+        $session = $this->createSessionMock();
+        $session->expects(self::once())->method('send')->willReturnCallback(function (ErrorMessage $message) {
+            self::assertSame([isInstanceOf(\Exception::class)], $message->getArguments());
+        });
+
+        $promise = new Promise(fn(callable $_1, callable $reject) => $reject(new \Exception('reject')));
+
+        $registration = new Registration('uri', fn() => $promise, 1, new Deferred());
+        $registration->setRegistrationID(1);
+
+        $session->registrations = [$registration];
+
+        $module = new CalleeModule();
+        $module->onMessageReceived($message, $session);
     }
 
     public function testOnMessageReceivedINTERRUPT()

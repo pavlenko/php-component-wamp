@@ -144,12 +144,12 @@ final class CalleeModule implements ClientModuleInterface
                     }
 
                     // Send messages depends on invocation state
-                    $result->then(
-                        function ($result) use ($session, $message) {
+                    $result
+                        ->then(function ($result) use ($session, $message) {
                             // Send invocation success
                             $session->send(new YieldMessage($message->getRequestID(), [], [$result]));
-                        },
-                        function ($error) use ($session, $message) {
+                        })
+                        ->otherwise(function ($error) use ($session, $message) {
                             // Send invocation error
                             $errorMessage = MessageFactory::createErrorMessageFromMessage($message);
 
@@ -159,12 +159,13 @@ final class CalleeModule implements ClientModuleInterface
                             }
 
                             $session->send($errorMessage);
-                        },
-                        function ($result) use ($session, $message) {
-                            // Send invocation progress
+                        })
+                        ->progress(function ($result) use ($session, $message) {
+                            // Send invocation progress, TO DO check how to execute progress from callback
+                            // @codeCoverageIgnoreStart
                             $session->send(new YieldMessage($message->getRequestID(), ['progress' => true], [$result]));
-                        }
-                    );
+                            // @codeCoverageIgnoreEnd
+                        });
                 } catch (\Exception $exception) {
                     $error = MessageFactory::createErrorMessageFromMessage($message);
                     $error->setArguments([$exception->getMessage()]);
