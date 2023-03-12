@@ -16,8 +16,8 @@ use PE\Component\WAMP\Message\UnregisteredMessage;
 use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Message\YieldMessage;
-use PE\Component\WAMP\Router\Call;
-use PE\Component\WAMP\Router\Procedure;
+use PE\Component\WAMP\Router\DTO\Call;
+use PE\Component\WAMP\Router\DTO\Procedure;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session\SessionInterface;
@@ -191,6 +191,7 @@ final class DealerModule implements RouterModuleInterface
                 );
 
                 $call = new Call();
+                $call->setCallMessage($message);
                 $call->setCalleeSession($procedure->getSession());
                 $call->setCallerSession($session);
                 $call->setInvocationMessage($invocation);

@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Tests\Client\Role;
 
-use PE\Component\WAMP\Client\Registration;
+use PE\Component\WAMP\Client\DTO\Registration;
 use PE\Component\WAMP\Client\Role\CalleeAPI;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\RegisterMessage;

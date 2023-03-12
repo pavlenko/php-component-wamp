@@ -4,7 +4,7 @@ namespace PE\Component\WAMP\Router\Role\Broker;
 
 use PE\Component\WAMP\Message\PublishMessage;
 use PE\Component\WAMP\Router\Session\SessionInterface;
-use PE\Component\WAMP\Router\Subscription;
+use PE\Component\WAMP\Router\DTO\Subscription;
 
 final class FeatureBlackWhiteList implements BrokerFeatureInterface
 {

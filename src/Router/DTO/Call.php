@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Router;
+namespace PE\Component\WAMP\Router\DTO;
 
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;

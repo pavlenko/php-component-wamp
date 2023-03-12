@@ -1,6 +1,6 @@
 <?php
 
-namespace PE\Component\WAMP\Client;
+namespace PE\Component\WAMP\Client\DTO;
 
 use React\Promise\Deferred;
 

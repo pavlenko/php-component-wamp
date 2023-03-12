@@ -120,25 +120,23 @@ final class MessageFactory
     }
 
     /**
-     * @param Message     $message
+     * @param Message $message
      * @param string|null $errorUri
+     * @param array $details
      *
      * @return ErrorMessage
-     *
-     * @throws \InvalidArgumentException If the message didn't have a request id
      */
-    public static function createErrorMessageFromMessage(Message $message, string $errorUri = null): ErrorMessage
+    public static function createErrorMessageFromMessage(Message $message, string $errorUri = null, array $details = []): ErrorMessage
     {
         if ($errorUri === null) {
             $errorUri = Message::ERROR_UNKNOWN;
         }
 
+        $requestID = 0;
         if (method_exists($message, 'getRequestId')) {
-            return new ErrorMessage($message->getCode(), $message->getRequestId(), [], $errorUri);
+            $requestID = $message->getRequestId();
         }
 
-        throw new \InvalidArgumentException(
-            "Can't create an error message because the message didn't have a request id"
-        );
+        return new ErrorMessage($message->getCode(), $requestID, $details, $errorUri);
     }
 }

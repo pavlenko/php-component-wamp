@@ -13,7 +13,7 @@ use PE\Component\WAMP\Message\UnsubscribedMessage;
 use PE\Component\WAMP\Message\UnsubscribeMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Role\Broker\BrokerFeatureInterface;
-use PE\Component\WAMP\Router\Subscription;
+use PE\Component\WAMP\Router\DTO\Subscription;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session\SessionInterface;

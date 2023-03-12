@@ -2,7 +2,7 @@
 
 namespace PE\Component\WAMP\Client\Role;
 
-use PE\Component\WAMP\Client\Call;
+use PE\Component\WAMP\Client\DTO\Call;
 use PE\Component\WAMP\Client\Session\SessionInterface;
 use PE\Component\WAMP\Message\CallMessage;
 use PE\Component\WAMP\Message\CancelMessage;
