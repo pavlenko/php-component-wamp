@@ -38,6 +38,17 @@ final class SessionModuleTest extends TestCase
         $module->detach($events);
     }
 
+    public function testOnMessageReceivedHELLO_duplicate()
+    {
+        $module = new SessionModule();
+
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('getSessionID')->willReturn(1);
+        $session->expects(self::once())->method('send')->with(self::isInstanceOf(AbortMessage::class));
+
+        $module->onMessageReceived(new WelcomeMessage(0, []), $session);
+    }
+
     public function testOnMessageReceivedWELCOME()
     {
         $module = new SessionModule();

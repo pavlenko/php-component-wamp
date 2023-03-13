@@ -2,10 +2,12 @@
 
 namespace PE\Component\WAMP\Tests\Router\Session;
 
+use PE\Component\WAMP\Message\AbortMessage;
 use PE\Component\WAMP\Message\GoodbyeMessage;
 use PE\Component\WAMP\Message\HelloMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Router\Router;
+use PE\Component\WAMP\Router\RouterInterface;
 use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Util\EventsInterface;
@@ -39,25 +41,51 @@ final class SessionModuleTest extends TestCase
         $module->detach($events);
     }
 
+    public function testOnMessageReceivedHELLO_no_realm()
+    {
+        $module = new SessionModule();
+        $router = $this->createMock(RouterInterface::class);
+        $router->method('getRealms')->willReturn(['foo']);
+
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('send')->with(self::isInstanceOf(AbortMessage::class));
+
+        $module->onMessageReceived(new HelloMessage('realm', []), $session, $router);
+    }
+
+    public function testOnMessageReceivedHELLO_duplicate()
+    {
+        $module = new SessionModule();
+        $router = $this->createMock(RouterInterface::class);
+
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('getSessionID')->willReturn(1);
+        $session->expects(self::once())->method('send')->with(self::isInstanceOf(AbortMessage::class));
+
+        $module->onMessageReceived(new HelloMessage('realm', []), $session, $router);
+    }
+
     public function testOnMessageReceivedHELLO()
     {
         $module = new SessionModule();
+        $router = $this->createMock(RouterInterface::class);
 
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())->method('setSessionID');
         $session->expects(self::once())->method('send')->with(self::isInstanceOf(WelcomeMessage::class));
 
-        $module->onMessageReceived(new HelloMessage('realm', []), $session);
+        $module->onMessageReceived(new HelloMessage('realm', []), $session, $router);
     }
 
     public function testOnMessageReceivedGOODBYE()
     {
         $module = new SessionModule();
+        $router = $this->createMock(RouterInterface::class);
 
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())->method('send')->with(self::isInstanceOf(GoodbyeMessage::class));
         $session->expects(self::once())->method('shutdown');
 
-        $module->onMessageReceived(new GoodbyeMessage([], 'foo'), $session);
+        $module->onMessageReceived(new GoodbyeMessage([], 'foo'), $session, $router);
     }
 }
