@@ -17,7 +17,7 @@ final class AuthenticationModule implements ClientModuleInterface
     /**
      * @var MethodInterface[]
      */
-    private array $methods = [];
+    private array $methods;
 
     /**
      * @param MethodInterface ...$methods

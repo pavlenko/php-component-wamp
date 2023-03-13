@@ -16,11 +16,17 @@ final class TicketMethod implements MethodInterface
         $this->ticket = $ticket;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getName(): string
     {
         return 'ticket';
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function processHelloMessage(SessionInterface $session, HelloMessage $message): void
     {
         // DO NOTHING
