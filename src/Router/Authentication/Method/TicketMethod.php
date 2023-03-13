@@ -46,7 +46,7 @@ final class TicketMethod implements MethodInterface
             $session->setSessionID($sessionID);
             $session->send(new WelcomeMessage($sessionID, []));
         } else {
-            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_NOT_AUTHORIZED));
+            $session->send(MessageFactory::createErrorMessageFromMessage($message, Message::ERROR_AUTHORIZATION_FAILED));
         }
         return true;
     }
