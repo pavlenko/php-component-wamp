@@ -7,7 +7,7 @@ use PE\Component\WAMP\Connection\ConnectionInterface;
 trait SessionBaseTrait
 {
     private ConnectionInterface $connection;
-    private int $id;
+    private int $id = 0;
     private array $data = [];
 
     public function __construct(ConnectionInterface $connection)

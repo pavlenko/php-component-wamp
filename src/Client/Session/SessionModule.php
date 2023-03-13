@@ -2,7 +2,6 @@
 
 namespace PE\Component\WAMP\Client\Session;
 
-use PE\Component\WAMP\Client\Client;
 use PE\Component\WAMP\Client\ClientInterface;
 use PE\Component\WAMP\Client\ClientModuleInterface;
 use PE\Component\WAMP\Message\AbortMessage;
@@ -44,9 +43,17 @@ final class SessionModule implements ClientModuleInterface
 
     private function processWelcomeMessage(SessionInterface $session, WelcomeMessage $message): void
     {
+        if (0 !== $session->getSessionID()) {
+            $session->send(new AbortMessage(
+                ['message' => 'Received WELCOME message after session was established.'],
+                Message::ERROR_PROTOCOL_VIOLATION
+            ));
+            return;
+        }
+
         $session->setSessionID($message->getSessionId());
         if ($this->events) {
-            $this->events->trigger(Client::EVENT_SESSION_ESTABLISHED, $session);
+            $this->events->trigger(ClientInterface::EVENT_SESSION_ESTABLISHED, $session);
         }
     }
 

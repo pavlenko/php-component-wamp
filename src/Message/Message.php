@@ -83,6 +83,7 @@ abstract class Message implements \JsonSerializable
     public const ERROR_NO_ELIGIBLE_CALLEE            = 'wamp.error.no_eligible_callee';
     public const ERROR_OPTION_DISALLOWED_DISCLOSE_ME = 'wamp.error.option_disallowed.disclose_me';
     public const ERROR_NETWORK_FAILURE               = 'wamp.error.network_failure';
+    public const ERROR_PROTOCOL_VIOLATION            = 'wamp.error.protocol_violation';
 
     /**
      * @return int

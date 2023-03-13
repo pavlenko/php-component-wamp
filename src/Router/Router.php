@@ -29,6 +29,11 @@ final class Router implements RouterInterface
     private LoggerInterface $logger;
 
     /**
+     * @var string[]
+     */
+    private array $realms = [];
+
+    /**
      * @var RouterModuleInterface[]
      */
     private array $modules = [];
@@ -76,7 +81,7 @@ final class Router implements RouterInterface
     public function processMessageReceived(ConnectionInterface $connection, Message $message): void
     {
         $this->logger->info('<-- ' . $message);
-        $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $this->sessions[$connection]);
+        $this->events->trigger(self::EVENT_MESSAGE_RECEIVED, $message, $this->sessions[$connection], $this);
     }
 
     public function processMessageSend(ConnectionInterface $connection, Message $message): void
@@ -91,6 +96,16 @@ final class Router implements RouterInterface
         $this->logger->debug("\n{$exception->getTraceAsString()}");
 
         $this->events->trigger(self::EVENT_CONNECTION_ERROR, $this->sessions[$connection]);
+    }
+
+    public function getRealms(): array
+    {
+        return $this->realms;
+    }
+
+    public function setRealms(array $realms): void
+    {
+        $this->realms = $realms;
     }
 
     public function setTransport(TransportInterface $transport): void
