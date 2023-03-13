@@ -73,9 +73,9 @@ abstract class Message implements \JsonSerializable
     public const ERROR_NO_SUCH_ROLE                  = 'wamp.error.no_such_role';
     public const ERROR_PROCEDURE_ALREADY_EXISTS      = 'wamp.error.procedure_already_exists';
     public const ERROR_INVALID_ARGUMENT              = 'wamp.error.invalid_argument';
-    public const ERROR_SYSTEM_SHUTDOWN               = 'wamp.error.system_shutdown';
-    public const ERROR_CLOSE_REALM                   = 'wamp.error.close_realm';
-    public const ERROR_GOODBYE_AND_OUT               = 'wamp.error.goodbye_and_out';
+    public const ERROR_SYSTEM_SHUTDOWN               = 'wamp.close.system_shutdown';
+    public const ERROR_CLOSE_REALM                   = 'wamp.close.close_realm';
+    public const ERROR_GOODBYE_AND_OUT               = 'wamp.close.goodbye_and_out';
     public const ERROR_NOT_AUTHORIZED                = 'wamp.error.not_authorized';
     public const ERROR_AUTHORIZATION_FAILED          = 'wamp.error.authorization_failed';
     public const ERROR_CANCELLED                     = 'wamp.error.canceled';

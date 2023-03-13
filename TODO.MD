@@ -4,7 +4,9 @@
 - Authentication
   - Transport-level Authentication (router only)
     - TLS Certificate Authentication
-- Standardize structure: modules, dtos, etc
+- maybe change session logic:
+  - set id on create session
+  - add isAuthorized flag for check later
 
 ## Message flow
 HELLO
