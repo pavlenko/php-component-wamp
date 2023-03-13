@@ -96,7 +96,7 @@ final class BrokerModule implements RouterModuleInterface
         $publicationID = Util::generateID();
 
         foreach ($this->subscriptions as $subscription) {
-            if ($session !== $subscription->getSession() && $subscription->getTopic() === $message->getTopic()) {
+            if (/*$session !== $subscription->getSession() && */$subscription->getTopic() === $message->getTopic()) {
 //                foreach ($this->features as $feature) {
 //                    if (!$feature->processPublishMessage($session, $message, $subscription)) {
 //                        //TODO what is do here???
