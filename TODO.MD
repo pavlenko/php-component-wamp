@@ -7,6 +7,12 @@
 - maybe change session logic:
   - set id on create session
   - add isAuthorized flag for check later
+- Broker
+  - see \Ratchet\Wamp\TopicManager and \Ratchet\Wamp\Topic as ref
+    for refactoring: create topics with subscriptions
+    instead of global subscriptions list
+- Session:
+  - add some user identity for identify users instead of connections
 
 ## Message flow
 HELLO
