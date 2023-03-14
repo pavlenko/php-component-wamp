@@ -7,7 +7,7 @@ use PE\Component\WAMP\Router\Session\SessionInterface;
 /**
  * @codeCoverageIgnore
  */
-final class Procedure
+final class Registration
 {
     private SessionInterface $session;
     private string $procedureURI;

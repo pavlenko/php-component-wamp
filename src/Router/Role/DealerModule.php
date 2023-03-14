@@ -17,7 +17,7 @@ use PE\Component\WAMP\Message\UnregisterMessage;
 use PE\Component\WAMP\Message\WelcomeMessage;
 use PE\Component\WAMP\Message\YieldMessage;
 use PE\Component\WAMP\Router\DTO\Call;
-use PE\Component\WAMP\Router\DTO\Procedure;
+use PE\Component\WAMP\Router\DTO\Registration;
 use PE\Component\WAMP\Router\Router;
 use PE\Component\WAMP\Router\RouterModuleInterface;
 use PE\Component\WAMP\Router\Session\SessionInterface;
@@ -33,7 +33,7 @@ final class DealerModule implements RouterModuleInterface
     private array $features;
 
     /**
-     * @var Procedure[]
+     * @var Registration[]
      */
     private array $procedures = [];
 
@@ -143,7 +143,7 @@ final class DealerModule implements RouterModuleInterface
             }
         }
 
-        $this->procedures[] = new Procedure($session, $message->getProcedureURI(), $registrationID);
+        $this->procedures[] = new Registration($session, $message->getProcedureURI(), $registrationID);
 
         $session->send(new RegisteredMessage($message->getRequestID(), $registrationID));
     }
