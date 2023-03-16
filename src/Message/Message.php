@@ -14,7 +14,6 @@ abstract class Message implements \JsonSerializable
     public const CODE_CHALLENGE    = 4; // advanced
     public const CODE_AUTHENTICATE = 5; // advanced
     public const CODE_GOODBYE      = 6;
-    public const CODE_HEARTBEAT    = 7; // advanced
     public const CODE_ERROR        = 8;
     public const CODE_PUBLISH      = 16;
     public const CODE_PUBLISHED    = 17;

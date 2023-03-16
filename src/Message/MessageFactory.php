@@ -99,10 +99,6 @@ final class MessageFactory
             case Message::CODE_CHALLENGE:
                 // [CHALLENGE, AuthMethod|string, Extra|dict]
                 return new ChallengeMessage($arg0, $arg1);
-            case Message::CODE_HEARTBEAT:
-                // [HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer
-                // [HEARTBEAT, IncomingSeq|integer, OutgoingSeq|integer, Discard|string]
-                return new HeartbeatMessage($arg0, $arg1, $arg2);
             case Message::CODE_CANCEL:
                 // [CANCEL, CALL.Request|id, Options|dict]
                 return new CancelMessage($arg0, $arg1);
