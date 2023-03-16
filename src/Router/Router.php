@@ -5,7 +5,7 @@ namespace PE\Component\WAMP\Router;
 use PE\Component\WAMP\Connection\ConnectionInterface;
 use PE\Component\WAMP\FactoryInterface;
 use PE\Component\WAMP\Message\Message;
-use PE\Component\WAMP\Router\Session\Session;
+use PE\Component\WAMP\Router\Session\SessionInterface;
 use PE\Component\WAMP\Router\Session\SessionModule;
 use PE\Component\WAMP\Router\Transport\TransportInterface;
 use PE\Component\WAMP\Util\Events;
@@ -13,14 +13,20 @@ use PE\Component\WAMP\Util\EventsInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\TimerInterface;
 
 final class Router implements RouterInterface
 {
-    const EVENT_CONNECTION_OPEN  = 'wamp.router.connection_open';
-    const EVENT_CONNECTION_CLOSE = 'wamp.router.connection_close';
-    const EVENT_CONNECTION_ERROR = 'wamp.router.connection_error';
-    const EVENT_MESSAGE_RECEIVED = 'wamp.router.message_received';
-    const EVENT_MESSAGE_SEND     = 'wamp.router.message_send';
+    public const EVENT_CONNECTION_OPEN  = 'wamp.router.connection_open';
+    public const EVENT_CONNECTION_CLOSE = 'wamp.router.connection_close';
+    public const EVENT_CONNECTION_ERROR = 'wamp.router.connection_error';
+    public const EVENT_MESSAGE_RECEIVED = 'wamp.router.message_received';
+    public const EVENT_MESSAGE_SEND     = 'wamp.router.message_send';
+
+    private const PING_INTERVAL = 120;
+
+    private int $pingInterval = self::PING_INTERVAL;
+    private ?TimerInterface $pingTimer = null;
 
     private ?TransportInterface $transport = null;
     private FactoryInterface $factory;
@@ -39,7 +45,7 @@ final class Router implements RouterInterface
     private array $modules = [];
 
     /**
-     * @var \SplObjectStorage|Session[]
+     * @var \SplObjectStorage|SessionInterface[]
      */
     private $sessions;
 
@@ -123,6 +129,13 @@ final class Router implements RouterInterface
         $this->transport->start($this, $this->loop, $this->logger);
 
         if ($startLoop) {
+            $this->pingTimer = $this->loop->addPeriodicTimer($this->pingInterval, function () {
+                /* @var $connection ConnectionInterface */
+                foreach ($this->sessions as $connection) {
+                    $connection->ping();
+                }
+            });
+
             $this->loop->run();
         }
     }
@@ -130,6 +143,9 @@ final class Router implements RouterInterface
     public function stop(): void
     {
         $this->logger->info('Router: stop');
+        if ($this->pingTimer) {
+            $this->loop->cancelTimer($this->pingTimer);
+        }
         $this->transport->stop();
     }
 

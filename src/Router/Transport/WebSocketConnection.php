@@ -26,9 +26,12 @@ final class WebSocketConnection extends Connection
         $this->connection->close();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function ping(): void
     {
-        // TODO: Implement ping() method.
+        // Do nothing for this transport
     }
 
     /**

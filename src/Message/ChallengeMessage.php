@@ -71,7 +71,7 @@ final class ChallengeMessage extends Message
      */
     public function setAuthenticationMethod(string $authenticationMethod): ChallengeMessage
     {
-        $this->authenticationMethod = (string) $authenticationMethod;
+        $this->authenticationMethod = $authenticationMethod;
         return $this;
     }
 

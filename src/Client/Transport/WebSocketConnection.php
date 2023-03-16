@@ -31,8 +31,13 @@ final class WebSocketConnection extends Connection
         $this->socket->close();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function ping(): void
-    {}
+    {
+        //Do nothing for this transport
+    }
 
     public function getTransportDetails(): array
     {

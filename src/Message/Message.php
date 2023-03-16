@@ -41,7 +41,6 @@ abstract class Message implements \JsonSerializable
         self::CODE_CHALLENGE    => 'CHALLENGE',
         self::CODE_AUTHENTICATE => 'AUTHENTICATE',
         self::CODE_GOODBYE      => 'GOODBYE',
-        self::CODE_HEARTBEAT    => 'HEARTBEAT',
         self::CODE_ERROR        => 'ERROR',
         self::CODE_PUBLISH      => 'PUBLISH',
         self::CODE_PUBLISHED    => 'PUBLISHED',
