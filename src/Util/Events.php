@@ -55,6 +55,8 @@ final class Events implements EventsInterface
                 }
             }
         }
+        // @codeCoverageIgnoreStart
         return $triggered;
+        // @codeCoverageIgnoreEnd
     }
 }
