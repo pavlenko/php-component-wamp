@@ -59,7 +59,7 @@ final class SessionModule implements ClientModuleInterface
 
     private function processGoodbyeMessage(SessionInterface $session): void
     {
-        $session->send(new GoodbyeMessage([], Message::ERROR_GOODBYE_AND_OUT));
+        $session->send(new GoodbyeMessage([], Message::CLOSE_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 

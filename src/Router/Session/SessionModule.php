@@ -60,7 +60,7 @@ final class SessionModule implements RouterModuleInterface
 
     private function processGoodbyeMessage(SessionInterface $session/*, GoodbyeMessage $message*/): void
     {
-        $session->send(new GoodbyeMessage([], Message::ERROR_GOODBYE_AND_OUT));
+        $session->send(new GoodbyeMessage([], Message::CLOSE_GOODBYE_AND_OUT));
         $session->shutdown();
     }
 }
