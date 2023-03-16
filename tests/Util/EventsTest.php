@@ -14,7 +14,7 @@ final class EventsTest extends TestCase
 
         $handler = function () use (&$count) {
             $count++;
-            return false;
+            return false;//<-- this will break execution of other listeners
         };
 
         $events->trigger('event');
@@ -23,9 +23,10 @@ final class EventsTest extends TestCase
 
         $events->attach('event', $handler);
         $events->attach('event', $handler2 = fn() => 1);
-        $events->trigger('event');
+        $triggered = $events->trigger('event');
 
         self::assertSame(1, $count);
+        self::assertSame(1, $triggered);
 
         $events->detach('event', $handler);
         $events->detach('event', $handler2);
