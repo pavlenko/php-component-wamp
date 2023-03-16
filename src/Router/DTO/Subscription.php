@@ -11,7 +11,7 @@ final class Subscription
 {
     private SessionInterface $session;
     private string $topic;
-    private int $subscriptionID = 0;
+    private int $subscriptionID;
 
     public function __construct(SessionInterface $session, string $topic, int $subscriptionID)
     {

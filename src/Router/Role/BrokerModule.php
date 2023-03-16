@@ -96,14 +96,7 @@ final class BrokerModule implements RouterModuleInterface
         $publicationID = Util::generateID();
 
         foreach ($this->subscriptions as $subscription) {
-            if (/*$session !== $subscription->getSession() && */$subscription->getTopic() === $message->getTopic()) {
-//                foreach ($this->features as $feature) {
-//                    if (!$feature->processPublishMessage($session, $message, $subscription)) {
-//                        //TODO what is do here???
-//                        break;
-//                    }
-//                }
-
+            if ($subscription->getTopic() === $message->getTopic()) {
                 // If publisher_identification feature supported and $message->getOption('disclose_me') === true
                 //   you can send $details['publisher'] = <publisher_session_id>
                 $subscription->getSession()->send(new EventMessage(
