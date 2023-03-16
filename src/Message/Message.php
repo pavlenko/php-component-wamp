@@ -71,7 +71,7 @@ abstract class Message implements \JsonSerializable
     public const ERROR_NO_SUCH_SUBSCRIPTION          = 'wamp.error.no_such_subscription';
     public const ERROR_NO_SUCH_REALM                 = 'wamp.error.no_such_realm';
     public const ERROR_NO_SUCH_ROLE                  = 'wamp.error.no_such_role';
-    public const ERROR_NO_SUCH_SESSION               = 'wamp.error.no_such_session';
+    public const ERROR_NO_SUCH_SESSION               = 'wamp.error.no_such_session';// advanced
     public const ERROR_NO_SUCH_PRINCIPAL             = 'wamp.error.no_such_principal';// advanced
     public const ERROR_PROCEDURE_ALREADY_EXISTS      = 'wamp.error.procedure_already_exists';
     public const ERROR_INVALID_ARGUMENT              = 'wamp.error.invalid_argument';
@@ -87,6 +87,7 @@ abstract class Message implements \JsonSerializable
     public const ERROR_NO_ELIGIBLE_CALLEE            = 'wamp.error.no_eligible_callee';
     public const ERROR_OPTION_DISALLOWED_DISCLOSE_ME = 'wamp.error.option_disallowed.disclose_me';
     public const ERROR_NETWORK_FAILURE               = 'wamp.error.network_failure';
+    public const ERROR_PAYLOAD_SIZE_EXCEED           = 'wamp.error.payload_size_exceeded';
     public const ERROR_PROTOCOL_VIOLATION            = 'wamp.error.protocol_violation';
     public const ERROR_FEATURE_NOT_SUPPORTED         = 'wamp.error.feature_not_supported';// advanced
     public const ERROR_TIMEOUT                       = 'wamp.error.timeout';// advanced
